@@ -2,21 +2,30 @@ import { useState } from 'react'
 
 import './App.css'
 import Navbar from './components/Navbar.jsx'
-import Form from './components/Form.jsx'
+import Evaluation from './pages/Evaluation.jsx'
 import './index.css'
-import { ThemeProvider } from '@emotion/react'
-
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 function App() {
   const [count, setCount] = useState(0)
-
+  const [showTest1, setShowTest1] = useState(false);
   return (
-      <div className='main-content'>
-        <Navbar />
-        <div className="test">
-          <Form></Form>
-        </div>
+      <div className='app'>
+        <BrowserRouter>
 
+          <Navbar />
+
+          <div className="content">
+            <Routes>
+              <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
+            </Routes>
+          </div>
+
+        </BrowserRouter>
       </div>
 
 

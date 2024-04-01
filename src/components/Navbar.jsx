@@ -10,6 +10,8 @@ import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import { Hidden } from '@mui/material';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
 
 function Navbar() {
     return (
@@ -43,6 +45,16 @@ function Navbar() {
                 <ListItemText primary="Eventos" />
                 </ListItemButton>
             </ListItem>
+            <Link to="/Evaluaciones">
+                <ListItem disablePadding>
+                    <ListItemButton>
+                    <ListItemIcon>
+                        <DraftsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Evaluaciones" />
+                    </ListItemButton>
+                </ListItem>
+            </Link>
 
             </List>
         </nav>

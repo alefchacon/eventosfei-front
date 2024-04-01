@@ -5,18 +5,23 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
-export default function RowRadioButtonsGroup() {
+export default function RowRadioButtonsGroup( {onRadioChange} ) {
+  const [value, setValue] = React.useState(0);
+  const handleChange = (event) => {
+    onRadioChange(event.target.value);
+  }
   return (
     <FormControl>
       <FormLabel id="demo-row-radio-buttons-group-label">Subtitulo</FormLabel>
       <RadioGroup
-        column
+        column='true'
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
+        onChange={handleChange}
       >
-        <FormControlLabel value="female" control={<Radio />} label="Opción 1" />
-        <FormControlLabel value="male" control={<Radio />} label="Opción 2" />
-        <FormControlLabel value="other" control={<Radio />} label="Opción 3" />
+        <FormControlLabel value="3" control={<Radio />} label="Sí" />
+        <FormControlLabel value="1" control={<Radio />} label="No" />
+        <FormControlLabel value="2" control={<Radio />} label="En parte" />
 
       </RadioGroup>
     </FormControl>

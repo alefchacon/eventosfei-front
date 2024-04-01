@@ -3,8 +3,16 @@ import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import Typography from '@mui/material/Typography';
 
-export default function BasicRating() {
-  const [value, setValue] = React.useState(2);
+
+export default function BasicRating(props, { setRating }) {
+
+  const {question = "Pregunta", asdf} = props
+
+  const [value, setValue] = React.useState(0);
+
+  const sendRatingToParent = (rating) => {
+    setRating(rating);
+  };
 
   return (
     <Box
@@ -12,13 +20,14 @@ export default function BasicRating() {
         '& > legend': { mt: 2 },
       }}
     >
-      <Typography component="legend">Controlled</Typography>
+      <Typography component="legend">{question}</Typography>
       <Rating
         name="simple-controlled"
         value={value}
         size="large"
-        onChange={(event, newValue) => {
-          setValue(newValue);
+        onChange={(event, newRating) => {
+          setValue(newRating);
+          sendRatingToParent(newRating)
         }}
       />
     </Box>
