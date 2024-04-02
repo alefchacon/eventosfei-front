@@ -76,7 +76,7 @@ export default function Form () {
                 <Box
                     noValidate
                     autoComplete="off"
-                    bgcolor='red'
+                    //bgcolor='red'
                     sx = {{
                         flexGrow: 1,
                     }}

@@ -37,14 +37,17 @@ function Navbar() {
                 </ListItemButton>
             </ListItem>
 
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Eventos" />
-                </ListItemButton>
-            </ListItem>
+            <Link to="/miseventos">
+                <ListItem disablePadding>
+                    <ListItemButton>
+                    <ListItemIcon>
+                        <DraftsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Eventos" />
+                    </ListItemButton>
+                </ListItem>
+            </Link>
+
             <Link to="/Evaluaciones">
                 <ListItem disablePadding>
                     <ListItemButton>

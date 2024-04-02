@@ -1,17 +1,3 @@
-import { useState } from 'react'
-
-import './App.css'
-import Appbar from './components/Appbar.jsx'
-import Navbar from './components/Navbar.jsx'
-import Evaluation from './pages/Evaluation.jsx'
-import Eventos from './pages/Eventos.jsx'
-import './index.css'
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link
-} from "react-router-dom";
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
@@ -30,12 +16,10 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import DraftsIcon from '@mui/icons-material/Drafts';
 
 const drawerWidth = 240;
 
-
-function App(props) {
+function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -61,53 +45,20 @@ function App(props) {
       <Typography variant='h4' sx={{ padding: '10px'}}>SEAFEI</Typography>
       <Divider />
       <List>
-        <Link to="/miseventos">
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Calendario" />
-                </ListItemButton>
-            </ListItem>
-        </Link>
-        <Link to="/miseventos">
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Notificaciones" />
-                </ListItemButton>
-            </ListItem>
-        </Link>
-        <Link to="/miseventos">
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Eventos" />
-                </ListItemButton>
-            </ListItem>
-        </Link>
-        <Link to="/Evaluaciones">
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Evaluación" />
-                </ListItemButton>
-            </ListItem>
-        </Link>
-
-
-        
+        {['Calendario', 'Notificaciones', 'Eventos'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
       <Divider />
       <List>
-        {['Otro coso'].map((text, index) => (
+        {['All mail', 'Trash', 'Spam'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -186,13 +137,6 @@ function App(props) {
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-          <div className="content">
-            <Routes>
-              
-              <Route path='/miseventos' element={<Eventos/>}> </Route>
-              <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
-            </Routes>
-          </div>
 
 
 
@@ -202,4 +146,4 @@ function App(props) {
 }
 
 
-export default App;
+export default ResponsiveDrawer;

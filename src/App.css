@@ -24,7 +24,7 @@ html, body {
 }
 
 .form{
-  background-color: blue;
+  /*background-color: blue;*/
 
   display: flex;
   flex-grow: 1;
@@ -33,14 +33,14 @@ html, body {
   height: 100%;
 }
 .form-page{
-  background-color: yellow;
+  /*background-color: yellow;*/
   display: flex;
   flex-grow: 1;
   flex-direction: column;
 }
 
 .content{
-  background-color: cyan;
+  /*background-color: cyan;*/
   margin: 20px;
   flex-grow: 1;
   width: 100%;

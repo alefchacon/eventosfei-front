@@ -34,7 +34,7 @@ export default function Progress({ changePage }) {
         height: '40vh', 
         padding: 5,
         width: 30,
-        bgcolor: 'green',
+        //bgcolor: 'green',
         paddingTop: 10,
         paddingBottom: 10,
         paddingLeft: 5,
