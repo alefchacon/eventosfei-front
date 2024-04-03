@@ -7,6 +7,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
 
+import {
+  Link
+} from "react-router-dom";
+
 const bull = (
   <Box
     component="span"
@@ -36,7 +40,7 @@ export default function EventCard({props, parentHandle}, {key}) {
       <CardContent sx={{ mb: -3 }}>
         <Container disableGutters={true} sx = {{ padding: 0, display: 'flex', justifyContent: 'space-between'}}>
           <Typography variant="h6" component="div">
-            <a href="/Evento" >{name}</a>
+            <Link to="/Evento" onClick={handle}> {name} </Link>
           </Typography>
           <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
             {status}

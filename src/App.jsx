@@ -203,7 +203,7 @@ function App(props) {
             
             <Route path='/Eventos' element={<Eventos setSelectedFEIEvent={handleFEIEventSelection}/>}> </Route>
             <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
-            <Route path='/Evento' element={<Event/>}> </Route>
+            <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
           </Routes>
         </div>
 
