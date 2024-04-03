@@ -30,6 +30,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import DraftsIcon from '@mui/icons-material/Drafts';
 
+import Event from './pages/Event.jsx'
+
 const drawerWidth = 240;
 
 
@@ -38,6 +40,12 @@ function App(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [currentSection, setCurrentSection] = React.useState('Calendario');
+  const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
+
+  const handleFEIEventSelection = (FEIEvent) =>{
+    setSelectedFEIEvent(FEIEvent)
+    console.log(FEIEvent)
+  }
 
   const handleSelection = (event) => {
     setCurrentSection(event.currentTarget.id);
@@ -193,8 +201,9 @@ function App(props) {
         <div className="content">
           <Routes>
             
-            <Route path='/Eventos' element={<Eventos/>}> </Route>
+            <Route path='/Eventos' element={<Eventos setSelectedFEIEvent={handleFEIEventSelection}/>}> </Route>
             <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
+            <Route path='/Evento' element={<Event/>}> </Route>
           </Routes>
         </div>
 
