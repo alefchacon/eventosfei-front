@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 const marks = [
   {
@@ -31,15 +32,20 @@ export default function Progress({ changePage }) {
     <Box 
       height={300} 
       sx={{
-        height: '40vh', 
+        height: '60vh', 
         padding: 5,
-        width: 30,
-        //bgcolor: 'green',
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 5,
-        paddingRight: 5,
+        bgcolor: 'green',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}>
+      <Typography
+        sx = {{
+          paddingBottom: '50px'
+        }}
+      >
+        Progreso
+      </Typography>
       <Slider
         onChangeCommitted={ handleChange }
         track='inverted'
@@ -54,8 +60,8 @@ export default function Progress({ changePage }) {
         sx={{
           // Increase the size of the marks
           '& .MuiSlider-mark': {
-            width: '3vh',
-            height: '3vh',
+            width: '5vh',
+            height: '5vh',
             borderRadius: '50%',
             backgroundColor: '#a7caed',
             '&.MuiSlider-markActive': {
@@ -72,8 +78,8 @@ export default function Progress({ changePage }) {
           },
           // Custom styling for the thumb to ensure it doesn't get overshadowed
           '& .MuiSlider-thumb': {
-            width: '4vh',
-            height: '4vh',
+            width: '6vh',
+            height: '6vh',
             marginBottom: '2vh'
           },
           // Make sure the rail doesn't overshadow the marks

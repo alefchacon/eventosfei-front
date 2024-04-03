@@ -1,8 +1,6 @@
 import { useState } from 'react'
 
 import './App.css'
-import Appbar from './components/Appbar.jsx'
-import Navbar from './components/Navbar.jsx'
 import Evaluation from './pages/Evaluation.jsx'
 import Eventos from './pages/Eventos.jsx'
 import './index.css'
@@ -39,6 +37,11 @@ function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [currentSection, setCurrentSection] = React.useState('Calendario');
+
+  const handleSelection = (event) => {
+    setCurrentSection(event.currentTarget.id);
+  }
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -61,7 +64,7 @@ function App(props) {
       <Typography variant='h4' sx={{ padding: '10px'}}>SEAFEI</Typography>
       <Divider />
       <List>
-        <Link to="/miseventos">
+        <Link to="/miseventos" onClick={handleSelection} id='Calendario'>
             <ListItem disablePadding>
                 <ListItemButton>
                 <ListItemIcon>
@@ -71,17 +74,17 @@ function App(props) {
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/miseventos">
+        <Link to="/Notificaciones" onClick={handleSelection} id='Notificaciones'>
             <ListItem disablePadding>
                 <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Notificaciones" />
+                  <ListItemIcon>
+                      <DraftsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Notificaciones"/>
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/miseventos">
+        <Link to="/Eventos" onClick={handleSelection} id='Eventos'>
             <ListItem disablePadding>
                 <ListItemButton>
                 <ListItemIcon>
@@ -91,7 +94,7 @@ function App(props) {
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/Evaluaciones">
+        <Link to="/Evaluaciones" onClick={handleSelection} id='Evaluaciones'>
             <ListItem disablePadding>
                 <ListItemButton>
                 <ListItemIcon>
@@ -132,27 +135,29 @@ function App(props) {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          bgcolor: '--secondary-blue'
         }}
       >
-        <Toolbar>
+        <Toolbar >
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: 'none' }  }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Responsive drawer
+            {currentSection}
           </Typography>
         </Toolbar>
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 },  }}
         aria-label="mailbox folders"
+        
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
@@ -173,30 +178,29 @@ function App(props) {
         </Drawer>
         <Drawer
           variant="permanent"
+          
           sx={{
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            
           }}
           open
         >
           {drawer}
         </Drawer>
       </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-      >
-          <div className="content">
-            <Routes>
-              
-              <Route path='/miseventos' element={<Eventos/>}> </Route>
-              <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
-            </Routes>
-          </div>
+
+        <div className="content">
+          <Routes>
+            
+            <Route path='/Eventos' element={<Eventos/>}> </Route>
+            <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
+          </Routes>
+        </div>
 
 
 
-      </Box>
+
     </Box>
   );
 }

@@ -7,5 +7,5 @@ export default async function GetEvents(){
           'Content-Type': 'application/json',
         },
     });
-    return await response.json();
+    return response;
 }
