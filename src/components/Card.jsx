@@ -16,21 +16,27 @@ const bull = (
   </Box>
 );
 
-export default function EventCard(props, key) {
+export default function EventCard({props, parentHandle}, {key}) {
   const {
-    nombre,
+    id=0,
+    name = "nombre del evento",
     status = "Estado",
     organizer = "Nombre del organizador",
     program = "Programa educativo",
     schedule = "31 de diciembre del 9999 - 23:59 hrs",
     space = "Espacio",
-  } = props.props 
+  } = props
+
+  function handle(){
+    parentHandle(props)
+  }
+
   return (
     <Card sx={{ minWidth: '50%', maxHeight: 250 }}>
       <CardContent sx={{ mb: -3 }}>
         <Container disableGutters={true} sx = {{ padding: 0, display: 'flex', justifyContent: 'space-between'}}>
           <Typography variant="h6" component="div">
-            <a href="">{nombre}</a>
+            <a href="/Evento" >{name}</a>
           </Typography>
           <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
             {status}
@@ -50,7 +56,7 @@ export default function EventCard(props, key) {
         </Typography>
       </CardContent>
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end'}}>
-        <Button size="medium">Editar</Button>
+        <Button size="medium" onClick={handle}>Editar</Button>
         <Button size="medium" color='error'>Cancelar</Button>
       </CardActions>
     </Card>

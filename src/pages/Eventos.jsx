@@ -7,10 +7,14 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '../components/CircularProgress.jsx';
 import { Container } from '@mui/material';
 
-export default function Eventos () {
+export default function Eventos ({setSelectedFEIEvent}) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const itemRef = useRef(items)
+
+    const handle = (FEIEvent) => {
+        setSelectedFEIEvent(FEIEvent)
+    }
+
     useEffect(() => {
 
         // Simulate fetching data with static data
@@ -35,8 +39,8 @@ export default function Eventos () {
         fetchData();
       }, []); // Empty dependency array means this effect runs once on mount
       
-      //{loading && <CircularProgress></CircularProgress>}
     return (
+        
         <>
             {loading &&
                 <Container sx = {{
@@ -54,7 +58,7 @@ export default function Eventos () {
             }
             <Stack spacing={2}>
             {items.map((item) => (
-                <Card props={item} key={item.idEvento}></Card>
+                <Card props={item} key={item.id} parentHandle={handle}></Card>
             ))}
             </Stack>
         </>

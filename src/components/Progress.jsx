@@ -22,11 +22,13 @@ const marks = [
 ];
 
 
-export default function Progress({ changePage }) {
+export default function Progress({props, changePage }) {
 
   const handleChange = (event, newValue) => {
     changePage(newValue); // Call the parent's callback function with the new value
   };
+
+  console.log(props)
 
   return (
     <Box 

@@ -165,7 +165,7 @@ export default function Form () {
                 </Box>
 
 
-                <Progress changePage={handleChangePage}></Progress>
+                <Progress props={{asdf: "asdf", qwer: "qwer"}} changePage={handleChangePage}></Progress>
             </div>
         </div>
     );
