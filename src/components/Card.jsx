@@ -6,6 +6,8 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 
 import {
   Link
@@ -24,7 +26,7 @@ export default function EventCard({props, parentHandle}, {key}) {
   const {
     id=0,
     name = "nombre del evento",
-    status = "Estado",
+    status = {name: "estado"},
     organizer = "Nombre del organizador",
     program = "Programa educativo",
     schedule = "31 de diciembre del 9999 - 23:59 hrs",
@@ -34,6 +36,9 @@ export default function EventCard({props, parentHandle}, {key}) {
   function handle(){
     parentHandle(props)
   }
+  const handleClick = () => {
+    console.info('You clicked the Chip.');
+  };
 
   return (
     <Card sx={{ minWidth: '50%', maxHeight: 250 }}>
@@ -42,9 +47,7 @@ export default function EventCard({props, parentHandle}, {key}) {
           <Typography variant="h6" component="div">
             <Link to="/Evento" onClick={handle}> {name} </Link>
           </Typography>
-          <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
-            {status}
-          </Typography>
+          <Chip label={status.name} onClick={handleClick} />
         </Container>
         <Typography color="text.primary">
           Organizador: {organizer}

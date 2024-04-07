@@ -7,7 +7,6 @@
 
 
 .form{
-  background-color: blue;
 
   display: flex;
   /*height: 'inherit';*/
@@ -17,15 +16,19 @@
   flex-direction: row;
   overflow: hidden;
 }
-.form-page{
-  background-color: yellow;
-  display: flex;
-  flex-direction: column;
+
+.form-box{
+  background-color: white;
+  margin: 0 10px 0 10px;
 }
 
-.test{
-  background-color: red;
+.form-page{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
 }
+
 
 main{
   background-color: var(--gray-bg);
@@ -37,11 +40,23 @@ main{
 }
 
 .content{
-  /*background-color: cyan;*/
 
   margin-top: 80px;
-  margin-right: 50px;
-  margin-left: 50px;
-  flex: 1;
+  width: 100%;
+  min-height: 100%;
+  overflow: scroll;
 }
 
+
+.progress-horizontal{
+  position: relative;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding-bottom: 20px;
+}
+
+.sidebar-link{
+  color: white;
+}

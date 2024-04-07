@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import './App.css'
 import Evaluation from './pages/Evaluation.jsx'
-import Eventos from './pages/Eventos.jsx'
+import EventList from './pages/EventList.jsx'
 import './index.css'
 import {
   BrowserRouter,
@@ -29,6 +29,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import DraftsIcon from '@mui/icons-material/Drafts';
+import Button from "@mui/material/Button";
+import Stack from '@mui/material/Stack';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Badge from '@mui/material/Badge';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import FestivalIcon from '@mui/icons-material/Festival';
 
 import Event from './pages/Event.jsx'
 
@@ -44,7 +54,7 @@ function App(props) {
 
   const handleFEIEventSelection = (FEIEvent) =>{
     setSelectedFEIEvent(FEIEvent)
-    console.log(FEIEvent)
+    setCurrentSection(FEIEvent.name);
   }
 
   const handleSelection = (event) => {
@@ -67,51 +77,42 @@ function App(props) {
   };
 
   const drawer = (
-    <div>
-      <Toolbar />
-      <Typography variant='h4' sx={{ padding: '10px'}}>SEAFEI</Typography>
+    <Stack bgcolor={'#18529d'} flexGrow={1} color={'white'}>
+      <Toolbar/>
+      <Typography variant='h4' sx={{ padding: '10px'}} align='cen'>SEAFEI</Typography>
       <Divider />
-      <List>
-        <Link to="/miseventos" onClick={handleSelection} id='Calendario'>
+      <List >
+        <Link to="/miseventos" onClick={handleSelection} id='Calendario' className='sidebar-link'>
             <ListItem disablePadding>
                 <ListItemButton>
                 <ListItemIcon>
-                    <DraftsIcon />
+                    <CalendarMonthIcon className='sidebar-link'/>
                 </ListItemIcon>
                 <ListItemText primary="Calendario" />
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/Notificaciones" onClick={handleSelection} id='Notificaciones'>
+        <Link to="/Notificaciones" onClick={handleSelection} id='Notificaciones' className='sidebar-link'>
             <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                      <DraftsIcon />
+                      <NotificationsActiveIcon className='sidebar-link'/>
                   </ListItemIcon>
                   <ListItemText primary="Notificaciones"/>
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/Eventos" onClick={handleSelection} id='Eventos'>
+        <Link to="/Eventos" onClick={handleSelection} id='Eventos' className='sidebar-link'>
             <ListItem disablePadding>
                 <ListItemButton>
                 <ListItemIcon>
-                    <DraftsIcon />
+                    <FestivalIcon className='sidebar-link'/>
                 </ListItemIcon>
                 <ListItemText primary="Eventos" />
                 </ListItemButton>
             </ListItem>
         </Link>
-        <Link to="/Evaluaciones" onClick={handleSelection} id='Evaluaciones'>
-            <ListItem disablePadding>
-                <ListItemButton>
-                <ListItemIcon>
-                    <DraftsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Evaluación" />
-                </ListItemButton>
-            </ListItem>
-        </Link>
+
 
 
         
@@ -129,21 +130,54 @@ function App(props) {
           </ListItem>
         ))}
       </List>
-    </div>
+    </Stack>
   );
 
   // Remove this const when copying and pasting into your project.
   const container = window !== undefined ? () => window().document.body : undefined;
 
+  const menuId = 'primary-search-account-menu';
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const isMenuOpen = Boolean(anchorEl);
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    </Menu>
+  );
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box display={'flex'} height={'85%'} width={'100%'} bgcolor={'--grey-bg'}>
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: '--secondary-blue'
+          bgcolor: '#DFE7F1',
+          display: 'flex',
+          flexDirection: 'row',
+          color: 'black'
         }}
       >
         <Toolbar >
@@ -156,14 +190,37 @@ function App(props) {
           >
             <MenuIcon />
           </IconButton>
+          
           <Typography variant="h6" noWrap component="div">
             {currentSection}
           </Typography>
+      
+        <IconButton
+          size="large"
+          aria-label="show 17 new notifications"
+          color="inherit"
+        >
+          <Badge badgeContent={17} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        
+        <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <AccountCircle />
+        </IconButton>
+
         </Toolbar>
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 },  }}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }}}
         aria-label="mailbox folders"
         
       >
@@ -198,18 +255,20 @@ function App(props) {
         </Drawer>
       </Box>
 
-        <div className="content">
-          <Routes>
-            
-            <Route path='/Eventos' element={<Eventos setSelectedFEIEvent={handleFEIEventSelection}/>}> </Route>
-            <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
-            <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
-          </Routes>
-        </div>
+      <div className="content">
+        <Routes>
+          
+          <Route path='/Eventos' element={<EventList notifications={false} setSelectedFEIEvent={handleFEIEventSelection} />}> </Route>
+          <Route path='/Notificaciones' element={<EventList notifications={true} setSelectedFEIEvent={handleFEIEventSelection} />}> </Route>
+          <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
+          <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
+          <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
+        </Routes>
+      </div>
 
 
 
-
+      {renderMenu}
     </Box>
   );
 }

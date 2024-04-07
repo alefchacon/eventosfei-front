@@ -5,19 +5,19 @@ import Typography from '@mui/material/Typography';
 
 const marks = [
   {
-    value: 4,
-  },
-  {
-    value: 3,
-  },
-  {
-    value: 2,
+    value: 0,
   },
   {
     value: 1,
   },
   {
-    value: 0,
+    value: 2,
+  },
+  {
+    value: 3,
+  },
+  {
+    value: 4,
   },
 ];
 
@@ -25,42 +25,38 @@ const marks = [
 export default function Progress({props, changePage }) {
 
   const handleChange = (event, newValue) => {
-    changePage(newValue); // Call the parent's callback function with the new value
+    changePage(4 - newValue); // Call the parent's callback function with the new value
   };
 
-  console.log(props)
 
   return (
-    <div className="progress-vertical">
-      <Box 
-      sx={{
-        height: '70vh', 
-        padding: 5,
-        paddingTop: 10,
-        bgcolor: 'white',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        justifyItems: 'center',
-        alignContent: 'center',
-        alignItems: 'center'
-      }}>
-
+    <div className='progress-horizontal'>
+    <Box 
+      display={'flex'}
+      justifyContent={'center'}
+      justifyItems={'center'}
+      alignContent={'center'}
+      alignItems={'center'}
+      bgcolor={'white'}
+      margin={1.5}
+      padding={3}
+    >
       <Slider
         onChangeCommitted={ handleChange }
-        track='inverted'
-        orientation='vertical'
         aria-label="Custom marks"
-        defaultValue={4}
+        defaultValue={0}
         min={0}
         step={1}
         max={4}
         valueLabelDisplay="off"
         marks={marks}
         sx={{
+          width: '80%',
           // Increase the size of the marks
           '& .MuiSlider-mark': {
             width: '5vh',
             height: '5vh',
+
             borderRadius: '50%',
             backgroundColor: '#a7caed',
             '&.MuiSlider-markActive': {
@@ -70,8 +66,6 @@ export default function Progress({props, changePage }) {
           },
           // Adjust the mark label position if necessary
           '& .MuiSlider-markLabel': {
-            marginLeft: '12px',
-            marginBottom: '15px',
 
             color: 'primary.main', // Custom color for the label
           },
@@ -79,12 +73,10 @@ export default function Progress({props, changePage }) {
           '& .MuiSlider-thumb': {
             width: '6vh',
             height: '6vh',
-            marginBottom: '2vh'
+            marginLeft: '20px'
           },
           // Make sure the rail doesn't overshadow the marks
-          '& .MuiSlider-rail': {
-            width: '5px',
-          },
+
         }}
       />
     </Box>
