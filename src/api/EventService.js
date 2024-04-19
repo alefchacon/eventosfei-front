@@ -1,20 +1,11 @@
 import { urlEvents, urlNotifications } from "./urls"
+import { client } from "./Client";
 
 export const GetEvents = async () => {
-    const response = await fetch (urlEvents, {
-        method: 'GET', // or 'PUT'
-        headers: {
-          'Content-Type': 'application/json',
-        },
-    });
+    const response = await client.get(urlEvents)
     return response;
 }
 export const GetNotifications = async () => {
-    const response = await fetch (urlNotifications, {
-        method: 'GET', // or 'PUT'
-        headers: {
-          'Content-Type': 'application/json',
-        },
-    });
+    const response = await client.get(urlNotifications)
     return response;
 }

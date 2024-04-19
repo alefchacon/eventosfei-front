@@ -34,7 +34,8 @@ export default function EventCard({props, parentHandle}, {key}) {
   } = props
 
   function handle(){
-    parentHandle(props)
+    console.log(id)
+    //parentHandle(props)
   }
   const handleClick = () => {
     console.info('You clicked the Chip.');
@@ -45,7 +46,7 @@ export default function EventCard({props, parentHandle}, {key}) {
       <CardContent sx={{ mb: -3 }}>
         <Container disableGutters={true} sx = {{ padding: 0, display: 'flex', justifyContent: 'space-between'}}>
           <Typography variant="h6" component="div">
-            <Link to="/Evento" onClick={handle}> {name} </Link>
+            <Link to={`/eventos/${id}`} onClick={handle}> {name} </Link>
           </Typography>
           <Chip label={status.name} onClick={handleClick} />
         </Container>

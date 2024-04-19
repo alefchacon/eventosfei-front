@@ -10,7 +10,7 @@
 
   display: flex;
   /*height: 'inherit';*/
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 100%;
   width: 100%;
   flex-direction: row;
@@ -36,7 +36,7 @@ main{
   width: 100vw;
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .content{
@@ -44,7 +44,7 @@ main{
   margin-top: 80px;
   width: 100%;
   min-height: 100%;
-  overflow: scroll;
+  overflow: auto;
 }
 
 
@@ -59,4 +59,19 @@ main{
 
 .sidebar-link{
   color: white;
+}
+
+.slider-horizontal{
+  transform: rotate(180deg);
+}
+
+.upload-button{
+  background-color: red;
+  border-radius: 10px;
+  padding: 50px;
+  border: 2px dashed black;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
 }
