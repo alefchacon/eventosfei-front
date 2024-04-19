@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { Rotate90DegreesCcw, Rotate90DegreesCcwOutlined, Rotate90DegreesCw } from '@mui/icons-material';
 
 const marks = [
   {
@@ -22,10 +23,10 @@ const marks = [
 ];
 
 
-export default function Progress({props, changePage }) {
+export default function Progress({value, changePage }) {
 
   const handleChange = (event, newValue) => {
-    changePage(4 - newValue); // Call the parent's callback function with the new value
+    changePage(4-newValue);
   };
 
 
@@ -43,8 +44,11 @@ export default function Progress({props, changePage }) {
     >
       <Slider
         onChangeCommitted={ handleChange }
+        className='slider-horizontal'
         aria-label="Custom marks"
+        track='inverted'
         defaultValue={0}
+        value={value}
         min={0}
         step={1}
         max={4}

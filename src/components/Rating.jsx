@@ -5,14 +5,14 @@ import Typography from '@mui/material/Typography';
 import '../App.css'
 import Stack  from '@mui/material/Stack';
 
-export default function BasicRating(props, { setRating }) {
+export default function BasicRating(props) {
 
   const {question = "Pregunta", asdf} = props
 
   const [value, setValue] = React.useState(0);
 
   const sendRatingToParent = (rating) => {
-    setRating(rating);
+    //setRating(rating);
   };
 
   return (

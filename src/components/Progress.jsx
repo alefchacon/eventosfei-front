@@ -22,13 +22,12 @@ const marks = [
 ];
 
 
-export default function Progress({props, changePage }) {
+export default function Progress({value, changePage }) {
 
   const handleChange = (event, newValue) => {
     changePage(newValue); // Call the parent's callback function with the new value
   };
 
-  console.log(props)
 
   return (
     <div className="progress-vertical">
@@ -51,6 +50,7 @@ export default function Progress({props, changePage }) {
         orientation='vertical'
         aria-label="Custom marks"
         defaultValue={4}
+        value={value}
         min={0}
         step={1}
         max={4}

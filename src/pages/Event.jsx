@@ -1,4 +1,12 @@
-import {useEffect, useState} from 'react';
+import {
+  useEffect, 
+  useState
+} from 'react';
+
+import {
+  useParams
+} from 'react-router-dom';
+
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -43,8 +51,10 @@ function a11yProps(index) {
 
 export default function Event() {
   const [value, setValue] = useState(0);
-
   const [showEventResponseMobile, setShowEventResponseMobile] = useState(false)
+
+  let { eventId } = useParams();
+
   useEffect(() => {
     const updateOrientation = () => {
       setShowEventResponseMobile(window.innerWidth < 600);
@@ -53,7 +63,6 @@ export default function Event() {
     window.addEventListener('resize', updateOrientation);
 
     updateOrientation();
-
     return () => window.removeEventListener('resize', updateOrientation);
   }, []);
   
@@ -65,6 +74,7 @@ export default function Event() {
     <>
         <Box sx={{ width: '100%' }} >
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Button>{eventId}</Button>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" variant='scrollable' scrollButtons>
                     <Tab label="Organizador" {...a11yProps(0)} />
                     <Tab label="Evento" {...a11yProps(1)} />
@@ -101,7 +111,8 @@ export default function Event() {
                 <Evaluation></Evaluation>
             </CustomTabPanel>
         </Box>
-        {showEventResponseMobile && <EventResponseMobile/>}
+        
+        <EventResponseMobile/>
     </>
   );
 }

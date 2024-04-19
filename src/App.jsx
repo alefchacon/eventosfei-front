@@ -1,65 +1,62 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import './App.css'
-import Evaluation from './pages/Evaluation.jsx'
-import EventList from './pages/EventList.jsx'
-import './index.css'
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link
-} from "react-router-dom";
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
-import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import DraftsIcon from '@mui/icons-material/Drafts';
+import "./App.css";
+import Evaluation from "./pages/Evaluation.jsx";
+import EventList from "./pages/EventList.jsx";
+import "./index.css";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import * as React from "react";
+import PropTypes from "prop-types";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import MailIcon from "@mui/icons-material/Mail";
+import MenuIcon from "@mui/icons-material/Menu";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import DraftsIcon from "@mui/icons-material/Drafts";
 import Button from "@mui/material/Button";
-import Stack from '@mui/material/Stack';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import Badge from '@mui/material/Badge';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import FestivalIcon from '@mui/icons-material/Festival';
+import Stack from "@mui/material/Stack";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Badge from "@mui/material/Badge";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import FestivalIcon from "@mui/icons-material/Festival";
 
-import Event from './pages/Event.jsx'
+import LogInPage from "./pages/LogIn.jsx";
+
+import Event from "./pages/Event.jsx";
 
 const drawerWidth = 240;
-
 
 function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
-  const [currentSection, setCurrentSection] = React.useState('Calendario');
+  const [currentSection, setCurrentSection] = React.useState("Calendario");
   const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
-  const handleFEIEventSelection = (FEIEvent) =>{
-    setSelectedFEIEvent(FEIEvent)
+  const handleFEIEventSelection = (FEIEvent) => {
+    setSelectedFEIEvent(FEIEvent);
     setCurrentSection(FEIEvent.name);
-  }
+  };
 
   const handleSelection = (event) => {
     setCurrentSection(event.currentTarget.id);
-  }
+  };
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -77,49 +74,66 @@ function App(props) {
   };
 
   const drawer = (
-    <Stack bgcolor={'#18529d'} flexGrow={1} color={'white'}>
-      <Toolbar/>
-      <Typography variant='h4' sx={{ padding: '10px'}} align='cen'>SEAFEI</Typography>
+    <Stack bgcolor={"#18529d"} flexGrow={1} color={"white"}>
+      <Toolbar />
+      <Typography variant="h4" sx={{ padding: "10px" }} align="center">
+        SEAFEI
+      </Typography>
       <Divider />
-      <List >
-        <Link to="/miseventos" onClick={handleSelection} id='Calendario' className='sidebar-link'>
+
+      {isAuthenticated && (
+        <List>
+          <Link
+            to="/miseventos"
+            onClick={handleSelection}
+            id="Calendario"
+            className="sidebar-link"
+          >
             <ListItem disablePadding>
-                <ListItemButton>
+              <ListItemButton>
                 <ListItemIcon>
-                    <CalendarMonthIcon className='sidebar-link'/>
+                  <CalendarMonthIcon className="sidebar-link" />
                 </ListItemIcon>
                 <ListItemText primary="Calendario" />
-                </ListItemButton>
+              </ListItemButton>
             </ListItem>
-        </Link>
-        <Link to="/Notificaciones" onClick={handleSelection} id='Notificaciones' className='sidebar-link'>
+          </Link>
+          <Link
+            to="/Notificaciones"
+            onClick={handleSelection}
+            id="Notificaciones"
+            className="sidebar-link"
+          >
             <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                      <NotificationsActiveIcon className='sidebar-link'/>
-                  </ListItemIcon>
-                  <ListItemText primary="Notificaciones"/>
-                </ListItemButton>
-            </ListItem>
-        </Link>
-        <Link to="/Eventos" onClick={handleSelection} id='Eventos' className='sidebar-link'>
-            <ListItem disablePadding>
-                <ListItemButton>
+              <ListItemButton>
                 <ListItemIcon>
-                    <FestivalIcon className='sidebar-link'/>
+                  <NotificationsActiveIcon className="sidebar-link" />
+                </ListItemIcon>
+                <ListItemText primary="Notificaciones" />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link
+            to="/eventos"
+            onClick={handleSelection}
+            id="Eventos"
+            className="sidebar-link"
+          >
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <FestivalIcon className="sidebar-link" />
                 </ListItemIcon>
                 <ListItemText primary="Eventos" />
-                </ListItemButton>
+              </ListItemButton>
             </ListItem>
-        </Link>
+          </Link>
+        </List>
+      )}
 
-
-
-        
-      </List>
       <Divider />
       <List>
-        {['Otro coso'].map((text, index) => (
+        {["Otro coso"].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemIcon>
@@ -134,9 +148,10 @@ function App(props) {
   );
 
   // Remove this const when copying and pasting into your project.
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
-  const menuId = 'primary-search-account-menu';
+  const menuId = "primary-search-account-menu";
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -150,14 +165,14 @@ function App(props) {
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       id={menuId}
       keepMounted
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
@@ -167,45 +182,46 @@ function App(props) {
     </Menu>
   );
   return (
-    <Box display={'flex'} height={'85%'} width={'100%'} bgcolor={'--grey-bg'}>
+    <Box display={"flex"} height={"85%"} width={"100%"} bgcolor={"--grey-bg"}>
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: '#DFE7F1',
-          display: 'flex',
-          flexDirection: 'row',
-          color: 'black'
+          bgcolor: "#DFE7F1",
+          display: "flex",
+          flexDirection: "row",
+          color: "black",
         }}
       >
-        <Toolbar >
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' }  }}
-          >
-            <MenuIcon />
-          </IconButton>
-          
-          <Typography variant="h6" noWrap component="div">
-            {currentSection}
-          </Typography>
-      
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        
-        <IconButton
+        {isAuthenticated && (
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            <Typography variant="h6" noWrap component="div">
+              {currentSection}
+            </Typography>
+
+            <IconButton
+              size="large"
+              aria-label="show 17 new notifications"
+              color="inherit"
+            >
+              <Badge badgeContent={17} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+
+            <IconButton
               size="large"
               edge="end"
               aria-label="account of current user"
@@ -214,15 +230,14 @@ function App(props) {
               color="inherit"
             >
               <AccountCircle />
-        </IconButton>
-
-        </Toolbar>
+            </IconButton>
+          </Toolbar>
+        )}
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }}}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
-        
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
@@ -235,19 +250,23 @@ function App(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
         </Drawer>
         <Drawer
           variant="permanent"
-          
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-            
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >
@@ -257,21 +276,46 @@ function App(props) {
 
       <div className="content">
         <Routes>
-          
-          <Route path='/Eventos' element={<EventList notifications={false} setSelectedFEIEvent={handleFEIEventSelection} />}> </Route>
-          <Route path='/Notificaciones' element={<EventList notifications={true} setSelectedFEIEvent={handleFEIEventSelection} />}> </Route>
-          <Route path='/Evaluaciones' element={<Evaluation/>}> </Route>
-          <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
-          <Route path='/Evento' element={<Event FEIEvent={selectedFEIEvent}/>}> </Route>
+          <Route
+            path="/eventos"
+            element={
+              <EventList
+                notifications={false}
+                setSelectedFEIEvent={handleFEIEventSelection}
+              />
+            }
+          >
+            {" "}
+          </Route>
+          <Route path="/" element={<LogInPage></LogInPage>}>
+            {" "}
+          </Route>
+          <Route
+            path="/Notificaciones"
+            element={
+              <EventList
+                notifications={true}
+                setSelectedFEIEvent={handleFEIEventSelection}
+              />
+            }
+          >
+            {" "}
+          </Route>
+          <Route path="/Evaluaciones" element={<Evaluation />}>
+            {" "}
+          </Route>
+          <Route
+            path="/eventos/:eventId"
+            element={<Event FEIEvent={selectedFEIEvent} />}
+          >
+            {" "}
+          </Route>
         </Routes>
       </div>
-
-
 
       {renderMenu}
     </Box>
   );
 }
-
 
 export default App;

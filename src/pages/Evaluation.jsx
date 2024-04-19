@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import TextField from '@mui/material/TextField';
 import RadioGroup from '../components/RadioGroup.jsx'
+import UploadArea from '../components/UploadArea.jsx'
 import Rating from '../components/Rating.jsx'
 import Progress from '../components/Progress.jsx'
 import ProgressHorizontal from '../components/ProgressHorizontal.jsx'
@@ -9,9 +10,14 @@ import Button from '@mui/material/Button';
 import CreateEvaluation from '../api/EvaluationService.js';
 import ItemUpload from '../components/ItemUpload.jsx';
 import TextArea from '../components/TextArea.jsx';
-import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
-
+import CustomToggleButton from '../components/ToggleButton.jsx';
+import Toolbar from '@mui/material/Toolbar'
+import Divider from '@mui/material/Divider'
+import CardActionArea from '@mui/material/CardActionArea'
+import { styled } from '@mui/material/styles';
+import { useFormik } from 'formik';
+import { evaluationSchema } from '../validation/modelSchemas/evaluationSchema.js';
 
 import Typography from '@mui/material/Typography';
 
@@ -36,6 +42,7 @@ function CustomTabPanel(props) {
   }
 
 export default function Form () {
+
     const [value, setValue] = useState(0);
 
     const [attentionRating, setAttentionRating] = useState(0);
@@ -59,33 +66,27 @@ export default function Form () {
     }, []);
 
     const handleChangePage = (pageIndex) => {
-        console.log(pageIndex)
-        setValue(pageIndex)
+        if (pageIndex > -1 && pageIndex < 5 ){
+            setValue(pageIndex)
+
+        }
     };
 
-    async function createEvaluation(){
-        const evaluation = {
-            calificacionAtencion: attentionRating,
-            razonCalificacionAtencion : document.querySelector('#attentionRatingReason').value,
-            calificacionComunicacion: parseInt(communicationRating),
-            mejorasApoyo : document.querySelector('#supportImprovements').value,
-            calificacionEspacio: spaceRating,
-            problemasEspacio : document.querySelector('#spaceProblems').value,
-            calificacionCentroComputo: computerCenterRating,
-            razonCalificacionCentroComputo : document.querySelector('#computerCenterRatingReason').value,
-            calificacionRecursos: resourcesRating,
-            razonCalificacionRecursos : document.querySelector('#resourcesRatingReason').value,
-            problemaRecursos : document.querySelector('#resourcesProblems').value,
-            mejorasRecursos : document.querySelector('#resourcesImprovements').value,
-            adicional : document.querySelector('#additional').value,
-            idEvento: 1
-        }
-        console.log(await CreateEvaluation(evaluation))
-        const evidences = document.querySelector('#evidences').files;
-        for(var i = 0; i < evidences.length; i++) {
-            console.log("Filename: " + evidences[i].name);
-        }
-    }
+    const { 
+        values, 
+        errors, 
+        touched,
+        handleBlur, 
+        handleChange, 
+        handleSubmit,
+        isSubmitting
+      } = useFormik ({
+        initialValues: {
+            calificacionAtencion: 0,
+            razonCalificacionAtencion: '',
+        },
+        validationSchema: evaluationSchema,
+      });
 
 return (
     <>
@@ -95,93 +96,141 @@ return (
                 autoComplete="off"
                 flexGrow={1}
                 className='form-box'
+
             >
+                <form autoComplete="off" onSubmit={handleSubmit}>
 
-                <CustomTabPanel value={value} index={4}>
-                    <div className="form-page">
-                    <Typography variant='h5'>Coordinación de Eventos Académicos</Typography>
+                    <CustomTabPanel value={value} index={4}>
+                        <div className="form-page">
+                        <Typography variant='h5'>Coordinación de Eventos Académicos</Typography>
 
-                        <Rating 
-                            question="¿Cómo calificaría la atención recibida por parte de la Coordinación de Eventos Académicos?                            " 
-                            setRating={setAttentionRating}></Rating>
-                        <TextArea 
-                            question='Por favor, explique los factores que contribuyeron a su calificación anterior                            '
-                            placeholder='Los maestros me atendieron rápida y amablemente...'
-                            />
-                        <RadioGroup onRadioChange={setCommunicationRating}></RadioGroup>
-                        <TextArea 
-                            question='¿Hubo algún aspecto en el que el apoyo de la Coordinación de Eventos pudiera haber mejorado? (Describa brevemente)'
-                            placeholder='Nada, todo estuvo perfecto.'
-                            />
-                    </div>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={3}>
-                    <div className="form-page">
-                        <Rating setRating={setSpaceRating}></Rating>
-                        <TextField
-                            id="spaceProblems"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                    </div>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={2}>
-                    <div className="form-page">
-                        <Rating setRating={setComputerCenterRating}></Rating>
-                        <TextField
-                            id="computerCenterRatingReason"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                        <Rating setRating={setResourcesRating}></Rating>
+                            <Rating
+                                question="¿Cómo calificaría la atención recibida por parte de la Coordinación de Eventos Académicos?                            " 
+                                setRating={setAttentionRating}></Rating>
+                            <Toolbar></Toolbar>
+                            <Stack
+                                spacing={1}>
+                                <Typography variant='p'>Por favor, explique los factores que contribuyeron a su calificación anterior:</Typography>
+                                <TextField 
+                                    id= 'razonCalificacionAtencion'
+                                    name='razonCalificacionAtencion'
+                                    variant='filled' 
+                                    label='Razón de la calificación'
+                                    multiline
+                                    maxRows={3}
+                                    
+                                    value={values.razonCalificacionAtencion}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={Boolean(errors.razonCalificacionAtencion) && touched.razonCalificacionAtencion}
+                                    helperText={touched.razonCalificacionAtencion && errors.razonCalificacionAtencion}
+                                    ></TextField>
+                            </Stack>
+                            <Toolbar></Toolbar>
 
-                        <TextField
-                            id="resourcesRatingReason"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                        <TextField
-                            id="resourcesProblems"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                        <TextField
-                            id="resourcesImprovements"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                    </div>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={1}>
-                    <input type="file" multiple id='evidences'/>
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={0}>
-                    <div className="form-page">
-                        <TextField
-                            id="additional"
-                            label="Multiline"
-                            multiline
-                            maxRows={4}
-                            variant="filled"
-                            />
-                        <Button variant="contained" onClick={() => createEvaluation()}>Enviar</Button>
-                    </div>
-                </CustomTabPanel>
-                </Box>
 
-                {!showProgressHorizontal && <Progress changePage={handleChangePage}></Progress>}
+                            <Typography variant='p'>¿La comunicación fue clara y oportuna?</Typography>
+                            <CustomToggleButton options={["Sí", "No", "En parte"]}></CustomToggleButton>
+
+                            <Toolbar></Toolbar>
+                            <Stack
+                                spacing={2}>
+                                <Typography variant='p'>¿Hubo algún aspecto en el que el apoyo de la Coordinación de Eventos pudiera haber mejorado? (Describa brevemente):</Typography>
+                                <TextField 
+                                    variant='filled' 
+                                    label='Mejoras'
+                                    multiline
+                                    maxRows={3}></TextField>
+                            </Stack>
+
+                        </div>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={3}>
+                        <div className="form-page">
+                            <Typography variant='h5'>Espacio</Typography>
+                            <Rating
+                                question="¿Cómo calificaría el espacio donde se llevó acabo el evento, en términos de cumplir con sus expectativas y requisitos?" 
+                                setRating={setAttentionRating}></Rating>
+                            <Stack
+                                spacing={2}>
+                                <Typography variant='p'>¿Hubo algún problema relacionado con el espacio (por ejemplo, capacidad, comodidad, equipamiento, limpieza)? (Describa brevemente):</Typography>
+                                <TextField 
+                                    variant='filled' 
+                                    label='Mejoras'
+                                    multiline
+                                    maxRows={3}></TextField>
+                            </Stack>
+                        </div>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={2}>
+                        <Stack className="form-page" spacing={5}>
+                            <Typography variant='h5'>Apoyo en el Centro de Cómputo</Typography>
+                            <Rating
+                                question="¿Cómo calificaría la eficiencia del apoyo del Centro de Cómputo para la atención de su evento?" 
+                                setRating={setAttentionRating}></Rating>
+                            <Stack
+                                spacing={2}>
+                                <Typography variant='p'>Por favor, explique los factores que contribuyeron a su calificación anterior:</Typography>
+                                <TextField 
+                                    variant='filled' 
+                                    label='Factores'
+                                    multiline
+                                    maxRows={3}></TextField>
+                            </Stack>
+                            <Rating
+                                question="¿Cómo calificaría la eficiencia del apoyo del Centro de Cómputo para la atención de su evento?" 
+                                setRating={setAttentionRating}></Rating>
+                            <Stack
+                                spacing={2}>
+                                <Typography variant='p'>Por favor, explique los factores que contribuyeron a su calificación anterior:</Typography>
+                                <TextField 
+                                    variant='filled' 
+                                    label='Factores'
+                                    multiline
+                                    maxRows={3}></TextField>
+                            </Stack>
+
+                            <Stack
+                                spacing={2}>
+                                <Typography variant='p'>¿Hubo algún aspecto en el que el apoyo técnico pudiera haber mejorado? (Describa brevemente): </Typography>
+                                <TextField 
+                                    variant='filled' 
+                                    label='Mejoras'
+                                    multiline
+                                    maxRows={3}></TextField>
+                            </Stack>
+                        </Stack>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={1}>
+                        <Typography variant='h5'>Evidencias del evento</Typography>
+                        <Typography variant='p'>Por favor, si cuenta con ellos, comparta evidencias de la realización del evento (por ejemplo, fotografías, videos, listas de asistencia, etc.)</Typography>
+
+                        <UploadArea></UploadArea>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={0}>
+                        <div className="form-page">
+                            <Typography variant='h5'>Comentarios Adicionales</Typography>
+                            <Typography variant='p'>Por favor, comparta cualquier comentario que quiera agregar sobre la organización y ejecución del evento: </Typography>
+                            <TextField 
+                                variant='filled' 
+                                label='Comentario adicional'
+                                multiline
+                                maxRows={3}></TextField>
+                        </div>
+                    </CustomTabPanel>
+                    <Stack direction={'row'} padding={3} display={'flex'}  justifyContent={'flex-end'} spacing={2}>
+                        <Button onClick={() => handleChangePage(value+1)}>Regresar</Button>
+                        <Button variant='outlined' onClick={() => handleChangePage(value-1)}>Siguiente</Button>
+                        {value==0 && <Button variant='contained' type='submit'>Enviar</Button>}
+                    </Stack>
+
+                </form>
+
+            </Box>
+
+                {!showProgressHorizontal && <Progress value={value} changePage={handleChangePage}></Progress>}
         </Stack>
-         {showProgressHorizontal && <ProgressHorizontal changePage={handleChangePage}></ProgressHorizontal> }
+         {showProgressHorizontal && <ProgressHorizontal value={value} changePage={handleChangePage}></ProgressHorizontal> }
     </>
     );
 }
