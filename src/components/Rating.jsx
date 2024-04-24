@@ -1,13 +1,12 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Rating from '@mui/material/Rating';
-import Typography from '@mui/material/Typography';
-import '../App.css'
-import Stack  from '@mui/material/Stack';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Rating from "@mui/material/Rating";
+import Typography from "@mui/material/Typography";
+import "../App.css";
+import Stack from "@mui/material/Stack";
 
 export default function BasicRating(props) {
-
-  const {question = "Pregunta", asdf} = props
+  const { question = "Pregunta", asdf } = props;
 
   const [value, setValue] = React.useState(0);
 
@@ -18,13 +17,13 @@ export default function BasicRating(props) {
   return (
     <Box
       sx={{
-        '& > legend': { mt: 2 },
+        "& > legend": { mt: 2 },
       }}
-      display={'flex'}
-      flexDirection={'column'}
+      display={"flex"}
+      flexDirection={"column"}
     >
       <Typography component="legend">{question}</Typography>
-      <Stack display={'flex'} direction={'row'}>
+      <Stack display={"flex"} direction={"row"}>
         <Box flexGrow={1}></Box>
         <Rating
           name="simple-controlled"
@@ -33,11 +32,11 @@ export default function BasicRating(props) {
           flexGrow={2}
           sx={{
             fontSize: "2.5rem",
-            color: '#18529d'
+            color: "#18529d",
           }}
           onChange={(event, newRating) => {
             setValue(newRating);
-            sendRatingToParent(newRating)
+            sendRatingToParent(newRating);
           }}
         />
         <Box flexGrow={1}></Box>

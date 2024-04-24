@@ -1,71 +1,72 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { Container } from '@mui/material';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import { CardActionArea } from "@mui/material";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { Container } from "@mui/material";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
 
-import {
-  Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const bull = (
   <Box
     component="span"
-    sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}
+    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
   >
     •
   </Box>
 );
 
-export default function EventCard({props, parentHandle}, {key}) {
+export default function EventCard({ props, parentHandle }, { key }) {
   const {
-    id=0,
+    id = 0,
     name = "nombre del evento",
-    status = {name: "estado"},
+    status = { name: "estado" },
     organizer = "Nombre del organizador",
     program = "Programa educativo",
     schedule = "31 de diciembre del 9999 - 23:59 hrs",
     space = "Espacio",
-  } = props
+  } = props;
 
-  function handle(){
-    console.log(id)
+  function handle() {
+    console.log(id);
     //parentHandle(props)
   }
   const handleClick = () => {
-    console.info('You clicked the Chip.');
+    console.info("You clicked the Chip.");
   };
 
   return (
-    <Card sx={{ minWidth: '50%', maxHeight: 250 }}>
+    <Card sx={{ minWidth: "30%", maxHeight: 250 }}>
       <CardContent sx={{ mb: -3 }}>
-        <Container disableGutters={true} sx = {{ padding: 0, display: 'flex', justifyContent: 'space-between'}}>
+        <Stack
+          sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
+          direction={"row"}
+        >
           <Typography variant="h6" component="div">
-            <Link to={`/eventos/${id}`} onClick={handle}> {name} </Link>
+            <Link to={`/eventos/${id}`} onClick={handle}>
+              {" "}
+              {name}{" "}
+            </Link>
           </Typography>
           <Chip label={status.name} onClick={handleClick} />
-        </Container>
-        <Typography color="text.primary">
-          Organizador: {organizer}
-        </Typography>
-        <Typography color="text.primary">
-          {program}
-        </Typography>
-        <Typography color="text.primary">
-          {schedule}
-        </Typography>
-        <Typography  color="text.primary">
-          {space}
-        </Typography>
+        </Stack>
+        <Typography color="text.primary">Organizador: {organizer}</Typography>
+        <Typography color="text.primary">{program}</Typography>
+        <Typography color="text.primary">{schedule}</Typography>
+        <Typography color="text.primary">{space}</Typography>
       </CardContent>
-      <CardActions sx={{ display: 'flex', justifyContent: 'flex-end'}}>
-        <Button size="medium" onClick={handle}>Editar</Button>
-        <Button size="medium" color='error'>Cancelar</Button>
+      <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button size="medium" onClick={handle}>
+          Editar
+        </Button>
+        <Button size="medium" color="error">
+          Cancelar
+        </Button>
       </CardActions>
     </Card>
   );

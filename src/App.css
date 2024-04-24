@@ -31,19 +31,16 @@
 
 
 main{
-  background-color: var(--gray-bg);
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .content{
-
-  margin-top: 80px;
+  margin-top: 60px;
   width: 100%;
-  min-height: 100%;
   overflow: auto;
 }
 
@@ -66,12 +63,18 @@ main{
 }
 
 .upload-button{
-  background-color: red;
   border-radius: 10px;
-  padding: 50px;
-  border: 2px dashed black;
-  display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
+  border: 2px dashed var(--main-blue);
+  color: var(--main-blue);
+  padding: 30px;
+}
+
+@media (max-width: 768px) {
+  .desktop {
+    visibility: hidden;
+    height: 0;
+  }
+}
+
+.form-box{
 }

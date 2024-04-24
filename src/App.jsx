@@ -4,7 +4,13 @@ import "./App.css";
 import Evaluation from "./pages/Evaluation.jsx";
 import EventList from "./pages/EventList.jsx";
 import "./index.css";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import * as React from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
@@ -34,8 +40,12 @@ import MenuItem from "@mui/material/MenuItem";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import FestivalIcon from "@mui/icons-material/Festival";
+import PeopleIcon from "@mui/icons-material/People";
+
+import RouteGuard from "./pages/RouteGuard.jsx";
 
 import LogInPage from "./pages/LogIn.jsx";
+import Users from "./pages/Users.jsx";
 
 import Event from "./pages/Event.jsx";
 
@@ -47,7 +57,14 @@ function App(props) {
   const [isClosing, setIsClosing] = React.useState(false);
   const [currentSection, setCurrentSection] = React.useState("Calendario");
   const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
+
+  const navigate = useNavigate();
+
+  const handleLogIn = (authenticationOK) => {
+    setIsAuthenticated(authenticationOK);
+    navigate("/eventos");
+  };
 
   const handleFEIEventSelection = (FEIEvent) => {
     setSelectedFEIEvent(FEIEvent);
@@ -128,6 +145,21 @@ function App(props) {
               </ListItemButton>
             </ListItem>
           </Link>
+          <Link
+            to="/usuarios"
+            onClick={handleSelection}
+            id="Eventos"
+            className="sidebar-link"
+          >
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PeopleIcon className="sidebar-link" />
+                </ListItemIcon>
+                <ListItemText primary="Usuarios" />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         </List>
       )}
 
@@ -182,7 +214,13 @@ function App(props) {
     </Menu>
   );
   return (
-    <Box display={"flex"} height={"85%"} width={"100%"} bgcolor={"--grey-bg"}>
+    <Box
+      flexGrow={1}
+      display={"flex"}
+      height={"100%"}
+      width={"100%"}
+      bgcolor={"--grey-bg"}
+    >
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -279,24 +317,43 @@ function App(props) {
           <Route
             path="/eventos"
             element={
-              <EventList
-                notifications={false}
-                setSelectedFEIEvent={handleFEIEventSelection}
-              />
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <EventList
+                  notifications={false}
+                  setSelectedFEIEvent={handleFEIEventSelection}
+                />
+              </RouteGuard>
             }
           >
             {" "}
           </Route>
-          <Route path="/" element={<LogInPage></LogInPage>}>
+
+          <Route
+            path="/usuarios"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <Users />
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
+
+          <Route
+            path="/"
+            element={<LogInPage onLoginIn={handleLogIn}></LogInPage>}
+          >
             {" "}
           </Route>
           <Route
             path="/Notificaciones"
             element={
-              <EventList
-                notifications={true}
-                setSelectedFEIEvent={handleFEIEventSelection}
-              />
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <EventList
+                  notifications={true}
+                  setSelectedFEIEvent={handleFEIEventSelection}
+                />
+              </RouteGuard>
             }
           >
             {" "}
@@ -306,7 +363,14 @@ function App(props) {
           </Route>
           <Route
             path="/eventos/:eventId"
-            element={<Event FEIEvent={selectedFEIEvent} />}
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <Event
+                  FEIEvent={selectedFEIEvent}
+                  setTitle={setCurrentSection}
+                />
+              </RouteGuard>
+            }
           >
             {" "}
           </Route>
