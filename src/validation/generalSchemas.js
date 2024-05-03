@@ -1,10 +1,10 @@
 import * as yup from 'yup';
 import messages from './messages';
-import {aphanumericRegex} from './regexes';
+import {alphanumericRegex} from './regexes';
 
 export const alphanumericSchema = yup
     .string()
-    .matches(aphanumericRegex, messages.alphanumeric)
+    .matches(alphanumericRegex, messages.alphanumeric)
 
 export const numericSchema = yup
     .number()
