@@ -1,14 +1,5 @@
 import React, { Fragment, useMemo, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
-import {
-  Calendar,
-  Views,
-  DateLocalizer,
-  momentLocalizer,
-} from "react-big-calendar";
-import * as dates from "./dates";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
   Stack,
   Button,
@@ -16,10 +7,41 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Typography,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  Fab,
+  Container,
 } from "@mui/material";
+import {
+  Calendar,
+  Views,
+  DateLocalizer,
+  momentLocalizer,
+} from "react-big-calendar";
+
+import AddIcon from "@mui/icons-material/Add";
+
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { YearCalendar } from "@mui/x-date-pickers/YearCalendar";
+import { MonthCalendar } from "@mui/x-date-pickers/MonthCalendar";
+
+import moment from "moment";
+import "moment/locale/es";
+
+import * as dates from "./dates";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "../App.css";
 
 import { GetEventsByMonth } from "../api/EventService";
 
+import CalendarEventList from "./CalendarEventList";
+
+moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
 
 const ColoredDateCellWrapper = ({ children }) =>
@@ -30,55 +52,81 @@ const ColoredDateCellWrapper = ({ children }) =>
   });
 
 const now = new Date();
-const events = [
-  {
-    id: 14,
-    title: "Today",
-    space: "jam",
-    start: new Date(new Date().setHours(new Date().getHours() - 3)),
-    end: new Date(new Date().setHours(new Date().getHours() + 3)),
-  },
-  {
-    id: 15,
-    title: "Point in Time Event",
-    space: "jam",
-    start: now,
-    end: now,
-  },
-  {
-    id: 16,
-    title: "Point in Time Event",
-    space: "jam",
-    start: new Date(2024, 3, 1),
-    end: new Date(2024, 3, 1),
-  },
-  {
-    id: 16,
-    title: "Man",
-    space: "jam",
-    start: new Date(2024, 3, 26, 15, 30),
-    end: new Date(2024, 3, 26),
-  },
-];
 
-class CustomToolbar extends React.Component {
-  handleNavigate = (action) => {
+const CustomToolbar = (props) => {
+  const { date, onNavigate } = props;
+
+  const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
-    this.props.onNavigate(action);
+    onNavigate(action);
+    console.log(date);
   };
 
-  render() {
-    return (
-      <div className="custom-toolbar">
-        <button onClick={() => this.handleNavigate("PREVIOUS")}>
-          Previous
-        </button>
-        <button onClick={() => this.handleNavigate("TODAY")}>Today</button>
-        <button onClick={() => this.handleNavigate("NEXT")}>Next</button>
+  return (
+    <div className="calendar-toolbar">
+      <div className="calendar-date-control">
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel>
+              <Typography variant="h6">
+                {`${date.toLocaleString("es-MX", {
+                  month: "long",
+                })} ${date.getFullYear()}`}
+              </Typography>
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              className="date-select"
+              fullWidth
+              style={{ minWidth: "10rem" }}
+            >
+              <DateCalendar
+                defaultValue={moment("2022-04-17")}
+                views={["year"]}
+                openTo="year"
+              />{" "}
+            </Select>
+          </FormControl>
+        </LocalizationProvider>
+
+        <button onClick={() => handleNavigate("PREVIOUS")}>Previous</button>
+        <button onClick={() => handleNavigate("NEXT")}>Next</button>
       </div>
-    );
-  }
-}
+      <Stack
+        direction={"row"}
+        spacing={3}
+        width={"100%"}
+        display={"flex"}
+        justifyContent={"end"}
+      >
+        <Button onClick={() => handleNavigate("TODAY")}>Hoy</Button>
+        <Button
+          sx={{
+            backgroundColor: "var(--main-green)",
+            display: { md: "block", xs: "none" },
+          }}
+          variant="contained"
+        >
+          Nueva Notificación
+        </Button>
+      </Stack>
+      <Stack
+        position={"absolute"}
+        bottom={0}
+        right={0}
+        padding={5}
+        sx={{
+          display: { md: "none", xs: "block" },
+        }}
+      >
+        <Fab color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </Stack>
+    </div>
+  );
+};
 
 export default function MyCalendar({
   localizer = mLocalizer,
@@ -88,7 +136,6 @@ export default function MyCalendar({
   const { components, defaultDate, max, views } = useMemo(
     () => ({
       components: {
-        timeSlotWrapper: ColoredDateCellWrapper,
         toolbar: CustomToolbar,
       },
       defaultDate: new Date(2015, 3, 1),
@@ -98,14 +145,8 @@ export default function MyCalendar({
     []
   );
 
-  function formatTime(date) {
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
-
   const [selectedMonth, setDate] = React.useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
 
@@ -120,19 +161,10 @@ export default function MyCalendar({
     );
     setSelectedEvents(eventsInRange);
 
-    console.log("Selected slot:", slotInfo);
+    //console.log("Selected slot:", slotInfo);
     //console.log("Events in selected slot:", eventsInRange);
-    //console.log(selectedDate);
+    console.log(selectedDate.getTime());
     setSelectedDate(slotInfo.start);
-  };
-
-  const slotPropGetter = (date) => {
-    const isSelected = moment(selectedDate).isSame(date, "day");
-    return {
-      style: {
-        backgroundColor: isSelected ? "red" : "blue", // Change color here
-      },
-    };
   };
 
   const handleNavigation = async (newDate, view, action) => {
@@ -152,7 +184,7 @@ export default function MyCalendar({
 
     let eventsByReservation = [];
     for (const event of responseEvents) {
-      event.reservations.map((reservation) => {
+      let reservations = event.reservations.map((reservation) => {
         eventsByReservation.push({
           id: event.id,
           title: event.name,
@@ -168,63 +200,56 @@ export default function MyCalendar({
     setEvents(eventsByReservation);
   };
 
-  function parseDate(date, timeString) {
-    const timeParts = timeString.split(":");
-
-    const hours = parseInt(timeParts[0], 10);
-    const minutes = parseInt(timeParts[1], 10);
-    const seconds = parseInt(timeParts[2], 10);
-
-    console.log(date);
-    const newDate = new Date(date);
-
-    newDate.setHours(hours);
-    newDate.setMinutes(minutes);
-    newDate.setSeconds(seconds);
-
-    return newDate;
-  }
+  const formats = {
+    dateFormat: "DD", // day of month
+    dayFormat: "ddd DD/MM", // day of the week, date
+    monthHeaderFormat: "MMMM YYYY", // full month name and year
+    dayHeaderFormat: "dddd DD/MM", // full day of the week, date
+    dayRangeHeaderFormat: ({ start, end }, culture, localizer) =>
+      `${localizer.format(start, "DD/MM/YYYY", culture)} — ${localizer.format(
+        end,
+        "DD/MM/YYYY",
+        culture
+      )}`,
+  };
 
   return (
-    <Stack className="calendar" width={"100%"} direction={"row"}>
+    <Stack
+      display={"flex"}
+      className="calendar"
+      width={"100%"}
+      direction={"row"}
+      bgcolor={"red"}
+    >
       <Calendar
         localizer={localizer}
-        selectable={"ignoreEvents"}
+        selectable={true}
         startAccessor="start"
         endAccessor="end"
-        onSelectSlot={handleSelectSlot}
-        slotPropGetter={slotPropGetter}
-        date={selectedMonth}
         components={components}
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={() => console.log("EVENT")}
+        date={selectedMonth}
         defaultDate={defaultDate}
+        formats={formats}
         events={events}
-        max={max}
-        showMultiDayTimes
         onNavigate={handleNavigation}
-        step={60}
-        views={views}
-        style={{ height: 500, width: "100%" }}
+        style={{ height: 500, width: "100%", flexGrow: 2 }}
       />
 
-      <List sx={{ minWidth: 200, width: 400 }}>
-        {selectedEvents.map((FEIEvent) => (
-          <ListItem key={FEIEvent.id} disablePadding>
-            <ListItemButton>
-              <Stack direction={"row"} spacing={4}>
-                {" "}
-                <ListItemText
-                  primary={formatTime(FEIEvent.start)}
-                  secondary=" "
-                />
-                <ListItemText
-                  primary={FEIEvent.title}
-                  secondary={FEIEvent.space}
-                />
-              </Stack>
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <Stack
+        width={"50%"}
+        flexGrow={1}
+        paddingLeft={3}
+        sx={{
+          display: { md: "block", xs: "none" },
+        }}
+      >
+        <CalendarEventList
+          selectedEvents={selectedEvents}
+          selectedDate={selectedDate}
+        ></CalendarEventList>
+      </Stack>
     </Stack>
   );
 }

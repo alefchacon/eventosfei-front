@@ -1,10 +1,9 @@
 :root{
   --main-blue: #18529d;
+  --main-green: #2E8E49;
   --gray-bg: #f3f3f3;
   --secondary-blue: #DFE7F1;
 }
-
-
 
 .form{
 
@@ -42,6 +41,7 @@ main{
   margin-top: 60px;
   width: 100%;
   overflow: auto;
+  background-color: var(--gray-bg);
 }
 
 
@@ -81,12 +81,29 @@ main{
 
 
 /* --- calendar ---*/
-.calendar-toolbar{
-  background-color: red;
-  display: flex;
-  padding: 10px;
-  justify-content: space-between;
+.calendar{
+  padding: 30px;
+}
 
+
+
+.calendar-toolbar{
+  background-color: var(--gray-bg);
+  display: flex;
+  padding-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+
+
+.calendar-date-control{
+  display: flex;
+  
+  min-width: 100px;
+  width: 100%;
+  align-items: center;
 }
 
 .rbc-day-slot .rbc-time-slot {
@@ -106,4 +123,27 @@ main{
 
 .selected-date {
   background-color: #ffcccc; /* Light red background for selected date */
+}
+
+.calendar-event{
+  border-left: 10px solid var(--main-blue);
+  
+}
+
+
+
+@media (max-width:961px) {
+  .button-new-notification .MuiButton-root{
+    display: none !important;
+  }
+}
+
+
+
+.green{
+  background-color: #2E8E49;
+}
+
+.white{
+  background-color: white !important;
 }
