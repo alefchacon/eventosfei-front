@@ -14,6 +14,7 @@ import {
   Select,
   Fab,
   Container,
+  Drawer,
 } from "@mui/material";
 import {
   Calendar,
@@ -55,6 +56,7 @@ const now = new Date();
 
 const CustomToolbar = (props) => {
   const { date, onNavigate } = props;
+  const [openEventSidebar, setOpenEventSidebar] = useState(false);
 
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
@@ -149,6 +151,12 @@ export default function MyCalendar({
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
+  const [openEventSidebar, setOpenEventSidebar] = useState(false);
+
+  const handleOpenEventSidebar = () => {
+    setOpenEventSidebar(!openEventSidebar);
+    console.log(openEventSidebar);
+  };
 
   const handleSelectSlot = (slotInfo) => {
     const { start, end } = slotInfo;
@@ -160,10 +168,9 @@ export default function MyCalendar({
         moment(event.end).isSameOrBefore(moment(end))
     );
     setSelectedEvents(eventsInRange);
-
+    console.log(eventsInRange);
     //console.log("Selected slot:", slotInfo);
     //console.log("Events in selected slot:", eventsInRange);
-    console.log(selectedDate.getTime());
     setSelectedDate(slotInfo.start);
   };
 
@@ -184,7 +191,7 @@ export default function MyCalendar({
 
     let eventsByReservation = [];
     for (const event of responseEvents) {
-      let reservations = event.reservations.map((reservation) => {
+      event.reservations.map((reservation) => {
         eventsByReservation.push({
           id: event.id,
           title: event.name,
@@ -194,8 +201,6 @@ export default function MyCalendar({
         });
       });
     }
-
-    console.log(eventsByReservation);
 
     setEvents(eventsByReservation);
   };
@@ -218,38 +223,49 @@ export default function MyCalendar({
       display={"flex"}
       className="calendar"
       width={"100%"}
+      height={"100%"}
       direction={"row"}
-      bgcolor={"red"}
     >
-      <Calendar
-        localizer={localizer}
-        selectable={true}
-        startAccessor="start"
-        endAccessor="end"
-        components={components}
-        onSelectSlot={handleSelectSlot}
-        onSelectEvent={() => console.log("EVENT")}
-        date={selectedMonth}
-        defaultDate={defaultDate}
-        formats={formats}
-        events={events}
-        onNavigate={handleNavigation}
-        style={{ height: 500, width: "100%", flexGrow: 2 }}
-      />
-
-      <Stack
-        width={"50%"}
-        flexGrow={1}
-        paddingLeft={3}
+      <Button
         sx={{
-          display: { md: "block", xs: "none" },
+          display: { md: "none", xs: "block" },
+          position: "absolute",
+          zIndex: "10000",
+          top: 0,
+          right: 0,
+          margin: 2,
         }}
+        variant="contained"
+        onClick={handleOpenEventSidebar}
       >
-        <CalendarEventList
-          selectedEvents={selectedEvents}
-          selectedDate={selectedDate}
-        ></CalendarEventList>
+        Eventos
+      </Button>
+      <Stack
+        style={{ height: "100%", width: "100%", flexGrow: 2 }}
+        bgcolor={"white"}
+      >
+        <Calendar
+          localizer={localizer}
+          selectable={true}
+          startAccessor="start"
+          endAccessor="end"
+          components={components}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={() => console.log("EVENT")}
+          date={selectedMonth}
+          defaultDate={defaultDate}
+          formats={formats}
+          events={events}
+          onNavigate={handleNavigation}
+          style={{ height: "100%", width: "100%", flexGrow: 2 }}
+        />
       </Stack>
+
+      <CalendarEventList
+        selectedEvents={selectedEvents}
+        selectedDate={selectedDate}
+        isOpen={openEventSidebar}
+      ></CalendarEventList>
     </Stack>
   );
 }

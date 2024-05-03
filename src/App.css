@@ -132,9 +132,13 @@ main{
 
 
 
-@media (max-width:961px) {
+@media (max-width:900px) {
   .button-new-notification .MuiButton-root{
     display: none !important;
+  }
+
+  .calendar{
+    padding: 0px;
   }
 }
 
