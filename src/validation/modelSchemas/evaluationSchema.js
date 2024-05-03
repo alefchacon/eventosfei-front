@@ -17,22 +17,7 @@ export const evaluationSchema = yup.object().shape({
     ratingComputerCenterReason: alphanumericSchema.clone().required(messages.required),
     ratingResources: numericSchema.clone().required(messages.required),
     ratingResourcesReason: alphanumericSchema.clone().required(messages.required),
-    problemsResources: alphanumericSchema.clone().required(messages.required),
     improvementsResources: alphanumericSchema.clone(),
     additional: alphanumericSchema.clone(),
-    /*
-    razonCalificacionAtencion : alphanumericSchema.clone().required(messages.required),
-    calificacionComunicacion: parseInt(communicationRating),
-    mejorasApoyo : document.querySelector('#supportImprovements').value,
-    calificacionEspacio: spaceRating,
-    problemasEspacio : document.querySelector('#spaceProblems').value,
-    calificacionCentroComputo: computerCenterRating,
-    razonCalificacionCentroComputo : document.querySelector('#computerCenterRatingReason').value,
-    calificacionRecursos: resourcesRating,
-    razonCalificacionRecursos : document.querySelector('#resourcesRatingReason').value,
-    problemaRecursos : document.querySelector('#resourcesProblems').value,
-    mejorasRecursos : document.querySelector('#resourcesImprovements').value,
-    adicional : document.querySelector('#additional').value,
-    idEvento: 1
-    */
+
 });

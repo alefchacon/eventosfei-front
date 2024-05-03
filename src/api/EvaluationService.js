@@ -1,43 +1,26 @@
 import { urlEvaluations } from "./urls"
 import { client } from "./Client";
+import messages from "../validation/messages";
 
-export default async function CreateEvaluation(evaluation, evidences){
-  const formData = new FormData();
-  evidences.forEach((archivo, index) => {
-    formData.append(`evidencias[${index}][evidencia]`, archivo);
-  });
-  
-  
+export default async function AddEvaluation(evaluation){
+  console.log(evaluation)
   const data = {
     "calificacionAtencion": evaluation.ratingAttention,
     "razonCalificacionAtencion":evaluation.ratingAttentionReason,
     "calificacionComunicacion":evaluation.ratingCommunication,
-    "mejorasApoyo":evaluation.improvementsSupport,
+    "mejorasApoyo":evaluation.improvementsSupport ?? messages.campoOpcional,
     "calificacionEspacio":evaluation.ratingSpace,
-    "problemasEspacio":evaluation.problemsSpace,
+    "problemasEspacio": evaluation.problemsSpace ?? messages.campoOpcional,
     "calificacionCentroComputo":evaluation.ratingComputerCenter,
     "razonCalificacionCentroComputo":evaluation.ratingComputerCenterReason,
     "calificacionRecursos":evaluation.ratingResources,
     "razonCalificacionRecursos":evaluation.ratingResourcesReason,
-    "problemasRecursos":evaluation.problemsResources,
-    "mejorasRecursos":evaluation.improvementsResources,
-    "adicional":evaluation.additional,
+    "mejorasRecursos":evaluation.improvementsResources ?? messages.campoOpcional,
+    "adicional":evaluation.additional ?? messages.campoOpcional,
     "idEvento":evaluation.idEvento,
-    "evidencias": evidences
   }
   console.log(data)
-  const response = await client.post(urlEvaluations, data);
-  console.log(response)
-}
 
-export const AddUser = async (data) => {
-  const user = {
-    "nombres":          data.names,
-    "apellidoPaterno":  data.paternalName, 
-    "apellidoMaterno":  data.maternalName, 
-    "email":            data.email,
-    "puesto":           data.job,
-    "idRol":            data.idRol,
-  }
-  return await client.post(urlUsers.addUser, user);
+  const response = await client.post(urlEvaluations, data);
+  return response;
 }

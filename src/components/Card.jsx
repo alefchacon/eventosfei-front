@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -22,6 +22,8 @@ const bull = (
 );
 
 export default function EventCard({ props, parentHandle }, { key }) {
+  const [isEvaluated, setIsEvaluated] = useState(false);
+
   const {
     id = 0,
     name = "nombre del evento",
@@ -40,8 +42,18 @@ export default function EventCard({ props, parentHandle }, { key }) {
     console.info("You clicked the Chip.");
   };
 
+  useEffect(() => {
+    setIsEvaluated(status.id === 3);
+  }, [status]);
+
   return (
-    <Card sx={{ minWidth: "30%", maxHeight: 250 }}>
+    <Card
+      sx={{
+        minWidth: "30%",
+        maxHeight: 250,
+        bgcolor: isEvaluated ? "#f4f4f4" : "white",
+      }}
+    >
       <CardContent sx={{ mb: -3 }}>
         <Stack
           sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
@@ -61,10 +73,10 @@ export default function EventCard({ props, parentHandle }, { key }) {
         <Typography color="text.primary">{space}</Typography>
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button size="medium" onClick={handle}>
+        <Button size="medium" onClick={handle} disabled={isEvaluated}>
           Editar
         </Button>
-        <Button size="medium" color="error">
+        <Button size="medium" color="error" disabled={isEvaluated}>
           Cancelar
         </Button>
       </CardActions>

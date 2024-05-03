@@ -9,12 +9,16 @@ import {
 } from "@mui/material";
 
 import UploadIcon from "@mui/icons-material/Upload";
+import { ValidationError } from "yup";
+import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
 function File({ file }) {
   return <Button>{file.name}</Button>;
 }
 
 export default function UploadArea({ files, setFiles }) {
+  const { showSnackbar } = useSnackbar();
+
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -27,12 +31,21 @@ export default function UploadArea({ files, setFiles }) {
     width: 1,
   });
 
+  function validateNewFilename(newFile) {
+    if (files.some((file) => file.name === newFile.name)) {
+      throw new ValidationError(
+        "No puede subir múltiples archivos con el mismo nombre."
+      );
+    }
+  }
+
   const parseDroppedFile = async (items) => {
     let files = [];
 
     [...items].forEach((item, i) => {
       if (item.kind === "file") {
         const file = item.getAsFile();
+        validateNewFilename(file);
         files.push(file);
       }
     });
@@ -42,9 +55,7 @@ export default function UploadArea({ files, setFiles }) {
     let files = [];
 
     [...items].forEach((item, i) => {
-      //if (item.class === "File") {
       files.push(item);
-      //}
     });
     return files;
   };
@@ -54,9 +65,12 @@ export default function UploadArea({ files, setFiles }) {
     let items = [];
     items = event.dataTransfer.items;
 
-    const parsedFiles = await parseDroppedFile(items);
-
-    setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
+    try {
+      const parsedFiles = await parseDroppedFile(items);
+      setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
+    } catch (e) {
+      showSnackbar(e.message);
+    }
   };
 
   const handlePick = async (event) => {
@@ -64,15 +78,24 @@ export default function UploadArea({ files, setFiles }) {
     let items = [];
     items = event.target.files;
 
-    const parsedFiles = await parsePickedFile(items);
-
-    setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
+    try {
+      const parsedFiles = await parsePickedFile(items);
+      setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
+    } catch (e) {
+      showSnackbar(e.message);
+    }
   };
 
   function dragOverHandler(event) {
     event.preventDefault();
     console.log("sasdf");
   }
+
+  const handleDelete = async (fileToDelete) => {
+    const fileNameToDelete = fileToDelete.name;
+    const newFiles = files.filter((file) => file.name !== fileNameToDelete);
+    setFiles(newFiles);
+  };
 
   return (
     <div>
@@ -101,7 +124,12 @@ export default function UploadArea({ files, setFiles }) {
         </Stack>
       </CardActionArea>
       {files.map((file, index) => (
-        <Chip key={index} variant="filled" label={file.name}></Chip>
+        <Chip
+          key={index}
+          variant="filled"
+          label={file.name}
+          onDelete={() => handleDelete(file)}
+        ></Chip>
       ))}
     </div>
   );

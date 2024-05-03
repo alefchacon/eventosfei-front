@@ -1,5 +1,14 @@
-import { urlEvents, urlNotifications, urlEventById } from "./urls.js";
+import { urlEvents, urlNotifications, urlEventById, urlEventsByMonth } from "./urls.js";
 import { client } from "./Client.js";
+
+export const GetEventsByMonth = async (date) => {
+  const data = {
+    "year"  : date.getFullYear(),
+    "month" : date.getMonth()+1,
+  }
+  const response = await client.post(urlEventsByMonth,data);
+  return response;
+};
 
 export const GetEvents = async () => {
   const response = await client.get(urlEvents);
@@ -16,7 +25,6 @@ export const RespondToEvent = async (event, id) => {
     respuesta: event.response,
     idEstado: event.idEstado,
   };
-  console.log(data)
   const response = await client.put(urlEventById(id), data);
   return response;
 };

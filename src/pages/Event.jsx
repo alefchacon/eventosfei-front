@@ -56,7 +56,6 @@ function a11yProps(index) {
 export default function Event({ setTitle }) {
   const [value, setValue] = useState(0);
   const [FEIEvent, setEvent] = useState(null);
-  const [showEventResponseMobile, setShowEventResponseMobile] = useState(false);
 
   let { eventId } = useParams();
 
@@ -177,7 +176,11 @@ export default function Event({ setTitle }) {
             Four
           </CustomTabPanel>
           <CustomTabPanel value={value} index={7}>
-            <Evaluation idEvento={eventId}></Evaluation>
+            <Evaluation
+              idEvento={eventId}
+              FEIEvent={FEIEvent}
+              onSubmit={setEvent}
+            ></Evaluation>
           </CustomTabPanel>
         </Box>
       )}

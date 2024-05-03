@@ -21,7 +21,7 @@ const marks = [
   },
 ];
 
-export default function Progress({ value, changePage }) {
+export default function Progress({ value, isDisabled, changePage }) {
   const handleChange = (event, newValue) => {
     changePage(newValue); // Call the parent's callback function with the new value
   };
@@ -52,6 +52,7 @@ export default function Progress({ value, changePage }) {
           step={1}
           max={4}
           valueLabelDisplay="off"
+          disabled={isDisabled}
           marks={marks}
           sx={{
             // Increase the size of the marks
@@ -65,13 +66,7 @@ export default function Progress({ value, changePage }) {
                 backgroundColor: "primary.main", // Custom color for the active mark
               },
             },
-            // Adjust the mark label position if necessary
-            "& .MuiSlider-markLabel": {
-              marginLeft: "12px",
-              marginBottom: "15px",
 
-              color: "primary.main", // Custom color for the label
-            },
             // Custom styling for the thumb to ensure it doesn't get overshadowed
             "& .MuiSlider-thumb": {
               width: "6vh",

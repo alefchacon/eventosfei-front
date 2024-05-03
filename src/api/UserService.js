@@ -21,7 +21,7 @@ export const GetUsers = async () => {
   return await client.get(urlUsers.getUsersWithRoles);
 }
 
-export const AddUser = async (data) => {
+export const StoreUser = async (data) => {
   const user = {
     "nombres":          data.names,
     "apellidoPaterno":  data.paternalName, 

@@ -32,11 +32,12 @@ export function DialogProvider({ children }) {
 
   const DialogTypeForms = {};
 
-  const showDialog = (title, type, handleSubmit) => {
+  const showDialog = (title, type, handleSubmit, content) => {
     setTitle(title);
     setType(type);
     setOnSubmit(handleSubmit);
     setOpen(true);
+    setContent(content);
   };
 
   const handleSubmit = (value) => {
@@ -82,6 +83,7 @@ export function DialogProvider({ children }) {
                 onSubmit={handleSubmit}
               ></MultiUserForm>
             )}
+            {type === DialogTypes.searchList && content}
           </DialogContent>
         </Dialog>
       </Box>

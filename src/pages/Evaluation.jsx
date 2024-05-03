@@ -7,7 +7,6 @@ import Progress from "../components/Progress.jsx";
 import ProgressHorizontal from "../components/ProgressHorizontal.jsx";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CreateEvaluation from "../api/EvaluationService.js";
 import ItemUpload from "../components/ItemUpload.jsx";
 import TextArea from "../components/TextArea.jsx";
 import Stack from "@mui/material/Stack";
@@ -18,6 +17,10 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { styled } from "@mui/material/styles";
 import { useFormik } from "formik";
 import { evaluationSchema } from "../validation/modelSchemas/evaluationSchema.js";
+import { useSnackbar } from "../providers/SnackbarProvider.jsx";
+
+import AddEvaluation from "../api/EvaluationService.js";
+import AddEvidence from "../api/EvidenceService.js";
 
 import LoadingButton from "../components/LoadingButton.jsx";
 
@@ -41,9 +44,10 @@ function CustomTabPanel(props) {
   );
 }
 
-export default function Form({ idEvento }) {
+export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
   const [value, setValue] = useState(4);
   const [evidences, setEvidences] = useState([]);
+  const [isEvaluated, setIsEvaluated] = useState(false);
 
   const questionSpacing = 1;
   const formSpacing = 6;
@@ -51,7 +55,12 @@ export default function Form({ idEvento }) {
 
   const [showProgressHorizontal, setShowProgressHorizontal] = useState(false);
 
+  const { showSnackbar } = useSnackbar();
+
   useEffect(() => {
+    setFEIEvent(FEIEvent);
+    setIsEvaluated(FEIEvent && FEIEvent.evaluation !== null);
+
     const updateOrientation = () => {
       setShowProgressHorizontal(window.innerWidth < 900);
     };
@@ -64,10 +73,10 @@ export default function Form({ idEvento }) {
   }, []);
 
   const handleChangePage = (pageIndex) => {
+    console.log(values);
     if (pageIndex > -1 && pageIndex < 5) {
       setValue(pageIndex);
     }
-    console.log(values);
   };
 
   const handleRatingAttentionChange = (event, newRatingAttention) => {
@@ -107,12 +116,33 @@ export default function Form({ idEvento }) {
     { id: 3, name: "Si" },
   ];
 
-  const evaluate = async (values, actions) => {
+  const submitEvaluation = async (values, actions) => {
     try {
-      values.idEvento = idEvento;
-      CreateEvaluation(values, evidences);
+      console.log(FEIEvent);
+      values.idEvento = FEIEvent.id;
+      const response = await AddEvaluation(values);
+
+      const idEvaluacion = response.data.data.id;
+      if (response.status === 201) {
+        submitEvidences(idEvaluacion, evidences);
+      }
+
+      FEIEvent.evaluation = values;
+      setFEIEvent(FEIEvent);
+      setIsEvaluated(true);
+
+      showSnackbar(response.data.message);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const submitEvidences = async (idEvaluacion, evidences) => {
+    for (let i = 0; i < evidences.length; i++) {
+      const response = await AddEvidence(idEvaluacion, evidences[i]);
+      if (response.status !== 201) {
+        break;
+      }
     }
   };
 
@@ -128,21 +158,20 @@ export default function Form({ idEvento }) {
   } = useFormik({
     initialValues: {
       ratingAttention: 1,
-      ratingAttentionReason: "ratingAttentionReason",
+      ratingAttentionReason: "",
       ratingCommunication: 2,
-      improvementsSupport: "improvementsSupport",
+      improvementsSupport: "",
       ratingSpace: 3,
-      problemsSpace: "problemsSpace",
+      problemsSpace: "",
       ratingComputerCenter: 4,
-      ratingComputerCenterReason: "ratingComputerCenterReason",
+      ratingComputerCenterReason: "",
       ratingResources: 5,
-      ratingResourcesReason: "ratingResourcesReason",
-      problemsResources: "problemsResources",
-      improvementsResources: "improvementsResources",
-      additional: "additional",
+      ratingResourcesReason: "",
+      improvementsResources: "",
+      additional: "",
     },
     validationSchema: evaluationSchema,
-    onSubmit: evaluate,
+    onSubmit: submitEvaluation,
   });
 
   return (
@@ -169,6 +198,7 @@ export default function Form({ idEvento }) {
                         name="ratingAttention"
                         value={values.ratingAttention}
                         size="large"
+                        disabled={isSubmitting}
                         sx={{
                           fontSize: "2.5rem",
                           color: "#18529d",
@@ -189,6 +219,7 @@ export default function Form({ idEvento }) {
                       name="ratingAttentionReason"
                       variant="filled"
                       label="Razón de la calificación"
+                      disabled={isSubmitting}
                       multiline
                       maxRows={3}
                       value={values.ratingAttentionReason}
@@ -224,6 +255,7 @@ export default function Form({ idEvento }) {
                       id="improvementsSupport"
                       name="improvementsSupport"
                       variant="filled"
+                      disabled={isSubmitting}
                       label="Mejoras"
                       multiline
                       maxRows={3}
@@ -279,6 +311,7 @@ export default function Form({ idEvento }) {
                       id="problemsSpace"
                       name="problemsSpace"
                       variant="filled"
+                      disabled={isSubmitting}
                       label="Mejoras"
                       multiline
                       maxRows={3}
@@ -308,6 +341,7 @@ export default function Form({ idEvento }) {
                   <Stack display={"flex"} direction={"row"}>
                     <Box flexGrow={1}></Box>
                     <Rating
+                      disabled={isSubmitting}
                       name="attentionRating"
                       value={values.ratingComputerCenter}
                       size="large"
@@ -329,6 +363,7 @@ export default function Form({ idEvento }) {
                   <TextField
                     name="ratingComputerCenterReason"
                     variant="filled"
+                    disabled={isSubmitting}
                     label="Factores"
                     multiline
                     maxRows={3}
@@ -355,6 +390,7 @@ export default function Form({ idEvento }) {
                   <Stack display={"flex"} direction={"row"}>
                     <Box flexGrow={1}></Box>
                     <Rating
+                      disabled={isSubmitting}
                       name="attentionRating"
                       value={values.ratingResources}
                       size="large"
@@ -375,6 +411,7 @@ export default function Form({ idEvento }) {
                   <TextField
                     id="ratingResourcesReason"
                     name="ratingResourcesReason"
+                    disabled={isSubmitting}
                     variant="filled"
                     label="Factores"
                     multiline
@@ -402,6 +439,7 @@ export default function Form({ idEvento }) {
                     id="improvementsResources"
                     variant="filled"
                     label="Mejoras"
+                    disabled={isSubmitting}
                     multiline
                     maxRows={3}
                     value={values.improvementsResources}
@@ -443,6 +481,7 @@ export default function Form({ idEvento }) {
                     sobre la organización y ejecución del evento:{" "}
                   </Typography>
                   <TextField
+                    disabled={isSubmitting}
                     id="additional"
                     variant="filled"
                     label="Comentario adicional"
@@ -465,16 +504,20 @@ export default function Form({ idEvento }) {
               alignItems={"center"}
               spacing={2}
             >
-              <Button onClick={() => handleChangePage(value + 1)}>
-                Regresar
+              <Button
+                disabled={isSubmitting}
+                onClick={() => handleChangePage(value + 1)}
+              >
+                Anterior
               </Button>
               <Button
+                disabled={isSubmitting}
                 variant="outlined"
                 onClick={() => handleChangePage(value - 1)}
               >
                 Siguiente
               </Button>
-              {value == 0 && (
+              {value == 0 && !isEvaluated && (
                 <LoadingButton
                   label="Evaluar evento"
                   isLoading={isSubmitting}
@@ -485,11 +528,16 @@ export default function Form({ idEvento }) {
         </Box>
 
         {!showProgressHorizontal && (
-          <Progress value={value} changePage={handleChangePage}></Progress>
+          <Progress
+            isDisabled={isSubmitting}
+            value={value}
+            changePage={handleChangePage}
+          ></Progress>
         )}
       </Stack>
       {showProgressHorizontal && (
         <ProgressHorizontal
+          isDisabled={isSubmitting}
           value={value}
           changePage={handleChangePage}
         ></ProgressHorizontal>

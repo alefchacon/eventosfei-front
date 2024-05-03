@@ -42,10 +42,12 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import FestivalIcon from "@mui/icons-material/Festival";
 import PeopleIcon from "@mui/icons-material/People";
 
+import Calendar from "./components/Calendar.jsx";
 import RouteGuard from "./pages/RouteGuard.jsx";
 
 import LogInPage from "./pages/LogIn.jsx";
 import Users from "./pages/Users.jsx";
+import Reservation from "./pages/Reservation.jsx";
 
 import Event from "./pages/Event.jsx";
 
@@ -101,7 +103,7 @@ function App(props) {
       {isAuthenticated && (
         <List>
           <Link
-            to="/miseventos"
+            to="/calendario"
             onClick={handleSelection}
             id="Calendario"
             className="sidebar-link"
@@ -157,6 +159,21 @@ function App(props) {
                   <PeopleIcon className="sidebar-link" />
                 </ListItemIcon>
                 <ListItemText primary="Usuarios" />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link
+            to="/reservar"
+            onClick={handleSelection}
+            id="Espacios"
+            className="sidebar-link"
+          >
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PeopleIcon className="sidebar-link" />
+                </ListItemIcon>
+                <ListItemText primary="Reservar Espacio" />
               </ListItemButton>
             </ListItem>
           </Link>
@@ -338,6 +355,16 @@ function App(props) {
           >
             {" "}
           </Route>
+          <Route
+            path="/calendario"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <Calendar />
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
 
           <Route
             path="/"
@@ -369,6 +396,16 @@ function App(props) {
                   FEIEvent={selectedFEIEvent}
                   setTitle={setCurrentSection}
                 />
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
+          <Route
+            path="/reservar"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <Reservation></Reservation>
               </RouteGuard>
             }
           >

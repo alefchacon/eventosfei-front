@@ -5,7 +5,7 @@ import { TextField, Stack, DialogActions, Button } from "@mui/material";
 
 import { userSchema } from "../validation/modelSchemas/userSchema";
 import { GetRoles } from "../api/RolesService.js";
-import { AddUser } from "../api/UserService.js";
+import { StoreUser } from "../api/UserService.js";
 
 import LoadingButton from "../components/LoadingButton";
 import BasicSelect from "../components/Select";
@@ -31,7 +31,7 @@ export default function UserForm({ onCancel, onSubmit }) {
 
   const submitUser = async (values, actions) => {
     try {
-      const response = await AddUser(values);
+      const response = await StoreUser(values);
       let addedUser = response.data.data;
 
       onSubmit(addedUser);

@@ -78,3 +78,32 @@ main{
 
 .form-box{
 }
+
+
+/* --- calendar ---*/
+.calendar-toolbar{
+  background-color: red;
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+
+}
+
+.rbc-day-slot .rbc-time-slot {
+  padding: 0;
+  margin: 0;
+}
+
+.rbc-date-cell {
+  padding: 5px; /* Adjust padding to ensure it doesn't block cell selection */
+  width: 100%;
+  height: 100%;
+}
+
+.rbc-day-bg:hover {
+  background-color: #cceeff; /* Light blue background on hover */
+}
+
+.selected-date {
+  background-color: #ffcccc; /* Light red background for selected date */
+}
