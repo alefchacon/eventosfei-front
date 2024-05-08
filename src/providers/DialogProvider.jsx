@@ -13,6 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import UserForm from "../forms/UserForm";
 import MultiUserForm from "../forms/MultiUserForm";
+import ReservationForm from "../forms/ReservationForm";
 
 import DialogTypes from "./DialogTypes";
 
@@ -82,6 +83,12 @@ export function DialogProvider({ children }) {
                 onCancel={handleClose}
                 onSubmit={handleSubmit}
               ></MultiUserForm>
+            )}
+            {type === DialogTypes.reservationForm && (
+              <ReservationForm
+                onCancel={handleClose}
+                onSubmit={handleSubmit}
+              ></ReservationForm>
             )}
             {type === DialogTypes.searchList && content}
           </DialogContent>

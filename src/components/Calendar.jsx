@@ -37,6 +37,8 @@ import "moment/locale/es";
 import * as dates from "./dates";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../App.css";
+import DialogTypes from "../providers/DialogTypes";
+import { useDialog } from "../providers/DialogProvider.jsx";
 
 import { GetEventsByMonth } from "../api/EventService";
 
@@ -57,6 +59,7 @@ const now = new Date();
 const CustomToolbar = (props) => {
   const { date, onNavigate } = props;
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
+  const { showDialog } = useDialog();
 
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
@@ -109,6 +112,9 @@ const CustomToolbar = (props) => {
             display: { md: "block", xs: "none" },
           }}
           variant="contained"
+          onClick={() =>
+            showDialog("Solicitar espacio", DialogTypes.reservationForm)
+          }
         >
           Nueva Notificación
         </Button>
@@ -174,17 +180,7 @@ export default function MyCalendar({
     setSelectedDate(slotInfo.start);
   };
 
-  const handleNavigation = async (newDate, view, action) => {
-    switch (action) {
-      case "PREVIOUS":
-        selectedMonth.setMonth(selectedMonth.getMonth() - 1);
-        break;
-      case "NEXT":
-        selectedMonth.setMonth(selectedMonth.getMonth() + 1);
-        break;
-      default:
-        setDate(new Date());
-    }
+  const getEvents = async () => {
     const response = await GetEventsByMonth(selectedMonth);
 
     const responseEvents = response.data.data;
@@ -205,6 +201,21 @@ export default function MyCalendar({
     setEvents(eventsByReservation);
   };
 
+  const handleNavigation = async (newDate, view, action) => {
+    switch (action) {
+      case "PREVIOUS":
+        selectedMonth.setMonth(selectedMonth.getMonth() - 1);
+        break;
+      case "NEXT":
+        selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+        break;
+      default:
+        setDate(new Date());
+    }
+
+    getEvents();
+  };
+
   const formats = {
     dateFormat: "DD", // day of month
     dayFormat: "ddd DD/MM", // day of the week, date
@@ -217,6 +228,9 @@ export default function MyCalendar({
         culture
       )}`,
   };
+  useEffect(() => {
+    getEvents();
+  }, []);
 
   return (
     <Stack
