@@ -9,6 +9,7 @@ import {
   ListItemButton,
   ListItemText,
   Drawer,
+  Button,
 } from "@mui/material";
 
 import useWindowSize from "../hooks/useWindowSize";
@@ -32,6 +33,7 @@ export default function CalendarEventList({
   selectedEvents,
   selectedDate,
   isOpen,
+  isEvents = false,
 }) {
   const { width } = useWindowSize();
   const isMobile = width < 900; // Define mobile view as less than 768px
@@ -39,37 +41,54 @@ export default function CalendarEventList({
   const EventList = () => {
     return (
       <Stack bgcolor={"white"} height={"100%"} borderRadius={1}>
-        <Typography variant="h6" padding={2}>
-          {parseDate(selectedDate)}
-        </Typography>
+        <Stack direction={"row"}>
+          <Stack padding={2} spacing={-0.5} width={"100%"}>
+            <Typography variant="h6">{parseDate(selectedDate)}</Typography>
+          </Stack>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "var(--main-green)",
+              display: { md: "block", xs: "none" },
+
+              marginTop: "7px",
+              marginBottom: "7px",
+              marginRight: "5px",
+            }}
+          >
+            Solicitar espacio
+          </Button>
+        </Stack>
         <Divider></Divider>
         <List>
-          {selectedEvents.map((FEIEvent) => (
-            <ListItem
-              className="calendar-event"
-              key={FEIEvent.id}
-              disablePadding
-            >
-              <ListItemButton>
-                <Stack direction={"row"} spacing={4}>
-                  {" "}
-                  <ListItemText
-                    primary={formatTime(FEIEvent.start)}
-                    secondary=" "
-                  />
-                  <ListItemText
-                    sx={{
-                      width: "100%",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                    primary={FEIEvent.title}
-                    secondary={FEIEvent.space}
-                  />
-                </Stack>
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <Stack spacing={0.5}>
+            {selectedEvents.map((FEIEvent) => (
+              <ListItem
+                className="calendar-event"
+                key={FEIEvent.id}
+                disablePadding
+              >
+                <ListItemButton>
+                  <Stack direction={"row"} spacing={4}>
+                    {" "}
+                    <ListItemText
+                      primary={formatTime(FEIEvent.start)}
+                      secondary=" "
+                    />
+                    <ListItemText
+                      sx={{
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                      primary={FEIEvent.title}
+                      secondary={FEIEvent.space}
+                    />
+                  </Stack>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </Stack>
         </List>
       </Stack>
     );

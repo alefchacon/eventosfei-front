@@ -47,7 +47,7 @@ import RouteGuard from "./pages/RouteGuard.jsx";
 
 import LogInPage from "./pages/LogIn.jsx";
 import Users from "./pages/Users.jsx";
-import Reservation from "./pages/Reservation.jsx";
+import Reservation from "./forms/ReservationForm.jsx";
 
 import Event from "./pages/Event.jsx";
 
