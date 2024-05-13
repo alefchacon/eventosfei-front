@@ -14,6 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import UserForm from "../forms/UserForm";
 import MultiUserForm from "../forms/MultiUserForm";
 import ReservationForm from "../forms/ReservationForm";
+import ReservationResponseForm from "../forms/ReservationResponseForm";
 
 import DialogTypes from "./DialogTypes";
 
@@ -34,6 +35,7 @@ export function DialogProvider({ children }) {
   const DialogTypeForms = {};
 
   const showDialog = (title, type, handleSubmit, content) => {
+    console.log(type);
     setTitle(title);
     setType(type);
     setOnSubmit(handleSubmit);
@@ -57,13 +59,28 @@ export function DialogProvider({ children }) {
   return (
     <DialogContext.Provider value={{ showDialog }}>
       {children}
-      <Box sx={{ width: "100%", maxWidth: 460, bgcolor: "background.paper" }}>
+      <Box
+        sx={{
+          padding: 0,
+          width: "100%",
+          maxWidth: 460,
+          bgcolor: "background.paper",
+        }}
+      >
         <Dialog
-          sx={{ "& .MuiDialog-paper": { width: "100%", maxHeight: "100%" } }}
+          sx={{
+            "& .MuiDialog-paper": {
+              padding: 0,
+              width: "100%",
+              maxHeight: "100%",
+            },
+          }}
           maxWidth="xs"
           open={open}
           PaperProps={{
             style: {
+              padding: 0,
+              margin: 0,
               width: type.width,
               minWidth: type.minWidth,
               maxWidth: type.maxWidth,
@@ -90,7 +107,12 @@ export function DialogProvider({ children }) {
                 onSubmit={handleSubmit}
               ></ReservationForm>
             )}
-            {type === DialogTypes.searchList && content}
+            {type === DialogTypes.reservationResponse && (
+              <ReservationResponseForm
+                onCancel={handleClose}
+                onSubmit={handleSubmit}
+              ></ReservationResponseForm>
+            )}
           </DialogContent>
         </Dialog>
       </Box>

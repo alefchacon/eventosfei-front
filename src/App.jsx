@@ -3,6 +3,7 @@ import { useState } from "react";
 import "./App.css";
 import Evaluation from "./pages/Evaluation.jsx";
 import EventList from "./pages/EventList.jsx";
+import ReservationList from "./pages/ReservationList.jsx";
 import "./index.css";
 import {
   BrowserRouter,
@@ -11,6 +12,7 @@ import {
   Link,
   useNavigate,
 } from "react-router-dom";
+
 import * as React from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
@@ -41,6 +43,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import FestivalIcon from "@mui/icons-material/Festival";
 import PeopleIcon from "@mui/icons-material/People";
+import LinearProgress from "@mui/material/LinearProgress";
 
 import Calendar from "./components/Calendar.jsx";
 import RouteGuard from "./pages/RouteGuard.jsx";
@@ -91,6 +94,8 @@ function App(props) {
       setMobileOpen(!mobileOpen);
     }
   };
+
+  const handleNavigation = (route) => {};
 
   const drawer = (
     <Stack bgcolor={"#18529d"} flexGrow={1} color={"white"}>
@@ -173,7 +178,7 @@ function App(props) {
                 <ListItemIcon>
                   <PeopleIcon className="sidebar-link" />
                 </ListItemIcon>
-                <ListItemText primary="Reservar Espacio" />
+                <ListItemText primary="Reservaciones" />
               </ListItemButton>
             </ListItem>
           </Link>
@@ -270,12 +275,12 @@ function App(props) {
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              onClick={() => navigate("/calendario")}
             >
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-
             <IconButton
               size="large"
               edge="end"
@@ -330,6 +335,7 @@ function App(props) {
       </Box>
 
       <div className="content">
+        {false && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
         <Routes>
           <Route
             path="/eventos"
@@ -406,6 +412,16 @@ function App(props) {
             element={
               <RouteGuard isAuthenticated={isAuthenticated}>
                 <Reservation></Reservation>
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
+          <Route
+            path="/reservaciones"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <ReservationList></ReservationList>
               </RouteGuard>
             }
           >

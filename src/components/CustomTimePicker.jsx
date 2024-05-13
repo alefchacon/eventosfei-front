@@ -14,14 +14,17 @@ import moment from "moment";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
-export default function CustomTimePicker({ label = "Label" }) {
+export default function CustomTimePicker({
+  label = "Label",
+  defaultTime = moment(),
+  disabled = true,
+  onAccept,
+}) {
   return (
     <>
-      <ListItemButton>
+      <ListItemButton disabled={disabled}>
         <Stack
           spacing={-2}
-          paddingLeft={5}
-          paddingRight={5}
           width={"100%"}
           display={"flex"}
           justifyContent={"center"}
@@ -29,7 +32,9 @@ export default function CustomTimePicker({ label = "Label" }) {
           <Typography variant="h6">{label}</Typography>
 
           <TimePicker
-            defaultValue={moment("2022-04-17T12:00")}
+            value={defaultTime}
+            onAccept={onAccept}
+            ampm={false}
             slotProps={{
               textField: {
                 InputProps: { color: "primary" },

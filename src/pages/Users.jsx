@@ -146,7 +146,13 @@ export default function Users() {
   return (
     <>
       <Stack height={"100%"}>
-        <Stack direction={"row"} spacing={2} padding={2}>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          padding={2}
+          display={"flex"}
+          justifyContent={"end"}
+        >
           <Button
             variant="contained"
             onClick={() =>

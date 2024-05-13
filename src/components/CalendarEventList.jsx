@@ -12,15 +12,13 @@ import {
   Button,
 } from "@mui/material";
 
-import useWindowSize from "../hooks/useWindowSize";
+import useWindowSize from "../hooks/useWindowSize.jsx";
 function parseDate(date) {
-  // Convert the date object to a string, showing only the month
   return `${date.toLocaleString("es-MX", {
     weekday: "long",
   })}, ${date.getDate()} de ${date.toLocaleString("es-MX", {
     month: "long",
   })}`;
-  //return `${date.getDate()} de asdf`;
 }
 
 function formatTime(date) {
@@ -45,19 +43,6 @@ export default function CalendarEventList({
           <Stack padding={2} spacing={-0.5} width={"100%"}>
             <Typography variant="h6">{parseDate(selectedDate)}</Typography>
           </Stack>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "var(--main-green)",
-              display: { md: "block", xs: "none" },
-
-              marginTop: "7px",
-              marginBottom: "7px",
-              marginRight: "5px",
-            }}
-          >
-            Solicitar espacio
-          </Button>
         </Stack>
         <Divider></Divider>
         <List>
@@ -65,7 +50,7 @@ export default function CalendarEventList({
             {selectedEvents.map((FEIEvent) => (
               <ListItem
                 className="calendar-event"
-                key={FEIEvent.id}
+                key={FEIEvent.space.id}
                 disablePadding
               >
                 <ListItemButton>
@@ -82,7 +67,7 @@ export default function CalendarEventList({
                         textOverflow: "ellipsis",
                       }}
                       primary={FEIEvent.title}
-                      secondary={FEIEvent.space}
+                      secondary={FEIEvent.space.name}
                     />
                   </Stack>
                 </ListItemButton>
