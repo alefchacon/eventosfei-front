@@ -27,6 +27,13 @@ const DialogTypes = {
     minWidth: "350px",
     height: "50%",
   },
+  reservationResponse: {
+    title: "Responder reservación",
+    width: "40%",
+    maxWidth: "500px",
+    minWidth: "350px",
+    height: "50%",
+  },
 };
 
 export default DialogTypes;

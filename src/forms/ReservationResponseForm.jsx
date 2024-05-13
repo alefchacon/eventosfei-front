@@ -131,7 +131,7 @@ function SpaceRadio({
   );
 }
 
-export default function Reservation({ onCancel, onSubmit }) {
+export default function ReservationResponse({ onCancel, onSubmit }) {
   const { showDialog } = useDialog();
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(moment());
@@ -346,7 +346,7 @@ export default function Reservation({ onCancel, onSubmit }) {
           paddingTop={5}
         >
           <Button autoFocus onClick={onCancel} disabled={isSubmitting}>
-            Cerrar
+            RESPONSE!!
           </Button>
           <LoadingButton
             isReady={space !== null}

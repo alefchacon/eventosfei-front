@@ -16,6 +16,7 @@ import {
   Container,
   Drawer,
 } from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 import {
   Calendar,
   Views,
@@ -64,75 +65,76 @@ const CustomToolbar = (props) => {
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
     onNavigate(action);
-    console.log(date);
   };
 
   return (
-    <div className="calendar-toolbar">
-      <div className="calendar-date-control">
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel>
-              <Typography variant="h6">
-                {`${date.toLocaleString("es-MX", {
-                  month: "long",
-                })} ${date.getFullYear()}`}
-              </Typography>
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              className="date-select"
-              fullWidth
-              style={{ minWidth: "10rem" }}
-            >
-              <DateCalendar
-                defaultValue={moment("2022-04-17")}
-                views={["year"]}
-                openTo="year"
-              />{" "}
-            </Select>
-          </FormControl>
-        </LocalizationProvider>
+    <Stack>
+      <div className="calendar-toolbar">
+        <div className="calendar-date-control">
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel>
+                <Typography variant="h6">
+                  {`${date.toLocaleString("es-MX", {
+                    month: "long",
+                  })} ${date.getFullYear()}`}
+                </Typography>
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                className="date-select"
+                fullWidth
+                style={{ minWidth: "10rem" }}
+              >
+                <DateCalendar
+                  defaultValue={moment("2022-04-17")}
+                  views={["year"]}
+                  openTo="year"
+                />{" "}
+              </Select>
+            </FormControl>
+          </LocalizationProvider>
 
-        <button onClick={() => handleNavigate("PREVIOUS")}>Previous</button>
-        <button onClick={() => handleNavigate("NEXT")}>Next</button>
-      </div>
-      <Stack
-        direction={"row"}
-        spacing={3}
-        width={"100%"}
-        display={"flex"}
-        justifyContent={"end"}
-      >
-        <Button onClick={() => handleNavigate("TODAY")}>Hoy</Button>
-        <Button
-          sx={{
-            backgroundColor: "var(--main-green)",
-            display: { md: "block", xs: "none" },
-          }}
-          variant="contained"
-          onClick={() =>
-            showDialog("Solicitar espacio", DialogTypes.reservationForm)
-          }
+          <button onClick={() => handleNavigate("PREVIOUS")}>Previous</button>
+          <button onClick={() => handleNavigate("NEXT")}>Next</button>
+        </div>
+        <Stack
+          direction={"row"}
+          spacing={3}
+          width={"100%"}
+          display={"flex"}
+          justifyContent={"end"}
         >
-          Nueva Notificación
-        </Button>
-      </Stack>
-      <Stack
-        position={"absolute"}
-        bottom={0}
-        right={0}
-        padding={5}
-        sx={{
-          display: { md: "none", xs: "block" },
-        }}
-      >
-        <Fab color="primary" aria-label="add">
-          <AddIcon />
-        </Fab>
-      </Stack>
-    </div>
+          <Button onClick={() => handleNavigate("TODAY")}>Hoy</Button>
+          <Button
+            sx={{
+              backgroundColor: "var(--main-green)",
+              display: { md: "block", xs: "none" },
+            }}
+            variant="contained"
+            onClick={() =>
+              showDialog("Solicitar espacio", DialogTypes.reservationForm)
+            }
+          >
+            Nueva Notificación
+          </Button>
+        </Stack>
+        <Stack
+          position={"absolute"}
+          bottom={0}
+          right={0}
+          padding={5}
+          sx={{
+            display: { md: "none", xs: "block" },
+          }}
+        >
+          <Fab color="primary" aria-label="add">
+            <AddIcon />
+          </Fab>
+        </Stack>
+      </div>
+    </Stack>
   );
 };
 
@@ -141,10 +143,16 @@ export default function MyCalendar({
   showDemoLink = true,
   ...props
 }) {
+  const [selectedMonth, setDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedEvents, setSelectedEvents] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [openEventSidebar, setOpenEventSidebar] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { components, defaultDate, max, views } = useMemo(
     () => ({
       components: {
-        toolbar: CustomToolbar,
+        toolbar: (props) => CustomToolbar({ ...props }, isLoading),
       },
       defaultDate: new Date(2015, 3, 1),
       max: dates.add(dates.endOf(new Date(2015, 17, 1), "day"), -1, "hours"),
@@ -153,15 +161,8 @@ export default function MyCalendar({
     []
   );
 
-  const [selectedMonth, setDate] = React.useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedEvents, setSelectedEvents] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [openEventSidebar, setOpenEventSidebar] = useState(false);
-
   const handleOpenEventSidebar = () => {
     setOpenEventSidebar(!openEventSidebar);
-    console.log(openEventSidebar);
   };
 
   const handleSelectSlot = (slotInfo) => {
@@ -174,24 +175,21 @@ export default function MyCalendar({
         moment(event.end).isSameOrBefore(moment(end))
     );
     setSelectedEvents(eventsInRange);
-    console.log(eventsInRange);
-    //console.log("Selected slot:", slotInfo);
-    //console.log("Events in selected slot:", eventsInRange);
     setSelectedDate(slotInfo.start);
   };
 
   const getEvents = async () => {
+    setIsLoading(true);
     const response = await GetEventsByMonth(selectedMonth);
 
     const responseEvents = response.data.data;
-
     let eventsByReservation = [];
     for (const event of responseEvents) {
       event.reservations.map((reservation) => {
         eventsByReservation.push({
           id: event.id,
           title: event.name,
-          space: reservation.space.name,
+          space: reservation.space,
           start: new Date(reservation.start),
           end: new Date(reservation.end),
         });
@@ -199,6 +197,7 @@ export default function MyCalendar({
     }
 
     setEvents(eventsByReservation);
+    setIsLoading(false);
   };
 
   const handleNavigation = async (newDate, view, action) => {
@@ -258,6 +257,7 @@ export default function MyCalendar({
         style={{ height: "100%", width: "100%", flexGrow: 2 }}
         bgcolor={"white"}
       >
+        {isLoading && <LinearProgress></LinearProgress>}
         <Calendar
           localizer={localizer}
           selectable={true}

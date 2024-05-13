@@ -38,7 +38,8 @@ main{
 }
 
 .content{
-  margin-top: 60px;
+  margin-top: 65px;
+  height: 100%;
   width: 100%;
   overflow: auto;
   background-color: var(--gray-bg);
@@ -132,6 +133,19 @@ main{
 
 
 
+@media (max-width:600px) {
+  .button-new-notification .MuiButton-root{
+    display: none !important;
+  }
+
+  .calendar{
+    padding: 0px;
+  }
+  .content{
+    margin-top: 56px;
+  }
+}
+
 @media (max-width:900px) {
   .button-new-notification .MuiButton-root{
     display: none !important;
@@ -140,6 +154,7 @@ main{
   .calendar{
     padding: 0px;
   }
+
 }
 
 
