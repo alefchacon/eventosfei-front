@@ -93,6 +93,7 @@ export function DialogProvider({ children }) {
               <UserForm
                 onCancel={handleClose}
                 onSubmit={handleSubmit}
+                user={content}
               ></UserForm>
             )}
             {type === DialogTypes.multiUserForm && (
@@ -111,6 +112,7 @@ export function DialogProvider({ children }) {
               <ReservationResponseForm
                 onCancel={handleClose}
                 onSubmit={handleSubmit}
+                reservation={content}
               ></ReservationResponseForm>
             )}
           </DialogContent>

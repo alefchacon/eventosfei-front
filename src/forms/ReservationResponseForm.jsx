@@ -1,223 +1,50 @@
 import { useState, useEffect } from "react";
-import {
-  ListItem,
-  ListItemText,
-  ListItemButton,
-  TextField,
-  Typography,
-  Divider,
-  Stack,
-} from "@mui/material";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import { Typography, Stack } from "@mui/material";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import { useDialog } from "../providers/DialogProvider.jsx";
-import DialogTypes from "../providers/DialogTypes";
-import Chip from "@mui/material/Chip";
-import LinearProgress from "@mui/material/LinearProgress";
-
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { BorderAll } from "@mui/icons-material";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import Divider from "@mui/material/Divider";
+import TextField from "@mui/material/TextField";
 
 import { useFormik } from "formik";
 import moment from "moment";
 
-import SearchList from "../components/CustomSelect.jsx";
-import CustomTimePicker from "../components/CustomTimePicker.jsx";
 import LoadingButton from "../components/LoadingButton.jsx";
+import ToggleButton from "../components/ToggleButton.jsx";
 
 import {
-  GetReservationsByMonth,
+  UpdateReservation,
   AddReservation,
 } from "../api/ReservationService.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
-function SpaceRadio({
-  radioProps,
-  label,
-  space,
-  onClick,
-  selectedStart,
-  selectedEnd,
-  date,
-  isSubmitting = true,
+export default function ReservationResponse({
+  onCancel,
+  onSubmit,
+  reservation,
 }) {
-  const [reservations, setReservations] = useState(space.reservations ?? []);
-  const hasReservations = reservations.length > 0;
-  const [isDisabled, setIsDisabled] = useState(false);
-
-  useEffect(() => {
-    const overlaps = (reservations) => {
-      for (const reservation of reservations) {
-        const start = moment(reservation.start);
-        const end = moment(reservation.start);
-
-        //console.log(selectedStart.isBefore(moment(end)));
-        const overlaps =
-          selectedStart.isAfter(moment(start)) &&
-          selectedStart.isBefore(moment(end));
-        if (overlaps) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    if (space.reservations !== undefined) {
-      const disabled = overlaps(space.reservations);
-      setIsDisabled(disabled);
-    }
-  }, []);
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "start",
-        width: "100%",
-        paddingBottom: hasReservations ? 1 : 0,
-      }}
-    >
-      <ListItemButton
-        sx={{
-          padding: "0",
-          width: "100%",
-        }}
-        onClick={() => onClick(space)}
-        disabled={isSubmitting}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-          <Radio {...radioProps} disabled={isSubmitting} />
-          <Stack>
-            <Typography variant="paragraph1">{space.name}</Typography>
-          </Stack>
-        </Box>
-      </ListItemButton>
-      {hasReservations && (
-        <Stack
-          direction={"row"}
-          display={"flex"}
-          alignItems={"center"}
-          flexWrap={"wrap"}
-          marginLeft={5}
-        >
-          <Typography variant="caption" paddingRight={1}>
-            Reservaciones:{" "}
-          </Typography>
-          {reservations.map((reservation) => (
-            <Chip
-              key={reservation.id}
-              color="warning"
-              variant="filled"
-              sx={{
-                maxHeight: "15px",
-              }}
-              label={`${moment(reservation.start).format("HH:mm")} - ${moment(
-                reservation.end
-              ).format("HH:mm")}`}
-            ></Chip>
-          ))}
-        </Stack>
-      )}
-    </Box>
-  );
-}
-
-export default function ReservationResponse({ onCancel, onSubmit }) {
   const { showDialog } = useDialog();
-  const [openDatePicker, setOpenDatePicker] = useState(false);
-  const [date, setDate] = useState(moment());
   const [start, setStart] = useState(moment());
   const [end, setEnd] = useState(moment().add(1, "hours"));
-  const [isLoading, setIsLoading] = useState(true);
-  const [reservations, setReservations] = useState([]);
   const [space, setSpace] = useState();
 
   const { showSnackbar } = useSnackbar();
 
-  const handleSelection = (space) => {
-    showDialog(space.name, DialogTypes.userForm);
-  };
-  const handleOpenDatePicker = () => {
-    setOpenDatePicker(!openDatePicker);
-    //console.log(openDatePicker);
-  };
-  const handleDateChange = (newValue) => {
-    const newDate = moment(newValue.format("YYYY-MM-DDTHH:mm"));
-    setDate(newDate);
-
-    setStart((prevStart) => {
-      return newValue.clone().set({
-        hour: prevStart.hour(),
-        minute: prevStart.minute(),
-        second: prevStart.second(),
-      });
-    });
-    setEnd((prevEnd) => {
-      return newValue.clone().set({
-        hour: prevEnd.hour(),
-        minute: prevEnd.minute(),
-        second: prevEnd.second(),
-      });
-    });
+  const handleStatusIdChange = (newStatusId) => {
+    if (newStatusId !== null) {
+      setFieldValue("statusId", newStatusId);
+    }
+    console.log(newStatusId);
   };
 
-  const handleStartChange = (newValue) => {
-    const newStart = moment(newValue.format("YYYY-MM-DDTHH:mm"));
-    setStart(newStart);
-  };
-
-  const handleEndChange = (newValue) => {
-    const newEnd = moment(newValue.format("YYYY-MM-DDTHH:mm"));
-    setEnd(newEnd);
-  };
-
-  useEffect(() => {
-    const fetchData = async (start) => {
-      const response = await GetReservationsByMonth(start);
-      const responseReservations = response.data.data;
-      const availableSpace = await getFirstAvailableSpace(responseReservations);
-      setSpace(availableSpace);
-      setReservations(responseReservations);
-      setIsLoading(false);
-    };
-
-    const getFirstAvailableSpace = (spaces) => {
-      return spaces[0];
-    };
-
-    const parseDate = (dateToParse) => {
-      let parsedDate = dateToParse.clone();
-      parsedDate.year(date.year());
-      parsedDate.month(date.month());
-      parsedDate.date(date.date());
-      return parsedDate;
-    };
-    const parsedStart = parseDate(start);
-    const parsedEnd = parseDate(end);
-    setIsLoading(true);
-    fetchData(date);
-  }, [date]);
-
-  const submitReservation = async (values, actions) => {
+  const submitResponse = async (values, actions) => {
     try {
-      const reservation = {
-        start: start,
-        end: end,
-        idEspacio: space.id,
-        // CAMBIAR
-        idUsuario: 1,
+      const request = {
+        id: reservation.id,
+        response: values.response,
+        idEstado: values.statusId,
       };
 
-      const response = await AddReservation(reservation);
+      const response = await UpdateReservation(request);
       showSnackbar(response.data.message);
     } catch (error) {
       showSnackbar(error.message);
@@ -226,119 +53,64 @@ export default function ReservationResponse({ onCancel, onSubmit }) {
 
   const {
     values,
-    errors,
-    touched,
     handleBlur,
     handleChange,
     handleSubmit,
     isSubmitting,
+    setFieldValue,
   } = useFormik({
-    initialValues: {},
-    onSubmit: submitReservation,
+    initialValues: {
+      statusId: 4,
+      response: "",
+    },
+    onSubmit: submitResponse,
   });
+
+  const reservationStatus = [
+    { id: 2, name: "Aceptar" },
+    { id: 4, name: "Rechazar" },
+  ];
 
   return (
     <>
+      <Typography variant="h6">{reservation.space.name}</Typography>
+      <Typography variant="h7">
+        {moment(reservation.start).format("dddd, MMMM Do YYYY")}
+      </Typography>
+      <Typography gutterBottom>{`${moment(reservation.start).format(
+        "HH:mm"
+      )} - ${moment(reservation.end).format("HH:mm")}`}</Typography>
+      <Typography variant="body1">{`${reservation.user.names} ${reservation.user.paternalName} ${reservation.user.maternalName}`}</Typography>
+      <Typography variant="body2">{reservation.user.job}</Typography>
+      <Typography variant="body2">{reservation.user.email}</Typography>
+
       <form autoComplete="off" onSubmit={handleSubmit}>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <ListItemButton
-            onClick={handleOpenDatePicker}
-            disabled={isSubmitting}
-          >
-            <Stack spacing={-2} width={"100%"}>
-              <Typography variant="h6">Fecha</Typography>
-              <DatePicker
-                open={openDatePicker}
-                value={date}
-                onChange={handleDateChange}
-                slotProps={{
-                  textField: {
-                    InputProps: { color: "primary" },
-                    fullWidth: true,
-                    sx: {
-                      "& .MuiInputBase-input": {
-                        padding: "0",
-                        paddingTop: "10px",
-                      },
-
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        border: "none", // Removes the border
-                      },
-
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        border: "none", // Ensures the border remains removed on focus
-                      },
-                    },
-                  },
-                }}
-              />{" "}
-            </Stack>
-          </ListItemButton>
-
+        <Stack direction={"column"} spacing={2} paddingTop={2}>
           <Divider></Divider>
+          <div>
+            <ToggleButton
+              options={reservationStatus}
+              value={values.statusId}
+              onChange={handleStatusIdChange}
+            ></ToggleButton>
 
-          <CustomTimePicker
-            label="Inicio"
-            defaultTime={start}
-            onAccept={handleStartChange}
-            disabled={isSubmitting}
-          ></CustomTimePicker>
-          <Divider></Divider>
-
-          <CustomTimePicker
-            label="Fin"
-            defaultTime={end}
-            onAccept={handleEndChange}
-            disabled={isSubmitting}
-          ></CustomTimePicker>
-          <Divider></Divider>
-        </LocalizationProvider>
-        <Stack
-          width={"100%"}
-          paddingTop={2}
-          paddingLeft={2}
-          paddingRight={2}
-          overflow={"auto"}
-          minHeight={"300px"}
-          maxHeight={"300px"}
-        >
-          <FormControl fullWidth disabled={isSubmitting}>
-            <Typography variant="h6">Espacios</Typography>
-            {isLoading ? (
-              <LinearProgress></LinearProgress>
-            ) : (
-              <RadioGroup
-                aria-labelledby="demo-radio-buttons-group-label"
-                value={space.id}
-                name="radio-buttons-group"
-                sx={{
-                  width: "100%",
-                }}
-              >
-                {reservations.map((option) => (
-                  <FormControlLabel
-                    key={option.id}
-                    sx={{
-                      width: "100%",
-                    }}
-                    control={
-                      <SpaceRadio
-                        radioProps={{ value: option.id }}
-                        space={option}
-                        onClick={(e) => setSpace(e)}
-                        selectedStart={start}
-                        selectedEnd={end}
-                        date={date}
-                        isSubmitting={isSubmitting}
-                      ></SpaceRadio>
-                    }
-                    itemProp=""
-                  />
-                ))}
-              </RadioGroup>
-            )}
-          </FormControl>
+            <TextField
+              id="response"
+              name="response"
+              label="Respuesta"
+              variant="filled"
+              about="asdf"
+              fullWidth
+              multiline
+              rows={5}
+              disabled={isSubmitting}
+              value={values.response}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            ></TextField>
+          </div>
         </Stack>
+
         <Stack
           direction={"row"}
           spacing={3}
@@ -346,11 +118,11 @@ export default function ReservationResponse({ onCancel, onSubmit }) {
           paddingTop={5}
         >
           <Button autoFocus onClick={onCancel} disabled={isSubmitting}>
-            RESPONSE!!
+            Cancelar
           </Button>
           <LoadingButton
             isReady={space !== null}
-            label="Solicitar reservación"
+            label="Responder"
             isLoading={isSubmitting}
           ></LoadingButton>
         </Stack>

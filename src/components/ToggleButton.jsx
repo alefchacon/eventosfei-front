@@ -14,17 +14,20 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 export default function CustomToggleButton({ options, onChange, value }) {
-  const [alignment, setAlignment] = useState(2);
+  const [selectedValue, setSelectedValue] = useState(value);
 
   const handleChange = (event, newAlignment) => {
-    setAlignment(newAlignment);
-    onChange(event, newAlignment);
+    if (newAlignment !== null) {
+      setSelectedValue(newAlignment);
+
+      onChange(newAlignment);
+    }
   };
 
   return (
     <ToggleButtonGroup
       color="primary"
-      value={value}
+      value={selectedValue}
       exclusive
       onChange={handleChange}
       aria-label="Platform"
