@@ -49,6 +49,7 @@ import Calendar from "./components/Calendar.jsx";
 import RouteGuard from "./pages/RouteGuard.jsx";
 
 import LogInPage from "./pages/LogIn.jsx";
+import ProfilePage from "./pages/Profile.jsx";
 import Users from "./pages/Users.jsx";
 import Reservation from "./forms/ReservationForm.jsx";
 
@@ -422,6 +423,16 @@ function App(props) {
             element={
               <RouteGuard isAuthenticated={isAuthenticated}>
                 <ReservationList></ReservationList>
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
+          <Route
+            path="/usuario"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <ProfilePage></ProfilePage>
               </RouteGuard>
             }
           >

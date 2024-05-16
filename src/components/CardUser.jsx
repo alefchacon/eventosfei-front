@@ -15,7 +15,7 @@ import DialogTypes from "../providers/DialogTypes";
 
 import { Link } from "react-router-dom";
 
-export default function ReservationCard({ reservation }) {
+export default function CardUser({ user, onUpdate }) {
   const [isEvaluated, setIsEvaluated] = useState(false);
 
   const { showDialog } = useDialog();
@@ -38,41 +38,48 @@ export default function ReservationCard({ reservation }) {
     >
       <CardContent sx={{ mb: -3 }}>
         <Stack
-          sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
+          sx={{ padding: 0, display: "flex", justifyContent: "start" }}
           direction={"row"}
         >
-          <Typography variant="h6" component="div">
+          <Typography variant="button" component="div">
             <Link to={`/eventos/`} onClick={handle}>
               {" "}
-              {reservation.space.name}{" "}
+              {user.names +
+                " " +
+                user.paternalName +
+                " " +
+                user.maternalName}{" "}
             </Link>
           </Typography>
-          <Chip onClick={handleClick} />
         </Stack>
-        <Typography variant="h7">
-          {moment(reservation.start).format("dddd, MMMM Do YYYY")}
+        <Typography variant="caption" onClick={handleClick}>
+          {user.rol.name}
         </Typography>
-        <Typography gutterBottom>{`${moment(reservation.start).format(
-          "HH:mm"
-        )} - ${moment(reservation.end).format("HH:mm")}`}</Typography>
-        <Typography variant="body1">{`${reservation.user.names} ${reservation.user.paternalName} ${reservation.user.maternalName}`}</Typography>
-        <Typography variant="body2">{reservation.user.job}</Typography>
-        <Typography variant="body2">{reservation.user.email}</Typography>
+        <Typography>{user.job}</Typography>
+        <Typography>{user.email}</Typography>
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
           size="medium"
           onClick={() =>
             showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
+              "Editar usuario",
+              DialogTypes.userForm,
+              () => onUpdate,
+              user
             )
           }
           disabled={isEvaluated}
         >
-          Responder
+          Editar
+        </Button>
+        <Button
+          size="medium"
+          color="error"
+          onClick={() => console.log(user)}
+          disabled={isEvaluated}
+        >
+          Eliminar
         </Button>
       </CardActions>
     </Card>

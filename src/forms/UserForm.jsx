@@ -5,14 +5,19 @@ import { TextField, Stack, DialogActions, Button } from "@mui/material";
 
 import { userSchema } from "../validation/modelSchemas/userSchema";
 import { GetRoles } from "../api/RolesService.js";
-import { StoreUser } from "../api/UserService.js";
+import { StoreUser, UpdateUser } from "../api/UserService.js";
 
 import LoadingButton from "../components/LoadingButton";
 import BasicSelect from "../components/Select";
 import { Margin, Padding } from "@mui/icons-material";
+import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
-export default function UserForm({ onCancel, onSubmit }) {
+export default function UserForm({ onCancel, onSubmit, user }) {
   const [roles, setRoles] = useState([]);
+  const [isEdit, setIsEdit] = useState(user !== undefined);
+
+  const { showSnackbar } = useSnackbar();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,19 +30,28 @@ export default function UserForm({ onCancel, onSubmit }) {
         console.error("Error fetching data:", error);
       }
     };
-
+    console.log(user);
     fetchData();
   }, []);
 
   const submitUser = async (values, actions) => {
+    let response = null;
     try {
-      const response = await StoreUser(values);
-      let addedUser = response.data.data;
-
-      onSubmit(addedUser);
-      actions.resetForm();
+      if (isEdit) {
+        values.id = user.id;
+        response = await UpdateUser(values);
+        showSnackbar(response.data.message);
+        let updatedUser = response.data.data;
+        onSubmit(updatedUser);
+      } else {
+        response = await StoreUser(values);
+        actions.resetForm();
+        let addedUser = response.data.data;
+        onSubmit(addedUser);
+        showSnackbar(response.data.message);
+      }
     } catch (error) {
-      console.log(error);
+      showSnackbar(error.response.data.message);
     }
   };
 
@@ -51,12 +65,14 @@ export default function UserForm({ onCancel, onSubmit }) {
     isSubmitting,
   } = useFormik({
     initialValues: {
-      names: "",
-      paternalName: "",
-      maternalName: "",
-      email: "",
-      job: "",
-      idRol: "",
+      // NO cambie 'user' por 'isEdit': truena.
+
+      names: user ? user.names : "",
+      paternalName: user ? user.paternalName : "",
+      maternalName: user ? user.maternalName : "",
+      email: user ? user.email : "",
+      job: user ? user.job : "",
+      idRol: user ? user.rol.id : "",
     },
     validationSchema: userSchema,
     onSubmit: submitUser,

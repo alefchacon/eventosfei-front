@@ -6,125 +6,36 @@ import { Box, Button, Stack } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Grow } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import Grid from "@mui/material/Grid";
 
 import DialogTypes from "../providers/DialogTypes";
 
 import UserForm from "../forms/UserForm.jsx";
 import { useDialog } from "../providers/DialogProvider.jsx";
 import MultiUserForm from "../forms/MultiUserForm.jsx";
-
-const columns = [
-  {
-    field: "names",
-    headerName: "Nombres",
-    width: 150,
-    editable: true,
-    Grow: 1,
-  },
-  {
-    field: "paternalName",
-    headerName: "Apellido paterno",
-    width: 150,
-    editable: true,
-  },
-  {
-    field: "maternalName",
-    headerName: "Apellido materno",
-    width: 150,
-    editable: true,
-  },
-  {
-    field: "email",
-    headerName: "Email",
-    width: 150,
-    editable: true,
-  },
-  {
-    field: "job",
-    headerName: "Puesto",
-    width: 110,
-  },
-  {
-    field: "rol.name",
-    headerName: "Rol",
-    type: "number",
-    width: 110,
-    valueGetter: (value, row) => `${row.rol.name}`,
-  },
-  {
-    field: "edit",
-    headerName: "Editar",
-    type: "number",
-    width: 110,
-    renderCell: (value) => renderButton(value),
-  },
-];
-
-function renderButton(props) {
-  const { hasFocus, value } = props;
-  const buttonElement = useRef(null);
-  const rippleRef = useRef(null);
-  useLayoutEffect(() => {
-    if (hasFocus) {
-      const input = buttonElement.current.querySelector("input");
-      input?.focus();
-    } else if (rippleRef.current) {
-      rippleRef.current.stop({});
-    }
-  }, [hasFocus]);
-
-  return (
-    <strong>
-      <Button
-        ref={buttonElement}
-        touchRippleRef={rippleRef}
-        variant="contained"
-        size="small"
-        style={{ marginLeft: 16 }}
-        tabIndex={hasFocus ? 0 : -1}
-        onClick={() => console.log(value ?? "work in progress :D")}
-        onKeyDown={(event) => {
-          if (event.key === " ") {
-            event.stopPropagation();
-          }
-        }}
-      >
-        Open
-      </Button>
-    </strong>
-  );
-}
-function Table({ users }) {
-  return (
-    <Box sx={{ width: "100%" }}>
-      <DataGrid
-        autoHeight
-        rows={users}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
-          },
-        }}
-        pageSizeOptions={[5, 10, 15]}
-        checkboxSelection
-        disableRowSelectionOnClick
-      />
-    </Box>
-  );
-}
+import CardUser from "../components/CardUser.jsx";
+import UserList from "../components/UserList.jsx";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { showDialog } = useDialog();
 
   const matches = useMediaQuery("(min-width:768px)");
 
-  const handleAddUser = (newUser) => {
+  const handleStoreUser = (newUser) => {
     setUsers((oldUsers) => [...oldUsers, newUser]);
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    console.log(updatedUser);
+    console.log(users);
+
+    const newUsers = users.map((user) =>
+      user.id === updatedUser.id ? updatedUser : user
+    );
+    setUsers(newUsers);
   };
 
   useEffect(() => {
@@ -159,7 +70,7 @@ export default function Users() {
               showDialog(
                 "Importar usuario",
                 DialogTypes.multiUserForm,
-                () => handleAddUser
+                () => handleStoreUser
               )
             }
           >
@@ -171,16 +82,43 @@ export default function Users() {
               showDialog(
                 "Registrar usuario",
                 DialogTypes.userForm,
-                () => handleAddUser
+                () => handleStoreUser
               )
             }
           >
             Registrar usuario
           </Button>
         </Stack>
-        <div>
-          {matches ? <Table users={users} /> : <div>Diseño responsivo 😎</div>}
-        </div>
+
+        <>
+          {loading && (
+            <Container
+              sx={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                top: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress></CircularProgress>
+            </Container>
+          )}
+          <Grid container spacing={2} padding={{ md: 2 }}>
+            {users.map((item, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <CardUser
+                  user={item}
+                  onUpdate={handleUpdateUser}
+                  key={item.id}
+                ></CardUser>
+              </Grid>
+            ))}
+          </Grid>
+        </>
       </Stack>
     </>
   );
