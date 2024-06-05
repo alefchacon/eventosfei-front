@@ -22,6 +22,13 @@ export default function ReservationList(
     setSelectedFEIEvent(FEIEvent);
   };
 
+  const handleUpdateEvent = (updatedEvent) => {
+    const newEvents = items.map((event) =>
+      event.id === updatedEvent.id ? updatedEvent : event
+    );
+    setItems(newEvents);
+  };
+
   useEffect(() => {
     // Simulate fetching data with static data
     const fetchData = async () => {
@@ -68,11 +75,7 @@ export default function ReservationList(
       )}
       <Stack spacing={2} margin={5}>
         {items.map((item) => (
-          <ReservationCard
-            reservation={item}
-            key={item.id}
-            parentHandle={handle}
-          ></ReservationCard>
+          <ReservationCard reservation={item} key={item.id}></ReservationCard>
         ))}
       </Stack>
     </>

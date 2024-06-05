@@ -1,5 +1,10 @@
-import { urlEvents, urlNotifications, urlEventById, urlEventsByMonth } from "./urls.js";
+import { urlEvents, urlNotifications, urlEventById, urlEventsByMonth, urlUserEvents } from "./urls.js";
 import { client } from "./Client.js";
+
+const filters = {
+  porFechaEnvio: "&porFechaEnvio=true",
+  porAlfabetico: "&porAlfabetico=true",
+}
 
 export const GetEventsByMonth = async (date) => {
   const data = {
@@ -10,8 +15,17 @@ export const GetEventsByMonth = async (date) => {
   return response;
 };
 
-export const GetEvents = async () => {
-  const response = await client.get(urlEvents);
+export const GetEvents = async (filters = [""]) => {
+  let url = urlEvents
+  filters.forEach(filter => {
+    url = url.concat("&", filter)
+  })
+  const response = await client.get(url);
+  return response;
+};
+
+export const GetUserEvents = async (idUsuario, page, filter = "") => {
+  const response = await client.get(urlUserEvents(idUsuario, page, filters[filter]));
   return response;
 };
 

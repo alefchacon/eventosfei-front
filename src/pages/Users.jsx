@@ -7,6 +7,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Grow } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Grid from "@mui/material/Grid";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 
 import DialogTypes from "../providers/DialogTypes";
 
@@ -64,30 +66,47 @@ export default function Users() {
           display={"flex"}
           justifyContent={"end"}
         >
-          <Button
-            variant="contained"
-            onClick={() =>
-              showDialog(
-                "Importar usuario",
-                DialogTypes.multiUserForm,
-                () => handleStoreUser
-              )
-            }
+          {false && (
+            <>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  showDialog(
+                    "Importar usuario",
+                    DialogTypes.multiUserForm,
+                    () => handleStoreUser
+                  )
+                }
+              >
+                Importar usuarios
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  showDialog(
+                    "Registrar usuario",
+                    DialogTypes.userForm,
+                    () => handleStoreUser
+                  )
+                }
+              >
+                Registrar usuario
+              </Button>
+            </>
+          )}
+          <Stack
+            position={"absolute"}
+            bottom={0}
+            right={0}
+            padding={5}
+            sx={{
+              display: { md: "none", xs: "block" },
+            }}
           >
-            Importar usuarios
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() =>
-              showDialog(
-                "Registrar usuario",
-                DialogTypes.userForm,
-                () => handleStoreUser
-              )
-            }
-          >
-            Registrar usuario
-          </Button>
+            <Fab color="primary" aria-label="add">
+              <AddIcon />
+            </Fab>
+          </Stack>
         </Stack>
 
         <>

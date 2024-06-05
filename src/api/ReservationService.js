@@ -8,6 +8,8 @@ export const GetReservationsByMonth = async (date) => {
   };
 
   const response = await client.post(urlReservedSpaces, request);
+  console.log(request)
+  console.log(response)
   return response;
 };
 export const GetReservations = async () => {

@@ -15,7 +15,7 @@ import DialogTypes from "../providers/DialogTypes";
 
 import { Link } from "react-router-dom";
 
-export default function ReservationCard({ reservation }) {
+export default function ReservationCard({ reservation, parentHandle }) {
   const [isEvaluated, setIsEvaluated] = useState(false);
 
   const { showDialog } = useDialog();
@@ -47,7 +47,7 @@ export default function ReservationCard({ reservation }) {
               {reservation.space.name}{" "}
             </Link>
           </Typography>
-          <Chip onClick={handleClick} />
+          <Chip onClick={handleClick} label={reservation.status.name} />
         </Stack>
         <Typography variant="h7">
           {moment(reservation.start).format("dddd, MMMM Do YYYY")}

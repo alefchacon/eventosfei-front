@@ -52,6 +52,7 @@ import LogInPage from "./pages/LogIn.jsx";
 import ProfilePage from "./pages/Profile.jsx";
 import Users from "./pages/Users.jsx";
 import Reservation from "./forms/ReservationForm.jsx";
+import { GetEvents, GetNotifications } from "./api/EventService.js";
 
 import Event from "./pages/Event.jsx";
 
@@ -232,8 +233,10 @@ function App(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem divider onClick={handleMenuClose}>
+        Perfil
+      </MenuItem>
+      <MenuItem onClick={handleMenuClose}>Cerrar sesión</MenuItem>
     </Menu>
   );
   return (
@@ -247,51 +250,64 @@ function App(props) {
       <CssBaseline />
       <AppBar
         position="fixed"
+        variant="outlined"
+        elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: "#DFE7F1",
+          bgcolor: "inherit",
           display: "flex",
           flexDirection: "row",
           color: "black",
         }}
       >
         {isAuthenticated && (
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: "none" } }}
+          <Toolbar sx={{ width: "100%" }}>
+            <Stack
+              direction={"row"}
+              display={"flex"}
+              justifyContent={"space-between"}
+              width={"100%"}
             >
-              <MenuIcon />
-            </IconButton>
+              <Stack direction={"row"} alignItems={"center"}>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, display: { sm: "none" } }}
+                >
+                  <MenuIcon />
+                </IconButton>
 
-            <Typography variant="h6" noWrap component="div">
-              {currentSection}
-            </Typography>
+                <Typography variant="h6" noWrap component="div">
+                  {currentSection}
+                </Typography>
+              </Stack>
 
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-              onClick={() => navigate("/calendario")}
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+              <Stack direction={"row"} alignItems={"center"}>
+                <IconButton
+                  size="large"
+                  aria-label="show 17 new notifications"
+                  color="inherit"
+                  onClick={() => navigate("/calendario")}
+                >
+                  <Badge badgeContent={17} color="error">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-haspopup="true"
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </Stack>
+            </Stack>
           </Toolbar>
         )}
       </AppBar>
@@ -344,6 +360,7 @@ function App(props) {
               <RouteGuard isAuthenticated={isAuthenticated}>
                 <EventList
                   notifications={false}
+                  handleGet={GetEvents}
                   setSelectedFEIEvent={handleFEIEventSelection}
                 />
               </RouteGuard>
