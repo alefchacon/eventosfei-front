@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ListItem,
   ListItemText,
@@ -52,18 +52,28 @@ function SpaceRadio({
   const [reservations, setReservations] = useState(space.reservations ?? []);
   const hasReservations = reservations.length > 0;
   const [isDisabled, setIsDisabled] = useState(false);
+  const [checkable, setCheckable] = useState(true);
+  const radioRef = useRef();
 
   useEffect(() => {
     const overlaps = (reservations) => {
       for (const reservation of reservations) {
         const start = moment(reservation.start);
-        const end = moment(reservation.start);
+        const end = moment(reservation.end);
 
         //console.log(selectedStart.isBefore(moment(end)));
-        const overlaps =
-          selectedStart.isAfter(moment(start)) &&
-          selectedStart.isBefore(moment(end));
-        if (overlaps) {
+        const innerOverlap =
+          selectedStart.isSameOrBefore(start) && selectedEnd.isSameOrAfter(end);
+        const earlyOverlap =
+          selectedStart.isSameOrBefore(start) &&
+          selectedEnd.isSameOrAfter(start) &&
+          selectedEnd.isSameOrBefore(end);
+        const lateOverlap =
+          selectedStart.isSameOrAfter(start) &&
+          selectedStart.isSameOrBefore(end) &&
+          selectedEnd.isSameOrAfter(end);
+
+        if (innerOverlap || earlyOverlap || lateOverlap) {
           return true;
         }
       }
@@ -74,7 +84,11 @@ function SpaceRadio({
       const disabled = overlaps(space.reservations);
       setIsDisabled(disabled);
     }
-  }, []);
+  }, [selectedStart, selectedEnd]);
+
+  useEffect(() => {
+    console.log(radioRef);
+  }, [isDisabled]);
 
   return (
     <Box
@@ -92,10 +106,14 @@ function SpaceRadio({
           width: "100%",
         }}
         onClick={() => onClick(space)}
-        disabled={isSubmitting}
+        disabled={isSubmitting || isDisabled}
       >
         <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-          <Radio {...radioProps} disabled={isSubmitting} />
+          <Radio
+            {...radioProps}
+            disabled={isSubmitting || isDisabled}
+            ref={radioRef}
+          />
           <Stack>
             <Typography variant="paragraph1">{space.name}</Typography>
           </Stack>
@@ -115,8 +133,8 @@ function SpaceRadio({
           {reservations.map((reservation) => (
             <Chip
               key={reservation.id}
-              color="warning"
-              variant="filled"
+              color={isDisabled ? "error" : "warning"}
+              variant={isDisabled ? "filled" : "outlined"}
               sx={{
                 maxHeight: "15px",
               }}
@@ -143,12 +161,8 @@ export default function Reservation({ onCancel, onSubmit }) {
 
   const { showSnackbar } = useSnackbar();
 
-  const handleSelection = (space) => {
-    showDialog(space.name, DialogTypes.userForm);
-  };
   const handleOpenDatePicker = () => {
     setOpenDatePicker(!openDatePicker);
-    //console.log(openDatePicker);
   };
   const handleDateChange = (newValue) => {
     const newDate = moment(newValue.format("YYYY-MM-DDTHH:mm"));
@@ -194,15 +208,6 @@ export default function Reservation({ onCancel, onSubmit }) {
       return spaces[0];
     };
 
-    const parseDate = (dateToParse) => {
-      let parsedDate = dateToParse.clone();
-      parsedDate.year(date.year());
-      parsedDate.month(date.month());
-      parsedDate.date(date.date());
-      return parsedDate;
-    };
-    const parsedStart = parseDate(start);
-    const parsedEnd = parseDate(end);
     setIsLoading(true);
     fetchData(date);
   }, [date]);
@@ -238,14 +243,14 @@ export default function Reservation({ onCancel, onSubmit }) {
   });
 
   return (
-    <>
+    <Stack width={{ lg: "50%", sm: "100%" }}>
       <form autoComplete="off" onSubmit={handleSubmit}>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <ListItemButton
             onClick={handleOpenDatePicker}
             disabled={isSubmitting}
           >
-            <Stack spacing={-2} width={"100%"}>
+            <Stack spacing={0} width={"100%"}>
               <Typography variant="h6">Fecha</Typography>
               <DatePicker
                 open={openDatePicker}
@@ -255,44 +260,35 @@ export default function Reservation({ onCancel, onSubmit }) {
                   textField: {
                     InputProps: { color: "primary" },
                     fullWidth: true,
-                    sx: {
-                      "& .MuiInputBase-input": {
-                        padding: "0",
-                        paddingTop: "10px",
-                      },
-
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        border: "none", // Removes the border
-                      },
-
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        border: "none", // Ensures the border remains removed on focus
-                      },
-                    },
                   },
                 }}
               />{" "}
             </Stack>
           </ListItemButton>
-
-          <Divider></Divider>
-
-          <CustomTimePicker
-            label="Inicio"
-            defaultTime={start}
-            onAccept={handleStartChange}
-            disabled={isSubmitting}
-          ></CustomTimePicker>
-          <Divider></Divider>
-
-          <CustomTimePicker
-            label="Fin"
-            defaultTime={end}
-            onAccept={handleEndChange}
-            disabled={isSubmitting}
-          ></CustomTimePicker>
-          <Divider></Divider>
+          <Stack direction={"row"}>
+            <CustomTimePicker
+              label="Inicio"
+              defaultTime={start}
+              onAccept={handleStartChange}
+              disabled={isSubmitting}
+            ></CustomTimePicker>
+            <CustomTimePicker
+              label="Fin"
+              defaultTime={end}
+              onAccept={handleEndChange}
+              disabled={isSubmitting}
+            ></CustomTimePicker>
+          </Stack>
         </LocalizationProvider>
+        <Typography variant="h6" paddingLeft={2}>
+          Espacios de la FEI
+        </Typography>
+        <Typography variant="paragraph" paddingLeft={2}>
+          Seleccione uno de los espacios para reservarlo. Si el espacio ya
+          cuenta con reservaciones para la Fecha seleccionada, estas se
+          mostrarán en color naranja. Si alguna reservación se traslapa con los
+          horarios de Inicio y Fin seleccionados, se mostrará de color rojo.
+        </Typography>
         <Stack
           width={"100%"}
           paddingTop={2}
@@ -303,7 +299,6 @@ export default function Reservation({ onCancel, onSubmit }) {
           maxHeight={"300px"}
         >
           <FormControl fullWidth disabled={isSubmitting}>
-            <Typography variant="h6">Espacios</Typography>
             {isLoading ? (
               <LinearProgress></LinearProgress>
             ) : (
@@ -355,6 +350,6 @@ export default function Reservation({ onCancel, onSubmit }) {
           ></LoadingButton>
         </Stack>
       </form>
-    </>
+    </Stack>
   );
 }

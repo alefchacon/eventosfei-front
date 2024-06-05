@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import { Container } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
+import moment from "moment";
 
 import { Link } from "react-router-dom";
 
@@ -30,8 +31,9 @@ export default function EventCard({ props, parentHandle }, { key }) {
     status = { name: "estado" },
     organizer = "Nombre del organizador",
     program = "Programa educativo",
-    schedule = "31 de diciembre del 9999 - 23:59 hrs",
-    space = "Espacio",
+    start = "31 de diciembre del 9999 - 23:59 hrs",
+    createdAt = "asdf",
+    space = { name: "espacio" },
   } = props;
 
   function handle() {
@@ -68,9 +70,12 @@ export default function EventCard({ props, parentHandle }, { key }) {
           <Chip label={status.name} onClick={handleClick} />
         </Stack>
         <Typography color="text.primary">Organizador: {organizer}</Typography>
-        <Typography color="text.primary">{program}</Typography>
-        <Typography color="text.primary">{schedule}</Typography>
-        <Typography color="text.primary">{space}</Typography>
+        <Typography color="text.primary">
+          Fecha de notificación: {moment(createdAt).format("DD MMMM, YYYY")}
+        </Typography>
+        <Typography color="text.primary">
+          {moment(start).format("DD MMMM, YYYY")}
+        </Typography>
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button size="medium" onClick={handle} disabled={isEvaluated}>
