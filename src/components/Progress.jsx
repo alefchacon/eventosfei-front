@@ -3,6 +3,7 @@ import Slider from "@mui/material/Slider";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
+/*
 const marks = [
   {
     value: 4,
@@ -20,11 +21,28 @@ const marks = [
     value: 0,
   },
 ];
+*/
 
-export default function Progress({ value, isDisabled, changePage }) {
+export default function Progress({
+  stepAmount = 7,
+  value,
+  isDisabled,
+  changePage,
+}) {
   const handleChange = (event, newValue) => {
     changePage(newValue); // Call the parent's callback function with the new value
   };
+
+  const [steps, setSteps] = useState([]);
+  useEffect(() => {
+    let marks = [];
+    for (let i = 0; i < stepAmount; i++) {
+      marks.push({
+        value: i,
+      });
+    }
+    setSteps(marks);
+  }, []);
 
   return (
     <div className="progress-vertical">
@@ -50,10 +68,10 @@ export default function Progress({ value, isDisabled, changePage }) {
           value={value}
           min={0}
           step={1}
-          max={4}
+          max={5}
           valueLabelDisplay="off"
           disabled={isDisabled}
-          marks={marks}
+          marks={steps}
           sx={{
             // Increase the size of the marks
             "& .MuiSlider-mark": {

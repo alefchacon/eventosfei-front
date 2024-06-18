@@ -10,7 +10,7 @@ import PropTypes from "prop-types";
 import Eventos from "./EventList";
 
 import { GetUserEvents } from "../api/EventService";
-
+import { GetProfile } from "../api/UserService";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -41,23 +41,25 @@ function a11yProps(index) {
   };
 }
 
-export default function Profile() {
+export default function Profile({ user }) {
   const [value, setValue] = useState(0);
   const [idUsuario, setIdUsuario] = useState(1);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   return (
     <Stack display={"flex"}>
       <Stack padding={3} paddingBottom={0} justifyContent={"start"}>
         <Stack direction={"row"} alignItems={"center"} spacing={2}>
           <Typography variant="h6">
-            Alejandro Chacón Fernández <Chip label={"Desarrollador"}></Chip>
+            {user.names} {user.paternalName} {user.maternalName}{" "}
+            <Chip label={user.rol.name}></Chip>
           </Typography>
         </Stack>
-        <Typography>Ingeniero de Software</Typography>
-        <Typography variant="button">asdf@asdf.com</Typography>
+        <Typography>{user.job}</Typography>
+        <Typography variant="button">{user.email}</Typography>
       </Stack>
       <Box
         sx={{
@@ -78,7 +80,11 @@ export default function Profile() {
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          <Eventos notifications={false} handleGet={GetUserEvents}></Eventos>
+          <Eventos
+            notifications={false}
+            handleGet={GetUserEvents}
+            idUsuario={1}
+          ></Eventos>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           Item Two

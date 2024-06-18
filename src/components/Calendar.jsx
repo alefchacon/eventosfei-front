@@ -60,7 +60,7 @@ const now = new Date();
 const CustomToolbar = (props) => {
   const { date, onNavigate } = props;
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
-  const { showDialog } = useDialog();
+  //const { showDialog } = useDialog();
 
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
@@ -113,8 +113,9 @@ const CustomToolbar = (props) => {
               display: { md: "block", xs: "none" },
             }}
             variant="contained"
-            onClick={() =>
-              showDialog("Solicitar espacio", DialogTypes.reservationForm)
+            onClick={
+              () => console.log("antes abría un modal")
+              //showDialog("Solicitar espacio", DialogTypes.reservationForm)
             }
           >
             Nueva Notificación

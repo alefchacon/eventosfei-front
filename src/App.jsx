@@ -53,8 +53,12 @@ import ProfilePage from "./pages/Profile.jsx";
 import Users from "./pages/Users.jsx";
 import Reservation from "./forms/ReservationForm.jsx";
 import { GetEvents, GetNotifications } from "./api/EventService.js";
+import { LogOut } from "./api/UserService.js";
 
 import Event from "./pages/Event.jsx";
+import NewNotification from "./pages/NewNotification.jsx";
+
+import { useIsLoading } from "./providers/LoadingProvider.jsx";
 
 const drawerWidth = 240;
 
@@ -64,13 +68,29 @@ function App(props) {
   const [isClosing, setIsClosing] = React.useState(false);
   const [currentSection, setCurrentSection] = React.useState("Calendario");
   const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
-  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
+  const [user, setUser] = React.useState(
+    JSON.parse(localStorage.getItem("user"))
+  );
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   const navigate = useNavigate();
 
+  const { isLoading, setIsLoading } = useIsLoading();
+
   const handleLogIn = (authenticationOK) => {
     setIsAuthenticated(authenticationOK);
-    navigate("/eventos");
+    setUser(JSON.parse(localStorage.getItem("user")));
+    navigate("/calendario");
+  };
+
+  const handleLogOut = async () => {
+    const response = await LogOut();
+    handleMenuClose();
+    if (response.status === 200) {
+      navigate("/");
+      setUser(null);
+      setIsAuthenticated(false);
+    }
   };
 
   const handleFEIEventSelection = (FEIEvent) => {
@@ -217,6 +237,10 @@ function App(props) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  const handleNavigateToProfile = () => {
+    handleMenuClose();
+    navigate("/usuario");
+  };
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -233,10 +257,10 @@ function App(props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem divider onClick={handleMenuClose}>
+      <MenuItem divider onClick={handleNavigateToProfile}>
         Perfil
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>Cerrar sesión</MenuItem>
+      <MenuItem onClick={handleLogOut}>Cerrar sesión</MenuItem>
     </Menu>
   );
   return (
@@ -261,30 +285,30 @@ function App(props) {
           color: "black",
         }}
       >
-        {isAuthenticated && (
-          <Toolbar sx={{ width: "100%" }}>
-            <Stack
-              direction={"row"}
-              display={"flex"}
-              justifyContent={"space-between"}
-              width={"100%"}
-            >
-              <Stack direction={"row"} alignItems={"center"}>
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  sx={{ mr: 2, display: { sm: "none" } }}
-                >
-                  <MenuIcon />
-                </IconButton>
+        <Toolbar sx={{ width: "100%" }}>
+          <Stack
+            direction={"row"}
+            display={"flex"}
+            justifyContent={"space-between"}
+            width={"100%"}
+          >
+            <Stack direction={"row"} alignItems={"center"}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { sm: "none" } }}
+              >
+                <MenuIcon />
+              </IconButton>
 
-                <Typography variant="h6" noWrap component="div">
-                  {currentSection}
-                </Typography>
-              </Stack>
+              <Typography variant="h6" noWrap component="div">
+                {currentSection}
+              </Typography>
+            </Stack>
 
+            {isAuthenticated && (
               <Stack direction={"row"} alignItems={"center"}>
                 <IconButton
                   size="large"
@@ -305,11 +329,15 @@ function App(props) {
                   color="inherit"
                 >
                   <AccountCircle />
+                  <Stack spacing={-1} alignItems={"start"}>
+                    <Typography variant="caption">{user.names}</Typography>
+                    <Typography variant="caption">{user.email}</Typography>
+                  </Stack>
                 </IconButton>
               </Stack>
-            </Stack>
-          </Toolbar>
-        )}
+            )}
+          </Stack>
+        </Toolbar>
       </AppBar>
       <Box
         component="nav"
@@ -352,7 +380,7 @@ function App(props) {
       </Box>
 
       <div className="content">
-        {false && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
+        {isLoading && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
         <Routes>
           <Route
             path="/eventos"
@@ -360,8 +388,8 @@ function App(props) {
               <RouteGuard isAuthenticated={isAuthenticated}>
                 <EventList
                   notifications={false}
-                  handleGet={GetEvents}
                   setSelectedFEIEvent={handleFEIEventSelection}
+                  idUsuario={0}
                 />
               </RouteGuard>
             }
@@ -400,10 +428,7 @@ function App(props) {
             path="/Notificaciones"
             element={
               <RouteGuard isAuthenticated={isAuthenticated}>
-                <EventList
-                  notifications={true}
-                  setSelectedFEIEvent={handleFEIEventSelection}
-                />
+                <NewNotification></NewNotification>
               </RouteGuard>
             }
           >
@@ -449,7 +474,7 @@ function App(props) {
             path="/usuario"
             element={
               <RouteGuard isAuthenticated={isAuthenticated}>
-                <ProfilePage></ProfilePage>
+                <ProfilePage user={user}></ProfilePage>
               </RouteGuard>
             }
           >
