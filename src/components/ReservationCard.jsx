@@ -15,10 +15,44 @@ import DialogTypes from "../providers/DialogTypes";
 
 import { Link } from "react-router-dom";
 
-export default function ReservationCard({ reservation, parentHandle }) {
-  const [isEvaluated, setIsEvaluated] = useState(false);
-
+function CustomCardActions({ isEvaluated, reservation }) {
   const { showDialog } = useDialog();
+  return (
+    <>
+      <Button
+        size="medium"
+        onClick={() =>
+          showDialog(
+            "Responder reservación",
+            DialogTypes.reservationResponse,
+            console.log(""),
+            reservation
+          )
+        }
+        disabled={isEvaluated}
+      >
+        Responder
+      </Button>
+    </>
+  );
+}
+
+function Organizer({ user }) {
+  return (
+    <>
+      <Typography variant="body1">{`${user.names} ${user.paternalName} ${user.maternalName}`}</Typography>
+      <Typography variant="body2">{user.job}</Typography>
+      <Typography variant="body2">{user.email}</Typography>
+    </>
+  );
+}
+
+export default function ReservationCard({
+  item,
+  parentHandle,
+  adminView = false,
+}) {
+  const [isEvaluated, setIsEvaluated] = useState(false);
 
   function handle() {
     console.log();
@@ -33,8 +67,8 @@ export default function ReservationCard({ reservation, parentHandle }) {
       sx={{
         minWidth: "30%",
         maxHeight: 250,
-        bgcolor: isEvaluated ? "#f4f4f4" : "white",
       }}
+      elevation={adminView ? 1 : 0}
     >
       <CardContent sx={{ mb: -3 }}>
         <Stack
@@ -42,38 +76,25 @@ export default function ReservationCard({ reservation, parentHandle }) {
           direction={"row"}
         >
           <Typography variant="h6" component="div">
-            <Link to={`/eventos/`} onClick={handle}>
-              {" "}
-              {reservation.space.name}{" "}
-            </Link>
+            {item.space.name}{" "}
           </Typography>
-          <Chip onClick={handleClick} label={reservation.status.name} />
+          {adminView && <Chip onClick={handleClick} label={item.status.name} />}
         </Stack>
         <Typography variant="h7">
-          {moment(reservation.start).format("dddd, MMMM Do YYYY")}
+          {moment(item.start).format("dddd, MMMM Do YYYY")}
         </Typography>
-        <Typography gutterBottom>{`${moment(reservation.start).format(
+        <Typography gutterBottom>{`${moment(item.start).format(
           "HH:mm"
-        )} - ${moment(reservation.end).format("HH:mm")}`}</Typography>
-        <Typography variant="body1">{`${reservation.user.names} ${reservation.user.paternalName} ${reservation.user.maternalName}`}</Typography>
-        <Typography variant="body2">{reservation.user.job}</Typography>
-        <Typography variant="body2">{reservation.user.email}</Typography>
+        )} - ${moment(item.end).format("HH:mm")}`}</Typography>
+        {adminView && <Organizer user={item.user} />}
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          size="medium"
-          onClick={() =>
-            showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
-            )
-          }
-          disabled={isEvaluated}
-        >
-          Responder
-        </Button>
+        {adminView && (
+          <CustomCardActions
+            isEvaluated={isEvaluated}
+            reservation={item}
+          ></CustomCardActions>
+        )}
       </CardActions>
     </Card>
   );

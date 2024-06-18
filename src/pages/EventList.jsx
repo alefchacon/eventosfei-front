@@ -22,23 +22,58 @@ import emotionStyledBase from "@emotion/styled/base";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useWindowSize from "../hooks/useWindowSize.jsx";
+import Fab from "@mui/material/Fab";
+import { useIsLoading } from "../providers/LoadingProvider.jsx";
+
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 
 export default function Eventos(
-  { notifications, handleGet },
+  { notifications, handleGet, idUsuario = 1 },
   { setSelectedFEIEvent }
 ) {
   const [queriedEvents, setQueriedEvents] = useState([]);
   const [defaultEvents, setDefaultEvents] = useState([]);
-  const [queriedPagination, setQueriedPagination] = useState(null);
-  const [defaultPagination, setDefaultPagination] = useState(null);
+  const [queriedPagination, setQueriedPagination] = useState(1);
+  const [defaultPagination, setDefaultPagination] = useState(1);
   const [loading, setLoading] = useState(true);
   const [currentFilter, setCurrentFilter] = useState("porFechaEnvio");
   const [currentPage, setCurrentPage] = useState(1);
-  const [idUsuario, setIdUsuario] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const { width } = useWindowSize();
-  const isMobile = width < 900;
+  const isMobile = width < 600;
+
+  const { isLoading, setIsLoading } = useIsLoading();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleGetEvents = async (extraFilters = []) => {
+    setIsLoading(true);
+
+    let filters = [`page=${currentPage}`, `${currentFilter}=true`];
+    console.log(currentPage);
+    for (const filter of extraFilters) {
+      filters.push(filter);
+    }
+    if (idUsuario > 0) {
+      filters.push(`idUsuario[eq]=${idUsuario}`);
+    }
+    console.log(filters);
+    const response = await GetEvents(filters);
+
+    setIsLoading(false);
+
+    return response.data.data;
+  };
 
   const handle = (FEIEvent) => {
     console.log(FEIEvent);
@@ -48,22 +83,18 @@ export default function Eventos(
   const handleFilterChange = async (event) => {
     const newFilter = event.target.value;
     setCurrentFilter(newFilter);
-    console.log("wtf");
-    const response = await handleGet(idUsuario, currentPage, newFilter);
-    console.log(response);
 
-    setQueriedEvents(response.data.data);
+    const events = await handleGetEvents();
+
+    setQueriedEvents(events);
     setCurrentPage(1);
   };
 
   const handleEventSearch = async (e) => {
-    console.log(searchQuery);
-    let response = await GetEvents([
-      `idUsuario[eq]=${idUsuario}`,
-      `nombre=${searchQuery}`,
-    ]);
-    setQueriedEvents(response.data.data);
-    setQueriedPagination(response.data.meta);
+    const extraFilter = `nombre=${searchQuery}`;
+    const events = await handleGetEvents([extraFilter]);
+    setQueriedEvents(events);
+    setQueriedPagination(events);
   };
 
   const handleSearchQueryChange = async (e) => {
@@ -72,7 +103,6 @@ export default function Eventos(
 
   const handleClearSearchQuery = (e) => {
     setSearchQuery("");
-    console.log(defaultEvents);
     setQueriedEvents(defaultEvents);
     setQueriedPagination(defaultPagination);
     setCurrentPage(1);
@@ -81,13 +111,18 @@ export default function Eventos(
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+
         let response = [];
 
-        if (notifications) {
-          response = await GetNotifications();
-        } else {
-          response = await handleGet(idUsuario, currentPage, currentFilter);
+        let initialFilters = [`page=${currentPage}`, `${currentFilter}=true`];
+        console.log(initialFilters);
+
+        if (idUsuario > 0) {
+          initialFilters.push(`idUsuario[eq]=${idUsuario}`);
         }
+
+        response = await GetEvents(initialFilters);
 
         if (!response.status === 200) {
           throw new Error("Network response was not ok");
@@ -112,31 +147,17 @@ export default function Eventos(
 
   const handlePageChange = async (event, newPage) => {
     setCurrentPage(newPage);
-    const response = await handleGet(idUsuario, newPage, currentFilter);
-    setQueriedEvents(response.data.data);
-    window.scrollTo(0, 0);
   };
 
-  if (loading) {
-    return (
-      <>
-        <Container
-          sx={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress></CircularProgress>
-        </Container>
-      </>
-    );
-  }
+  useEffect(() => {
+    async function fetchEvents() {
+      const events = await handleGetEvents();
+      setQueriedEvents(events);
+      window.scrollTo(0, 0);
+    }
+    fetchEvents();
+  }, [currentPage, currentFilter]);
+
   return (
     <>
       <Stack
@@ -195,7 +216,19 @@ export default function Eventos(
           </Select>
         </FormControl>
         {isMobile ? (
-          ""
+          <Fab
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              padding: 4,
+              margin: 5,
+            }}
+            color="primary"
+            variant="circular"
+          >
+            +
+          </Fab>
         ) : (
           <Button variant="contained">Nueva notificación</Button>
         )}
@@ -203,24 +236,31 @@ export default function Eventos(
 
       <Stack spacing={{ md: 2 }} margin={{ md: 1 }}>
         {queriedEvents.map((item) => (
-          <Card props={item} key={item.id} parentHandle={handle}></Card>
+          <Card
+            props={item}
+            key={item.id}
+            parentHandle={handle}
+            isProfile={idUsuario !== 0}
+          ></Card>
         ))}
       </Stack>
-      <Stack
-        spacing={2}
-        paddingTop={3}
-        paddingBottom={15}
-        display={"flex"}
-        alignItems={"center"}
-      >
-        <Pagination
-          count={queriedPagination.total_pages}
-          onChange={handlePageChange}
-          color="primary"
-          size="large"
-          page={currentPage}
-        />
-      </Stack>
+      {!isLoading && (
+        <Stack
+          spacing={2}
+          paddingTop={3}
+          paddingBottom={15}
+          display={"flex"}
+          alignItems={"center"}
+        >
+          <Pagination
+            count={queriedPagination.total_pages}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+            page={currentPage}
+          />
+        </Stack>
+      )}
     </>
   );
 }

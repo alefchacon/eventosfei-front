@@ -1,5 +1,5 @@
 import { client } from "./Client";
-import { urlReservedSpaces, urlReservations } from "./urls";
+import { urlReservedSpaces, urlReservations, urlAvailableReservations } from "./urls";
 import moment from "moment";
 
 export const GetReservationsByMonth = async (date) => {
@@ -40,3 +40,11 @@ export const UpdateReservation = async (reservation) => {
   const response = await client.put(urlReservations, request);
   return response;
 };
+
+export const GetAvailableReservations = async () => {
+  const request = {
+    idUsuario: JSON.parse(localStorage.getItem("user")).id,
+  }
+  return await client.post(urlAvailableReservations, request);
+  
+}

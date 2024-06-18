@@ -8,6 +8,7 @@ import {
   Rotate90DegreesCw,
 } from "@mui/icons-material";
 
+/*
 const marks = [
   {
     value: 0,
@@ -24,12 +25,29 @@ const marks = [
   {
     value: 4,
   },
-];
+];*/
 
-export default function Progress({ isDisabled, value, changePage }) {
+export default function Progress({
+  stepAmount = 5,
+  isDisabled,
+  value,
+  changePage,
+}) {
   const handleChange = (event, newValue) => {
     changePage(4 - newValue);
   };
+
+  const [steps, setSteps] = useState([]);
+  useEffect(() => {
+    let marks = [];
+    for (let i = 0; i < stepAmount; i++) {
+      marks.push({
+        value: i,
+      });
+    }
+    console.log(marks);
+    setSteps(marks);
+  }, []);
 
   return (
     <div className="progress-horizontal">
@@ -42,6 +60,7 @@ export default function Progress({ isDisabled, value, changePage }) {
         bgcolor={"white"}
         margin={1.5}
         padding={3}
+        paddingBottom={7}
       >
         <Slider
           onChangeCommitted={handleChange}
@@ -53,9 +72,9 @@ export default function Progress({ isDisabled, value, changePage }) {
           value={value}
           min={0}
           step={1}
-          max={4}
+          max={stepAmount}
           valueLabelDisplay="off"
-          marks={marks}
+          marks={steps}
           sx={{
             width: "80%",
             // Increase the size of the marks

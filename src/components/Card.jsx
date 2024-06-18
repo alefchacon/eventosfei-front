@@ -22,7 +22,7 @@ const bull = (
   </Box>
 );
 
-export default function EventCard({ props, parentHandle }, { key }) {
+export default function EventCard({ props, parentHandle, isProfile }, { key }) {
   const [isEvaluated, setIsEvaluated] = useState(false);
 
   const {
@@ -53,7 +53,7 @@ export default function EventCard({ props, parentHandle }, { key }) {
       sx={{
         minWidth: "30%",
         maxHeight: 250,
-        bgcolor: isEvaluated ? "#f4f4f4" : "white",
+        bgcolor: "white",
       }}
     >
       <CardContent sx={{ mb: -3 }}>
@@ -69,7 +69,12 @@ export default function EventCard({ props, parentHandle }, { key }) {
           </Typography>
           <Chip label={status.name} onClick={handleClick} />
         </Stack>
-        <Typography color="text.primary">Organizador: {organizer}</Typography>
+        {!isProfile && (
+          <Typography color="text.primary">
+            Organizador:
+            <Link to="/calendario"> {organizer}</Link>
+          </Typography>
+        )}
         <Typography color="text.primary">
           Fecha de notificación: {moment(createdAt).format("DD MMMM, YYYY")}
         </Typography>

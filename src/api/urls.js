@@ -11,14 +11,19 @@ export const urlEventById = (id) => `/api/eventos/${id}`
 
 export const urlEvaluations = "/api/evaluaciones/";
 export const urlEvidences = "/api/evidencias/";
-export const urlStatus = "/api/estados/"
-export const urlReservedSpaces = "/api/espacios/reservaciones/"
-export const urlReservations = "/api/solicitud/"
+export const urlStatus = "/api/estados/";
+export const urlReservedSpaces = "/api/espacios/reservaciones/";
+export const urlReservations = "/api/solicitud/";
+export const urlAvailableReservations = "/api/solicitud/disponibles";
+
+export const urlProgramasEducativos = "/api/programaseducativos";
 
 export const urlUsers = {
   getUsersWithRoles: '/api/usuarios?rol=true',
   addUser: '/api/usuarios',
 }
+
+export const urlProfile = '/api/perfil'
 
 export const urlRoles = {
   getRoles: '/api/roles',
