@@ -12,12 +12,12 @@ import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
+import ReservationCard from "./ReservationCard";
+
 export default function CheckboxList({
   label = "lav",
   max = null,
   required = false,
-  useId = false,
-  selectedValues = [{}],
   items = [
     { id: 0, name: "Nombre 0" },
     { id: 1, name: "Nombre 1" },
@@ -34,18 +34,19 @@ export default function CheckboxList({
     { id: 12, name: "Nombre 12" },
   ],
 }) {
-  const [checked, setChecked] = React.useState([items.at(0)]);
+  const [checked, setChecked] = React.useState([{ id: 0 }]);
 
-  const handleToggle = (selectedItem) => () => {
-    const value = useId ? selectedItem.id : selectedItem.name;
+  React.useEffect(() => {
+    console.log(items.at(0));
+    setChecked([items.at(0).id]);
+  }, [items.length > 1]);
 
-    const currentIndex = checked.findIndex(
-      (item) => item.id === selectedItem.id
-    );
+  const handleToggle = (value) => () => {
+    console.log(value);
+    const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
-    const tryingToAdd =
-      newChecked.findIndex((item) => item.id === selectedItem.id) === -1;
+    const tryingToAdd = newChecked.indexOf(value) === -1;
 
     if (max !== null && newChecked.length === max && tryingToAdd) {
       return;
@@ -58,12 +59,13 @@ export default function CheckboxList({
     const noneChecked = currentIndex === -1;
 
     if (noneChecked) {
-      newChecked.push(selectedItem);
+      newChecked.push(value);
     } else {
       newChecked.splice(currentIndex, 1);
     }
+
+    console.log(newChecked);
     setChecked(newChecked);
-    selectedValues.splice(0, selectedValues.length, ...newChecked);
   };
 
   return (
@@ -78,7 +80,7 @@ export default function CheckboxList({
               <ListItem key={item.id} disablePadding>
                 <ListItemButton
                   role={undefined}
-                  onClick={handleToggle(item)}
+                  onClick={handleToggle(item.id)}
                   dense
                   divider
                 >
@@ -86,23 +88,20 @@ export default function CheckboxList({
                     direction={{ sm: "row", xs: "row-reverse" }}
                     display={"flex"}
                     alignItems={"center"}
-                    justifyContent={"space-between"}
+                    justifyContent={{ sm: "start", xs: "space-between" }}
                     width={"100%"}
                   >
                     <Stack>
                       <Checkbox
                         edge="start"
-                        checked={
-                          checked.findIndex((_item) => _item.id === item.id) !==
-                          -1
-                        }
+                        checked={checked.indexOf(item.id) !== -1}
                         tabIndex={-1}
                         disableRipple
                         inputProps={{ "aria-labelledby": labelId }}
                       />
                     </Stack>
 
-                    <ListItemText id={labelId} primary={`${item.name}`} />
+                    <ReservationCard item={item}></ReservationCard>
                   </Stack>
                 </ListItemButton>
               </ListItem>

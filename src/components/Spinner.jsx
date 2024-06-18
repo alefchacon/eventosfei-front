@@ -13,7 +13,7 @@ export default function Spinner({
   min = 0,
   max = 1000000,
 }) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(min);
 
   const handleValueChange = (valueToAdd) => {
     if (value + valueToAdd < min || value + valueToAdd > max) {

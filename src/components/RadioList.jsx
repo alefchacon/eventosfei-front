@@ -34,7 +34,10 @@ function CustomRadio({ item, onClick }) {
 }
 
 export default function RadioList({
+  onClick,
   label = "lav",
+  valueName = "name",
+  selectedValue = "",
   items = [
     { id: 0, name: "Nombre 0" },
     { id: 1, name: "Nombre 1" },
@@ -51,7 +54,12 @@ export default function RadioList({
     { id: 12, name: "Nombre 12" },
   ],
 }) {
-  const [selected, setSelected] = React.useState([items.at(0).name]);
+  const [selected, setSelected] = React.useState(selectedValue);
+
+  const handleSelection = (value) => {
+    setSelected(value);
+    onClick(valueName, value);
+  };
 
   return (
     <Stack direction={"column"}>
@@ -63,7 +71,7 @@ export default function RadioList({
           row={false}
         >
           {items.map((item) => {
-            return <CustomRadio item={item} onClick={setSelected} />;
+            return <CustomRadio item={item} onClick={handleSelection} />;
           })}
         </RadioGroup>
       </FormControl>

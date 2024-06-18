@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useFormik } from "formik";
 import { TextField } from "@mui/material";
@@ -25,6 +25,7 @@ import CheckboxList from "../components/CheckboxList.jsx";
 import RadioList from "../components/RadioList.jsx";
 import Spinner from "../components/Spinner.jsx";
 import ReservationCard from "../components/ReservationCard.jsx";
+import ReservationCheckboxList from "../components/ReservationCheckboxList.jsx";
 
 import axios from "axios";
 import { backendUrl } from "../api/urls.js";
@@ -34,7 +35,7 @@ import { GetProgramasEducativos } from "../api/ProgramasEducativosService.js";
 import useWindowSize from "../hooks/useWindowSize.jsx";
 
 import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
+import moment from "moment";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -53,9 +54,7 @@ function CustomTabPanel(props) {
 }
 
 function NewNotification() {
-  const [programasEducativos, setProgramasEducativos] = useState([
-    { id: 0, name: "" },
-  ]);
+  const [programasEducativos, setProgramasEducativos] = useState([]);
 
   useEffect(() => {
     getDatos();
@@ -63,9 +62,6 @@ function NewNotification() {
     const getData = async () => {
       const programasResponse = await GetProgramasEducativos();
       setProgramasEducativos(programasResponse.data.data);
-
-      const response = await GetAvailableReservations();
-      setReservations(response.data.data);
     };
 
     getData();
@@ -168,12 +164,13 @@ function NewNotification() {
   const [tipo, setTipo] = useState("");
   const uploadInputRef = useRef(null);
 
+  const [showReservations, setShowReservations] = useState(false);
+  const [showPlatforms, setShowPlatforms] = useState(false);
+
   const getDatos = async () => {
     axios
       .all([
-        axios.get(backendUrl + "/api/espacios"),
         axios.get(backendUrl + "/api/modalidades"),
-        axios.get(backendUrl + "/api/plataformas"),
 
         axios.get(backendUrl + "/api/tipos"),
       ])
@@ -199,16 +196,26 @@ function NewNotification() {
     handleBlur,
     handleChange,
     handleSubmit,
+    setFieldValue,
     isSubmitting,
   } = useFormik({
     initialValues: {
       nombre: "",
-      idPrograma: "",
-      idTipo: "",
       descripcion: "",
+      pagina: "",
+      idTipo: 1,
+      programas: [{ id: 1 }],
+      audiencia: [{ id: 1 }],
+      tematicas: [{ id: 1 }],
+      ambito: "Local/Regional",
+      eje: "Derechos Humanos",
+
+      fechaInicio: moment(),
+      fechaFin: moment().add("3", "days"),
+
       // fechaFin: null,
       numParticipantes: "",
-      idModalidad: "",
+      idModalidad: 2,
       idEspacio: "",
       idPlataforma: "",
       requisitosCentroComputo: "",
@@ -226,14 +233,29 @@ function NewNotification() {
     onSubmit: submitNotification,
   });
 
-  // const handleChangeSelect1 = (event) => {
-  //     setPrograma(event.target.value);
-  // };
-  // const handleChangeSelect2 = (event) => {
-  //     setTipo(event.target.value);
-  // };
+  useEffect(() => {
+    const _showReservations =
+      values.idModalidad === 1 || values.idModalidad === 3;
+    const _showPlatforms = values.idModalidad === 2 || values.idModalidad === 3;
+    setShowReservations(_showReservations);
+    setShowPlatforms(_showPlatforms);
+
+    const reservationsWhereFetched = reservations.length > 0;
+
+    if (_showReservations && !reservationsWhereFetched) {
+      getReservations();
+    }
+  }, [values.idModalidad]);
+
+  async function getReservations() {
+    const response = await GetAvailableReservations();
+    setReservations(response.data.data);
+    console.log(response);
+  }
 
   const handleChangePage = (pageIndex) => {
+    console.log(values.ambito);
+    console.log(values.eje);
     if (pageIndex > -1 && pageIndex < 6) {
       setValue(pageIndex);
     }
@@ -276,76 +298,90 @@ function NewNotification() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   label="Descripción del evento"
+                  required
                   multiline
                   maxRows={3}
                 />
                 <TextField
                   variant="outlined"
                   name="pagina"
-                  value={values.descripcion}
+                  value={values.pagina}
                   onChange={handleChange}
+                  required
                   onBlur={handleBlur}
                   label="Página web para consultar mayores detalles"
                 />
 
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">
-                    Tipo de evento:{" "}
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Programa educativo"
-                    name="idTipo"
-                    value={values.idTipo}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                  >
-                    {tipos.map((tipo) => (
-                      <MenuItem value={tipo.id} key={tipo.id}>
-                        {tipo.nombre}
-                      </MenuItem>
-                    ))}
-                    {/* <MenuItem value="academico">Academico</MenuItem>
+                {tipos.length > 0 && (
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label" required>
+                      Tipo de evento{" "}
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Tipo de evento"
+                      name="idTipo"
+                      value={values.idTipo}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      {tipos.map((tipo) => (
+                        <MenuItem value={tipo.id} key={tipo.id}>
+                          {tipo.nombre}
+                        </MenuItem>
+                      ))}
+                      {/* <MenuItem value="academico">Academico</MenuItem>
                                         <MenuItem value="cultural">Cultural</MenuItem>
                                         <MenuItem value="deportivo">Deportivo</MenuItem>
                                         <MenuItem value="mixto">Mixto</MenuItem> */}
-                  </Select>
-                </FormControl>
+                    </Select>
+                  </FormControl>
+                )}
 
-                <CheckboxList
-                  label="Programa educativo"
-                  items={programasEducativos}
-                  required={true}
-                ></CheckboxList>
+                {programasEducativos.length > 0 && (
+                  <CheckboxList
+                    label="Programa educativo"
+                    selectedValues={values.programas}
+                    items={programasEducativos}
+                    required={true}
+                  ></CheckboxList>
+                )}
 
                 <CheckboxList
                   label="Evento dirigido a"
+                  selectedValues={values.audiencia}
                   items={[
-                    { id: 0, name: "Estudiantes" },
-                    { id: 1, name: "Académicos" },
-                    { id: 2, name: "Personal Administrativo" },
-                    { id: 3, name: "Público en general" },
+                    { id: 1, name: "Estudiantes" },
+                    { id: 2, name: "Académicos" },
+                    { id: 3, name: "Personal Administrativo" },
+                    { id: 4, name: "Público en general" },
                   ]}
                   required={true}
                 ></CheckboxList>
                 <RadioList
                   label="Ámbito"
+                  onClick={setFieldValue}
+                  valueName="ambito"
+                  selectedValue={values.ambito}
                   items={[
-                    { id: 0, name: "Local/Regional" },
-                    { id: 1, name: "Estatal" },
-                    { id: 2, name: "Nacional" },
-                    { id: 3, name: "Inernacional" },
+                    { id: 1, name: "Local/Regional" },
+                    { id: 2, name: "Estatal" },
+                    { id: 3, name: "Nacional" },
+                    { id: 4, name: "Inernacional" },
                   ]}
                   required={true}
                 ></RadioList>
                 <RadioList
                   label="Eje del Programa de Trabajo al que impacta"
+                  onClick={setFieldValue}
+                  valueName="eje"
+                  selectedValue={values.eje}
                   items={[
-                    { id: 0, name: "Derechos Humanos" },
-                    { id: 1, name: "Sustentabilidad" },
-                    { id: 2, name: "Docencia e innovación académnica" },
-                    { id: 3, name: "Investigación e innovación" },
+                    { id: 1, name: "Derechos Humanos" },
+                    { id: 2, name: "Sustentabilidad" },
+                    { id: 3, name: "Docencia e innovación académnica" },
+                    { id: 4, name: "Investigación e innovación" },
                     {
                       id: 4,
                       name: "Difusión de la cultura y extensión de los servicios",
@@ -355,6 +391,7 @@ function NewNotification() {
                 ></RadioList>
                 <CheckboxList
                   label="Temáticas principales que aborda el evento (mínimo 1, máximo 3)"
+                  selectedValues={values.tematicas}
                   items={[
                     { id: 0, name: "Biodiversidad e integridad ecosistémica" },
                     { id: 1, name: "Calidad ambiental y gestión de campus" },
@@ -389,11 +426,12 @@ function NewNotification() {
                 </Typography>
                 <Stack direction={"column"} gap={3}>
                   <Stack direction={"column"} textAlign={"center"}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DatePicker
-                        value={fechaInicio}
-                        onChange={(newValue) => setFechaInicio(newValue)}
+                        minDate={moment()}
+                        value={values.fechaInicio}
                         label="Fecha de inicio"
+                        onChange={(date) => setFieldValue("fechaInicio", date)}
                       />
                     </LocalizationProvider>
                     {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -403,12 +441,13 @@ function NewNotification() {
                                         </LocalizationProvider> */}
                   </Stack>
                   <Stack direction={"column"} textAlign={"center"}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DatePicker
-                        value={fechaFin}
+                        minDate={values.fechaInicio}
+                        value={values.fechaFin}
                         label="Fecha de finalización"
                         name="fechaFin"
-                        onChange={(newValue) => setFechaFin(newValue)}
+                        onChange={(date) => setFieldValue("fechaFin", date)}
                       />
                     </LocalizationProvider>
                     {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -421,7 +460,7 @@ function NewNotification() {
 
                 <Spinner
                   label="Número estimado de participantes"
-                  min={0}
+                  min={10}
                   max={1000000}
                   step={10}
                 ></Spinner>
@@ -457,37 +496,43 @@ function NewNotification() {
                   Espacios del evento
                 </Typography>
 
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">
-                    Modalidad
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Programa educativo"
-                    name="idModalidad"
-                    value={values.idModalidad}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                  >
-                    {modalidades.map((modalidad) => (
-                      <MenuItem value={modalidad.id} key={modalidad.id}>
-                        {modalidad.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                {modalidades.length > 0 && (
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">
+                      Modalidad
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Modalidad"
+                      name="idModalidad"
+                      value={values.idModalidad}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      {modalidades.map((modalidad) => (
+                        <MenuItem value={modalidad.id} key={modalidad.id}>
+                          {modalidad.nombre}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
 
-                <Stack>
-                  {reservations.map((item) => {
-                    return <ReservationCard item={item} />;
-                  })}
-                </Stack>
-
-                <TextField
-                  label={"Plataforma(s)"}
-                  helperText={"e.g. Zoom, Google Meet, etc."}
-                ></TextField>
+                {showReservations & (reservations.length > 0) && (
+                  <ReservationCheckboxList
+                    label="Espacios reservados"
+                    items={reservations}
+                    required
+                  ></ReservationCheckboxList>
+                )}
+                {showPlatforms && (
+                  <TextField
+                    label={"Plataformas virtuales"}
+                    required
+                    helperText={"Ejemplo: Zoom, Google Meet"}
+                  ></TextField>
+                )}
               </Stack>
             </CustomTabPanel>
             {/* Recursos adicionales */}
@@ -502,7 +547,7 @@ function NewNotification() {
                   justifyContent={"start"}
                 >
                   <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
+                    <FormLabel id="demo-radio-buttons-group-label" required>
                       ¿Requiere estacionamiento?
                     </FormLabel>
                     <RadioGroup
@@ -527,7 +572,7 @@ function NewNotification() {
                     </RadioGroup>
                   </FormControl>
                   <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
+                    <FormLabel id="demo-radio-buttons-group-label" required>
                       ¿Requiere ingreso en fin de semana?
                     </FormLabel>
                     <RadioGroup
@@ -558,7 +603,7 @@ function NewNotification() {
                   justifyContent={"start"}
                 >
                   <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
+                    <FormLabel id="demo-radio-buttons-group-label" required>
                       ¿Requiere maestro de ceremonias?
                     </FormLabel>
                     <RadioGroup
@@ -583,7 +628,7 @@ function NewNotification() {
                     </RadioGroup>
                   </FormControl>
                   <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
+                    <FormLabel id="demo-radio-buttons-group-label" required>
                       ¿Requiere notificar a prensa UV?
                     </FormLabel>
                     <RadioGroup
@@ -619,7 +664,7 @@ function NewNotification() {
                   value={values.requisitosCentroComputo}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  label="Requisitos del centro de computo: "
+                  label="Requisitos del centro de computo"
                   multiline
                   maxRows={4}
                 />
