@@ -29,7 +29,7 @@ export default function EventCard({ props, parentHandle, isProfile }, { key }) {
     id = 0,
     name = "nombre del evento",
     status = { name: "estado" },
-    organizer = "Nombre del organizador",
+    user = { id: 0, names: "asdf", paternalName: "asdf" },
     program = "Programa educativo",
     start = "31 de diciembre del 9999 - 23:59 hrs",
     createdAt = "asdf",
@@ -72,7 +72,10 @@ export default function EventCard({ props, parentHandle, isProfile }, { key }) {
         {!isProfile && (
           <Typography color="text.primary">
             Organizador:
-            <Link to="/calendario"> {organizer}</Link>
+            <Link to="/calendario">
+              {" "}
+              {user.names} {user.paternalName}
+            </Link>
           </Typography>
         )}
         <Typography color="text.primary">

@@ -97,7 +97,7 @@ export default function Event({ setTitle }) {
     setValue(newValue);
   };
 
-  const makeReport = () => {
+  const getReport = () => {
     const doc = new jsPDF("p", "mm", "a4");
 
     let data = [
@@ -198,7 +198,6 @@ export default function Event({ setTitle }) {
 
     const colWidth = tableWidth / header.length;
 
-    // Function to draw a row
     const drawRow = (row, y) => {
       row.forEach((cell, index) => {
         doc.rect(startX + index * colWidth, y, colWidth, cellHeight);
@@ -211,12 +210,10 @@ export default function Event({ setTitle }) {
       });
     };
 
-    // Draw header
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     drawRow(header, startY);
 
-    // Draw data rows
     doc.setFont("helvetica", "normal");
     startY += cellHeight;
     data.forEach((row) => {
@@ -268,7 +265,7 @@ export default function Event({ setTitle }) {
           </Box>
           <CustomTabPanel value={value} index={0}>
             <Stack spacing={4}>
-              <Button onClick={makeReport}>Reporte :D</Button>
+              <Button onClick={getReport}>Reporte :D</Button>
               <Typography variant="h5">Organizador</Typography>
               <TextField
                 name="names"
