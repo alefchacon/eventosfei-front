@@ -31,6 +31,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import moment from "moment";
 import "moment/locale/es";
 
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
 import {
   BrowserRouter,
   Routes,
@@ -98,7 +101,7 @@ export default function Eventos(
   };
 
   const handleDateChange = async (date) => {
-    console.log(date);
+    setDate(date);
     const extraFilter = `inicio=${date.format("YYYY-MM")}`;
     const events = await handleGetEvents([extraFilter]);
     setQueriedEvents(events);
@@ -173,6 +176,103 @@ export default function Eventos(
     fetchEvents();
   }, [currentPage, currentFilter]);
 
+  const getReport = () => {
+    const doc = new jsPDF("p", "mm", "a4");
+    // Dimensiones del documento
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageMargin = 20; // Margin on each side
+    const tableWidth = pageWidth - 2 * pageMargin;
+
+    // Ancho de columnas
+    const col1Width = tableWidth * 0.4;
+    const col2Width = tableWidth * 0.6;
+
+    // El cursor se controla con estas variables:
+    let startX = pageMargin;
+    let startY = 20;
+    let originalStartY = startY;
+    doc.text(
+      "Coordinación de Eventos de la Facultad de Estadística e Informática",
+      startX,
+      startY
+    );
+    startY += 10;
+
+    let text = `Reporte mensual`;
+    let textX = (doc.internal.pageSize.getWidth() - doc.getTextWidth(text)) / 2;
+    doc.text(text, textX, startY);
+
+    startY += 10;
+
+    doc.setFontSize(12);
+
+    let data = [
+      ["Mes", moment(date).format("MMMM YYYY")],
+      ["Número de eventos", queriedEvents.length],
+    ];
+
+    // PRIMERA TABLA:
+    data.forEach((row, rowIndex) => {
+      let maxHeight = 0;
+
+      row.forEach((cell, colIndex) => {
+        let cellWidth = colIndex === 0 ? col1Width : col2Width;
+        let lines = doc.splitTextToSize(cell, cellWidth - 15); // Aquí es donde se calcula el salto de línea
+
+        let cellHeight = lines.length * 10; // 10 is the line height
+        maxHeight = Math.max(maxHeight, cellHeight);
+      });
+
+      // Dibujar celdas
+      row.forEach((cell, colIndex) => {
+        let cellWidth = colIndex === 0 ? col1Width : col2Width;
+        let lines = doc.splitTextToSize(cell, cellWidth - 15); // Aquí es donde se calcula el salto de línea
+
+        // Estilo
+        if (colIndex === 0) {
+          doc.setFont("helvetica", "bold");
+          doc.setFillColor(220, 220, 220);
+          //doc.setFillColor(255, 255, 255);
+        } else {
+          doc.setFont("helvetica", "normal");
+          doc.setFillColor(255, 255, 255);
+        }
+
+        doc.rect(
+          startX + (colIndex === 0 ? 0 : col1Width),
+          startY,
+          cellWidth,
+          maxHeight,
+          "FD"
+        );
+
+        // Dibujar texto
+        let textY = startY + 5;
+        lines.forEach((line) => {
+          doc.text(
+            line,
+            startX +
+              (colIndex === 0 ? cellWidth / 2 : col1Width + cellWidth / 2),
+            textY,
+            { align: "center", baseline: "middle" }
+          );
+          textY += 10; // Move to the next line
+        });
+      });
+
+      startY += maxHeight;
+    });
+
+    startY += 10; // Bajando el cursor
+
+    doc.setFontSize(16);
+    text = `Eventos`;
+    textX = (doc.internal.pageSize.getWidth() - doc.getTextWidth(text)) / 2;
+    doc.text(text, textX, startY);
+
+    doc.output("dataurlnewwindow");
+  };
+
   return (
     <>
       <Stack
@@ -240,7 +340,18 @@ export default function Eventos(
         <Button variant="outlined" onClick={handleClearSearchQuery}>
           Limpiar filtros
         </Button>
-        <Button variant="outlined">Descargar reporte</Button>
+      </Stack>
+
+      <Stack
+        direction={{ lg: "row", sm: "column" }}
+        padding={2}
+        spacing={3}
+        display={"flex"}
+        justifyContent={"end"}
+      >
+        <Button variant="outlined" onClick={getReport}>
+          Descargar reporte
+        </Button>
         {isMobile ? (
           <Fab
             sx={{
