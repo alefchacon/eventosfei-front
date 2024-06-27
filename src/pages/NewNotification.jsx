@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import ProgressHorizontal from "../components/ProgressHorizontal.jsx";
 import Progress from "../components/Progress.jsx";
 import Box from "@mui/material/Box";
@@ -31,6 +31,7 @@ import axios from "axios";
 import { backendUrl } from "../api/urls.js";
 import { GetAvailableReservations } from "../api/ReservationService.js";
 import { GetProgramasEducativos } from "../api/ProgramasEducativosService.js";
+import { StoreEvent } from "../api/EventService.js";
 
 import useWindowSize from "../hooks/useWindowSize.jsx";
 
@@ -120,6 +121,30 @@ function NewNotification() {
     }
   };
 
+  const handleSubmitEvent = () => {
+    /*
+    const formData = new FormData();
+
+    let valueIndex = 0;
+    for (const key in values) {
+      if (key === "difusion") {
+        console.log(values[key].length);
+
+        for (let i = 0; i < values[key].length; i++) {
+          formData.append(`difusion[${key}-${i}]`, values[key][i]);
+        }
+
+        //formData.append(`${key}-${valueIndex}`, values[key]);
+      }
+      formData.append(key, values[key]);
+
+      valueIndex++;
+    }
+    console.log(formData.entries);
+    */
+    StoreEvent(values);
+  };
+
   const subirMaterial = async (idEvento) => {
     try {
       for (const element of material) {
@@ -138,6 +163,7 @@ function NewNotification() {
   };
 
   const [reservations, setReservations] = useState([]);
+  useLayoutEffect(() => {}, []);
 
   const [modalidades, setModalidades] = useState([]);
   const [tipos, setTipos] = useState([]);
@@ -205,27 +231,34 @@ function NewNotification() {
       pagina: "",
       idTipo: 1,
       programas: [{ id: 1 }],
-      audiencia: [{ id: 1 }],
-      tematicas: [{ id: 1 }],
+      audiencias: [{ id: 1 }],
       ambito: "Local/Regional",
       eje: "Derechos Humanos",
+      tematicas: [{ id: 1 }],
 
-      fechaInicio: moment(),
-      fechaFin: moment().add("3", "days"),
+      //DETALLES LOGISTICOS
+      inicio: moment(),
+      fin: moment().add("3", "days"),
+      numParticipantes: 10,
+      cronograma: null,
 
-      // fechaFin: null,
-      numParticipantes: "",
-      idModalidad: 2,
-      idEspacio: "",
-      idPlataforma: "",
+      //ESPACIOS DEL EVENTO,
+      idModalidad: 1,
+      plataformas: "",
+      reservaciones: [],
+
+      // RECURSOS ADICIONALES
+      requiereEstacionamiento: 0,
+      requiereFinDeSemana: 0,
+      requiereMaestroDeObra: 0,
+      requiereNotificarPrensaUV: 0,
+      numParticipantesExternos: 0,
       requisitosCentroComputo: "",
 
-      numParticipantesExternos: "",
-      requiereEstacionamiento: "",
-      requiereFinDeSemana: "",
-      requiereMaestroDeObra: "",
-      requiereNotificarPrensaUV: "",
+      difusion: [],
+
       adicional: "",
+
       idUsuario: 1,
       idEstado: 1,
     },
@@ -254,8 +287,7 @@ function NewNotification() {
   }
 
   const handleChangePage = (pageIndex) => {
-    console.log(values.ambito);
-    console.log(values.eje);
+    console.log(values);
     if (pageIndex > -1 && pageIndex < 6) {
       setValue(pageIndex);
     }
@@ -350,7 +382,7 @@ function NewNotification() {
 
                 <CheckboxList
                   label="Evento dirigido a"
-                  selectedValues={values.audiencia}
+                  selectedValues={values.audiencias}
                   items={[
                     { id: 1, name: "Estudiantes" },
                     { id: 2, name: "Académicos" },
@@ -429,64 +461,51 @@ function NewNotification() {
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DatePicker
                         minDate={moment()}
-                        value={values.fechaInicio}
+                        value={values.inicio}
                         label="Fecha de inicio"
                         onChange={(date) => setFieldValue("fechaInicio", date)}
                       />
                     </LocalizationProvider>
-                    {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DemoContainer components={['TimePicker']}>
-                                                <TimePicker views={['hours']} name='horaInicio' />
-                                            </DemoContainer>
-                                        </LocalizationProvider> */}
                   </Stack>
                   <Stack direction={"column"} textAlign={"center"}>
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DatePicker
-                        minDate={values.fechaInicio}
-                        value={values.fechaFin}
+                        minDate={values.inicio}
+                        value={values.fin}
                         label="Fecha de finalización"
                         name="fechaFin"
                         onChange={(date) => setFieldValue("fechaFin", date)}
                       />
                     </LocalizationProvider>
-                    {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DemoContainer components={['TimePicker']}>
-                                                <TimePicker views={['hours']} name='horaFin' />
-                                            </DemoContainer>
-                                        </LocalizationProvider> */}
                   </Stack>
                 </Stack>
 
                 <Spinner
+                  valueName="numParticipantes"
+                  onClick={setFieldValue}
                   label="Número estimado de participantes"
                   min={10}
                   max={1000000}
                   step={10}
                 ></Spinner>
 
-                <Fragment>
+                <Stack>
+                  <Typography color={"GrayText"} htmlFor="archivo">
+                    Si cuenta con un cronograma detallado del evento, favor de
+                    proporcionarlo.
+                  </Typography>
+
                   <input
                     ref={cronograma}
                     type="file"
                     accept=".pdf"
                     name="cronograma"
                     id="archivo"
-                    onChange={handleFileChange}
+                    onChange={(event) =>
+                      setFieldValue("cronograma", event.currentTarget.files[0])
+                    }
                   />
-                  {/* <input
-                                        ref={uploadInputRef}
-                                        type="file"
-                                        accept=".pdf"
-                                        style={{ display: "none" }}
-                                    />
-                                    <Button
-                                        onClick={() => uploadInputRef.current && uploadInputRef.current.click()}
-                                        variant="contained"
-                                    >
-                                        Subir cronograma
-                                    </Button> */}
-                </Fragment>
+                </Stack>
               </Stack>
             </CustomTabPanel>
             {/* Espacios del evento */}
@@ -495,7 +514,6 @@ function NewNotification() {
                 <Typography variant="h5" textAlign={"center"}>
                   Espacios del evento
                 </Typography>
-
                 {modalidades.length > 0 && (
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
@@ -518,16 +536,22 @@ function NewNotification() {
                     </Select>
                   </FormControl>
                 )}
-
                 {showReservations & (reservations.length > 0) && (
                   <ReservationCheckboxList
+                    valueName="reservaciones"
+                    onClick={setFieldValue}
                     label="Espacios reservados"
                     items={reservations}
                     required
                   ></ReservationCheckboxList>
                 )}
+
                 {showPlatforms && (
                   <TextField
+                    name="plataformas"
+                    value={values.plataformas}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                     label={"Plataformas virtuales"}
                     required
                     helperText={"Ejemplo: Zoom, Google Meet"}
@@ -654,6 +678,8 @@ function NewNotification() {
                   </FormControl>
                 </Stack>
                 <Spinner
+                  onClick={setFieldValue}
+                  valueName="numParticipantesExternos"
                   label="Número estimado de participantes externos"
                   min={0}
                   max={1000000}
@@ -688,26 +714,15 @@ function NewNotification() {
                 </Typography>
                 <Fragment>
                   <input
-                    ref={material}
                     multiple
                     type="file"
                     accept=".jpg"
                     name="cronograma"
                     id="archivo"
-                    onChange={handleChangeMultiple}
+                    onChange={(event) =>
+                      setFieldValue("difusion", event.currentTarget.files)
+                    }
                   />
-                  {/* <input
-                                        ref={uploadInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        style={{ display: "none" }}
-                                    />
-                                    <Button
-                                        onClick={() => uploadInputRef.current && uploadInputRef.current.click()}
-                                        variant="contained"
-                                    >
-                                        Subir material de difusion
-                                    </Button> */}
                 </Fragment>
               </Stack>
             </CustomTabPanel>
@@ -746,7 +761,7 @@ function NewNotification() {
                 Siguiente
               </Button>
               {value == 0 && (
-                <Button variant="contained" type="submit">
+                <Button variant="contained" onClick={handleSubmitEvent}>
                   Enviar
                 </Button>
               )}

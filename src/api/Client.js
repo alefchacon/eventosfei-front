@@ -7,7 +7,10 @@ import { backendUrl } from './urls.js'
 axios.defaults.withCredentials = true;
 
 const client = axios.create({
-  baseURL: backendUrl
+  baseURL: backendUrl,
+  headers: {
+    "Content-Type": "application/json"
+  }
 });
 
 

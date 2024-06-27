@@ -73,7 +73,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
   }, []);
 
   const handleChangePage = (pageIndex) => {
-    console.log(values);
+    console.log(values.ratingCommunication);
     if (pageIndex > -1 && pageIndex < 5) {
       setValue(pageIndex);
     }
@@ -85,7 +85,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
       setFieldValue("ratingAttention", newRatingAttention);
     }
   };
-  const handleRatingCommunicationChange = (event, newRatingAttention) => {
+  const handleRatingCommunicationChange = (newRatingAttention) => {
     console.log(newRatingAttention);
     if (newRatingAttention !== null) {
       setFieldValue("ratingCommunication", newRatingAttention);
@@ -170,7 +170,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
       improvementsResources: "",
       additional: "",
     },
-    validationSchema: evaluationSchema,
     onSubmit: submitEvaluation,
   });
 
