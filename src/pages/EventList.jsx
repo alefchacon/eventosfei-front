@@ -25,6 +25,12 @@ import useWindowSize from "../hooks/useWindowSize.jsx";
 import Fab from "@mui/material/Fab";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import moment from "moment";
+import "moment/locale/es";
+
 import {
   BrowserRouter,
   Routes,
@@ -48,6 +54,7 @@ export default function Eventos(
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [date, setDate] = useState(moment());
   const { width } = useWindowSize();
   const isMobile = width < 600;
 
@@ -90,7 +97,15 @@ export default function Eventos(
     setCurrentPage(1);
   };
 
-  const handleEventSearch = async (e) => {
+  const handleDateChange = async (date) => {
+    console.log(date);
+    const extraFilter = `inicio=${date.format("YYYY-MM")}`;
+    const events = await handleGetEvents([extraFilter]);
+    setQueriedEvents(events);
+    setQueriedPagination(events);
+  };
+
+  const handleEventSearch = async () => {
     const extraFilter = `nombre=${searchQuery}`;
     const events = await handleGetEvents([extraFilter]);
     setQueriedEvents(events);
@@ -202,6 +217,13 @@ export default function Eventos(
           </Button>
         </Stack>
 
+        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
+          <DatePicker
+            label={"Buscar por mes"}
+            views={["month", "year"]}
+            onYearChange={handleDateChange}
+          />
+        </LocalizationProvider>
         <FormControl>
           <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
           <Select
@@ -215,6 +237,10 @@ export default function Eventos(
             <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
           </Select>
         </FormControl>
+        <Button variant="outlined" onClick={handleClearSearchQuery}>
+          Limpiar filtros
+        </Button>
+        <Button variant="outlined">Descargar reporte</Button>
         {isMobile ? (
           <Fab
             sx={{
