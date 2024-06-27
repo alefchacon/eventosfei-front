@@ -1,5 +1,6 @@
 import { urlEvents, urlNotifications, urlEventById, urlEventsByMonth, urlUserEvents } from "./urls.js";
 import { client } from "./Client.js";
+import moment from "moment";
 
 const filters = {
   porFechaEnvio: "&porFechaEnvio=true",
@@ -47,3 +48,61 @@ export const GetNotifications = async () => {
   const response = await client.get(urlNotifications);
   return response;
 };
+
+export const StoreEvent = async (values) => {
+
+  const newValues = {...values};
+
+  //newValues.programas = parseIdCatalog(newValues.programas);
+  newValues.audiencias = parseStringCatalog(newValues.audiencias);
+  newValues.tematicas = parseStringCatalog(newValues.tematicas);
+  newValues.inicio = moment(newValues.inicio).format("YYYY-MM-DD");
+  newValues.fin = moment(newValues.fin).format("YYYY-MM-DD");
+
+  
+  newValues.programas = JSON.stringify(newValues.programas);
+  newValues.reservaciones = JSON.stringify(newValues.reservaciones);
+
+
+  const formData = new FormData();
+  for (const key in newValues) {
+    if (key === "difusion") {
+      console.log(newValues[key].length);
+
+      for (let i = 0; i < newValues[key].length; i++) {
+        formData.append(`difusion[${key}-${i}]`, newValues[key][i]);
+      }
+    } else {
+
+      formData.append(key, newValues[key]);
+    }
+  }
+
+  formData.forEach((value, key) => {
+    console.log(`${key}: ${value}`);
+  });
+
+  console.log(newValues);
+
+  //console.log(await client.post(urlEvents, formData));
+}
+
+/*
+Los catalogos ("ProgramasEducativos", por ejemplo) se manejaban 
+como tablas en la BD. Sin embargo, en etapas tardías del desarrollo 
+se descubrieron más posibles catalogos (eg: "Ambitos"). Por cuestiones
+de tiempo, estas tablas no se implementaron, y en su lugar son 
+columnas varchar en la tabla Eventos. Dado que algunos catalogos funcionan
+con su ID de la tabla, y otros con un valor string, las listas seleccionables
+manejan sus valores como si fueran JSONs con dos atributos: id y name. 
+Aquí se parsean esos datos, dependiendo de si el catalogo maneja id o name varchar.
+
+*/ 
+function parseStringCatalog(catalog){
+  console.log(catalog)
+  return catalog.map(item => item["name"]).join(";")
+}
+function parseIdCatalog(catalog){
+  console.log(catalog)
+  return catalog.map(item => item["id"]);
+}

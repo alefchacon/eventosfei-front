@@ -15,6 +15,8 @@ import FormLabel from "@mui/material/FormLabel";
 import ReservationCard from "./ReservationCard";
 
 export default function CheckboxList({
+  valueName = "",
+  onClick,
   label = "lav",
   max = null,
   required = false,
@@ -37,16 +39,17 @@ export default function CheckboxList({
   const [checked, setChecked] = React.useState([{ id: 0 }]);
 
   React.useEffect(() => {
-    console.log(items.at(0));
-    setChecked([items.at(0).id]);
+    const defaultChecked = [items.at(0)];
+    setChecked(defaultChecked);
+    onClick(valueName, defaultChecked);
   }, [items.length > 1]);
 
   const handleToggle = (value) => () => {
-    console.log(value);
-    const currentIndex = checked.indexOf(value);
+    const currentIndex = checked.findIndex((item) => item.id === value.id);
     const newChecked = [...checked];
 
-    const tryingToAdd = newChecked.indexOf(value) === -1;
+    const tryingToAdd =
+      newChecked.findIndex((item) => item.id === value.id) === -1;
 
     if (max !== null && newChecked.length === max && tryingToAdd) {
       return;
@@ -66,6 +69,7 @@ export default function CheckboxList({
 
     console.log(newChecked);
     setChecked(newChecked);
+    onClick(valueName, newChecked);
   };
 
   return (
@@ -80,7 +84,7 @@ export default function CheckboxList({
               <ListItem key={item.id} disablePadding>
                 <ListItemButton
                   role={undefined}
-                  onClick={handleToggle(item.id)}
+                  onClick={handleToggle(item)}
                   dense
                   divider
                 >
@@ -94,7 +98,10 @@ export default function CheckboxList({
                     <Stack>
                       <Checkbox
                         edge="start"
-                        checked={checked.indexOf(item.id) !== -1}
+                        checked={
+                          checked.findIndex((_item) => _item.id === item.id) !==
+                          -1
+                        }
                         tabIndex={-1}
                         disableRipple
                         inputProps={{ "aria-labelledby": labelId }}

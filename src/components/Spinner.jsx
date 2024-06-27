@@ -8,6 +8,8 @@ import FormLabel from "@mui/material/FormLabel";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
 export default function Spinner({
+  onClick,
+  valueName = "valueName",
   label = "Número",
   step = 1,
   min = 0,
@@ -19,7 +21,9 @@ export default function Spinner({
     if (value + valueToAdd < min || value + valueToAdd > max) {
       return;
     }
-    setValue(value + valueToAdd);
+    const newValue = value + valueToAdd;
+    setValue(newValue);
+    onClick(valueName, newValue);
   };
 
   return (

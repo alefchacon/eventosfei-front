@@ -75,17 +75,17 @@ export default function ReservationCard({
           sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
           direction={"row"}
         >
-          <Typography variant="h6" component="div">
+          <Typography variant="h6" fontSize={"1.1em"} component="div">
             {item.space.name}{" "}
           </Typography>
           {adminView && <Chip onClick={handleClick} label={item.status.name} />}
         </Stack>
-        <Typography variant="h7">
+        <Typography variant="body1" fontSize={"0.9em"}>
           {moment(item.start).format("dddd, MMMM Do YYYY")}
         </Typography>
-        <Typography gutterBottom>{`${moment(item.start).format(
-          "HH:mm"
-        )} - ${moment(item.end).format("HH:mm")}`}</Typography>
+        <Typography fontSize={"0.9em"} gutterBottom>{`${moment(
+          item.start
+        ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
         {adminView && <Organizer user={item.user} />}
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>

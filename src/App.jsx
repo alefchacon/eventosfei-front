@@ -314,7 +314,7 @@ function App(props) {
                   size="large"
                   aria-label="show 17 new notifications"
                   color="inherit"
-                  onClick={() => navigate("/calendario")}
+                  onClick={() => navigate("/reservaciones")}
                 >
                   <Badge badgeContent={17} color="error">
                     <NotificationsIcon />
