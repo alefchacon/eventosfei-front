@@ -3,6 +3,7 @@ import { useState } from "react";
 import "./App.css";
 import Evaluation from "./pages/Evaluation.jsx";
 import EventList from "./pages/EventList.jsx";
+import Notices from "./pages/Notices.jsx";
 import ReservationList from "./pages/ReservationList.jsx";
 import "./index.css";
 import {
@@ -314,7 +315,7 @@ function App(props) {
                   size="large"
                   aria-label="show 17 new notifications"
                   color="inherit"
-                  onClick={() => navigate("/reservaciones")}
+                  onClick={() => navigate("/avisos")}
                 >
                   <Badge badgeContent={17} color="error">
                     <NotificationsIcon />
@@ -382,6 +383,9 @@ function App(props) {
       <div className="content">
         {isLoading && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
         <Routes>
+          <Route path="/avisos" element={<Notices />}>
+            {" "}
+          </Route>
           <Route
             path="/eventos"
             element={

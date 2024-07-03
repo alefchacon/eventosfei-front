@@ -1,4 +1,11 @@
-import { urlEvents, urlNotifications, urlEventById, urlEventsByMonth, urlUserEvents } from "./urls.js";
+import { 
+  urlEvents, 
+  urlNotifications, 
+  urlEventById, 
+  urlEventsByMonth, 
+  urlUserEvents, 
+  urlNewEvents 
+} from "./urls.js";
 import { client } from "./Client.js";
 import moment from "moment";
 
@@ -49,6 +56,16 @@ export const GetNotifications = async () => {
   return response;
 };
 
+export const GetNewEvents = async (filters = [""]) => {
+  let url = urlNewEvents
+  filters.forEach(filter => {
+    url = url.concat("&", filter)
+  })
+  console.log(url)
+  const response = await client.get(url);
+  return response;
+}
+
 export const StoreEvent = async (values) => {
 
   const newValues = {...values};
@@ -63,11 +80,13 @@ export const StoreEvent = async (values) => {
   newValues.programas = JSON.stringify(newValues.programas);
   newValues.reservaciones = JSON.stringify(newValues.reservaciones);
 
+  //newValues.cronograma = await toBase64(newValues.cronograma);
+  
 
   const formData = new FormData();
   for (const key in newValues) {
+    /*
     if (key === "difusion") {
-      console.log(newValues[key].length);
 
       for (let i = 0; i < newValues[key].length; i++) {
         formData.append(`difusion[${key}-${i}]`, newValues[key][i]);
@@ -76,16 +95,22 @@ export const StoreEvent = async (values) => {
 
       formData.append(key, newValues[key]);
     }
+    */
+    //formData.append(key, newValues[key]);
   }
+  console.log(newValues["cronograma"])
+  formData.append("cronograma", newValues["cronograma"]);
 
-  formData.forEach((value, key) => {
-    console.log(`${key}: ${value}`);
-  });
-
-  console.log(newValues);
-
-  //console.log(await client.post(urlEvents, formData));
+  console.log(await client.post(urlEvents, formData));
+  //console.log(await client.post(urlEvents, newValues));
 }
+
+const toBase64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+});
 
 /*
 Los catalogos ("ProgramasEducativos", por ejemplo) se manejaban 
