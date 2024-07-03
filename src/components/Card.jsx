@@ -82,7 +82,7 @@ export default function EventCard({ props, parentHandle, isProfile }, { key }) {
           Fecha de notificación: {moment(createdAt).format("DD MMMM, YYYY")}
         </Typography>
         <Typography color="text.primary">
-          {moment(start).format("DD MMMM, YYYY")}
+          Inicio: {moment(start).format("DD MMMM, YYYY")}
         </Typography>
       </CardContent>
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
