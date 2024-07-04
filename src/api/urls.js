@@ -14,7 +14,9 @@ export const urlEvaluations = "/api/evaluaciones/";
 export const urlEvidences = "/api/evidencias/";
 export const urlStatus = "/api/estados/";
 export const urlReservedSpaces = "/api/espacios/reservaciones/";
-export const urlReservations = "/api/solicitud/";
+export const urlReservations = "/api/solicitud?";
+export const urlUpdateReservation = (id) => `/api/solicitud/${id}`;
+export const urlNewReservations = "/api/solicitud?idEstado[eq]=1";
 export const urlAvailableReservations = "/api/solicitud/disponibles";
 
 export const urlProgramasEducativos = "/api/programaseducativos";

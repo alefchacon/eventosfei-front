@@ -15,24 +15,41 @@ import DialogTypes from "../providers/DialogTypes";
 
 import { Link } from "react-router-dom";
 
-function CustomCardActions({ isEvaluated, reservation }) {
+function CustomCardActions({ isEvaluated, reservation, adminView = true }) {
   const { showDialog } = useDialog();
   return (
     <>
-      <Button
-        size="medium"
-        onClick={() =>
-          showDialog(
-            "Responder reservación",
-            DialogTypes.reservationResponse,
-            console.log(""),
-            reservation
-          )
-        }
-        disabled={isEvaluated}
-      >
-        Responder
-      </Button>
+      {adminView ? (
+        <Button
+          size="medium"
+          onClick={() =>
+            showDialog(
+              "Responder reservación",
+              DialogTypes.reservationResponse,
+              console.log(""),
+              reservation
+            )
+          }
+          disabled={isEvaluated}
+        >
+          Responder
+        </Button>
+      ) : (
+        <Button
+          size="medium"
+          onClick={() =>
+            showDialog(
+              "Responder reservación",
+              DialogTypes.reservationResponse,
+              console.log(""),
+              reservation
+            )
+          }
+          disabled={isEvaluated}
+        >
+          Ver respuesta
+        </Button>
+      )}
     </>
   );
 }
@@ -48,7 +65,11 @@ function Organizer({ user }) {
 }
 
 export default function ReservationCard({
-  item,
+  item = {
+    space: {
+      name: "space name",
+    },
+  },
   parentHandle,
   adminView = false,
 }) {
@@ -62,39 +83,67 @@ export default function ReservationCard({
     console.info("You clicked the Chip.");
   };
 
+  const getColor = () => {
+    if (adminView) {
+      return item.notifyAdministrator ? "success" : "default";
+    }
+
+    if (!item.notifyUser) {
+      return "default";
+    }
+
+    if (item.status.id === 2) {
+      return "success";
+    } else {
+      return "error";
+    }
+  };
+
   return (
     <Card
       sx={{
         minWidth: "30%",
         maxHeight: 250,
       }}
-      elevation={adminView ? 1 : 0}
+      elevation={1}
     >
-      <CardContent sx={{ mb: -3 }}>
-        <Stack
-          sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
-          direction={"row"}
-        >
-          <Typography variant="h6" fontSize={"1.1em"} component="div">
-            {item.space.name}{" "}
+      <CardActionArea>
+        <CardContent sx={{ mb: -3 }}>
+          <Stack
+            sx={{
+              padding: 0,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+            direction={"row"}
+          >
+            <Typography variant="h6" component="div" gutterBottom>
+              {item.space.name}{" "}
+            </Typography>
+
+            <Chip
+              onClick={handleClick}
+              color={getColor()}
+              label={item.status.name}
+            />
+          </Stack>
+          <Typography variant="body1" color={"text.secondary"}>
+            {moment(item.start).format("dddd, MMMM Do YYYY")}
           </Typography>
-          {adminView && <Chip onClick={handleClick} label={item.status.name} />}
-        </Stack>
-        <Typography variant="body1" fontSize={"0.9em"}>
-          {moment(item.start).format("dddd, MMMM Do YYYY")}
-        </Typography>
-        <Typography fontSize={"0.9em"} gutterBottom>{`${moment(
-          item.start
-        ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
-        {adminView && <Organizer user={item.user} />}
-      </CardContent>
+          <Typography gutterBottom color={"text.secondary"}>{`${moment(
+            item.start
+          ).format("HH:mm")} - ${moment(item.end).format(
+            "HH:mm"
+          )}`}</Typography>
+        </CardContent>
+      </CardActionArea>
+
       <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        {adminView && (
-          <CustomCardActions
-            isEvaluated={isEvaluated}
-            reservation={item}
-          ></CustomCardActions>
-        )}
+        <CustomCardActions
+          isEvaluated={isEvaluated}
+          reservation={item}
+          adminView={adminView}
+        ></CustomCardActions>
       </CardActions>
     </Card>
   );
