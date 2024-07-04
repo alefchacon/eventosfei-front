@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Typography, Stack } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useDialog } from "../providers/DialogProvider.jsx";
 import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
 
@@ -20,13 +19,13 @@ import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 export default function ReservationResponse({
   onCancel,
   onSubmit,
-  reservation,
+  reservation = {
+    space: {
+      name: "space name",
+      start: moment().format("dddd, MMMM Do YYYY"),
+    },
+  },
 }) {
-  const { showDialog } = useDialog();
-  const [start, setStart] = useState(moment());
-  const [end, setEnd] = useState(moment().add(1, "hours"));
-  const [space, setSpace] = useState();
-
   const { showSnackbar } = useSnackbar();
 
   const handleStatusIdChange = (newStatusId) => {
@@ -73,16 +72,20 @@ export default function ReservationResponse({
 
   return (
     <>
-      <Typography variant="h6">{reservation.space.name}</Typography>
-      <Typography variant="h7">
-        {moment(reservation.start).format("dddd, MMMM Do YYYY")}
-      </Typography>
-      <Typography gutterBottom>{`${moment(reservation.start).format(
-        "HH:mm"
-      )} - ${moment(reservation.end).format("HH:mm")}`}</Typography>
-      <Typography variant="body1">{`${reservation.user.names} ${reservation.user.paternalName} ${reservation.user.maternalName}`}</Typography>
-      <Typography variant="body2">{reservation.user.job}</Typography>
-      <Typography variant="body2">{reservation.user.email}</Typography>
+      {reservation !== null && (
+        <>
+          <Typography variant="h6">{reservation.space.name}</Typography>
+          <Typography variant="h7">
+            {moment(reservation.start).format("dddd, MMMM Do YYYY")}
+          </Typography>
+          <Typography gutterBottom>{`${moment(reservation.start).format(
+            "HH:mm"
+          )} - ${moment(reservation.end).format("HH:mm")}`}</Typography>
+          <Typography variant="body1">{`${reservation.user.names} ${reservation.user.paternalName} ${reservation.user.maternalName}`}</Typography>
+          <Typography variant="body2">{reservation.user.job}</Typography>
+          <Typography variant="body2">{reservation.user.email}</Typography>
+        </>
+      )}
 
       <form autoComplete="off" onSubmit={handleSubmit}>
         <Stack direction={"column"} spacing={2} paddingTop={2}>
@@ -121,7 +124,6 @@ export default function ReservationResponse({
             Cancelar
           </Button>
           <LoadingButton
-            isReady={space !== null}
             label="Responder"
             isLoading={isSubmitting}
           ></LoadingButton>

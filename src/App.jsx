@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import "./App.css";
 import Evaluation from "./pages/Evaluation.jsx";
@@ -12,10 +12,10 @@ import {
   Route,
   Link,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 
 import * as React from "react";
-import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -32,8 +32,6 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -56,6 +54,8 @@ import Reservation from "./forms/ReservationForm.jsx";
 import { GetEvents, GetNotifications } from "./api/EventService.js";
 import { LogOut } from "./api/UserService.js";
 
+import useNotices from "./hooks/useNotices.jsx";
+
 import Event from "./pages/Event.jsx";
 import NewNotification from "./pages/NewNotification.jsx";
 
@@ -72,9 +72,12 @@ function App(props) {
   const [user, setUser] = React.useState(
     JSON.parse(localStorage.getItem("user"))
   );
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { notices, noticeAmount } = useNotices();
 
   const { isLoading, setIsLoading } = useIsLoading();
 
@@ -117,8 +120,6 @@ function App(props) {
       setMobileOpen(!mobileOpen);
     }
   };
-
-  const handleNavigation = (route) => {};
 
   const drawer = (
     <Stack bgcolor={"#18529d"} flexGrow={1} color={"white"}>
@@ -317,7 +318,7 @@ function App(props) {
                   color="inherit"
                   onClick={() => navigate("/avisos")}
                 >
-                  <Badge badgeContent={17} color="error">
+                  <Badge badgeContent={noticeAmount} color="error">
                     <NotificationsIcon />
                   </Badge>
                 </IconButton>
