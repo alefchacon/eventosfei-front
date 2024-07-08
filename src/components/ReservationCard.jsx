@@ -69,9 +69,13 @@ export default function ReservationCard({
     space: {
       name: "space name",
     },
+    status: {
+      name: "space name",
+    },
   },
   parentHandle,
   adminView = false,
+  elevated = true,
 }) {
   const [isEvaluated, setIsEvaluated] = useState(false);
 
@@ -105,7 +109,7 @@ export default function ReservationCard({
         minWidth: "30%",
         maxHeight: 250,
       }}
-      elevation={1}
+      elevation={elevated ? 1 : 0}
     >
       <CardActionArea>
         <CardContent sx={{ mb: -3 }}>

@@ -1,5 +1,5 @@
 import { client } from "./Client";
-import { urlReservedSpaces, urlReservations, urlAvailableReservations, urlNewReservations, urlUpdateReservation } from "./urls";
+import { urlReservedSpaces, urlReservations, urlAvailableReservations, urlNewReservations, urlUpdateReservation, urlReservationsMarkAsRead } from "./urls";
 import moment from "moment";
 
 export const GetReservationsByMonth = async (date) => {
@@ -8,8 +8,7 @@ export const GetReservationsByMonth = async (date) => {
   };
 
   const response = await client.post(urlReservedSpaces, request);
-  console.log(request)
-  console.log(response)
+
   return response;
 };
 export const GetReservations = async () => {
@@ -31,7 +30,6 @@ export const GetReservations2 = async (filters = [""]) => {
   filters.forEach(filter => {
     url = url.concat("&", filter)
   })
-  console.log(url)
   const response = await client.get(url);
   return response;
 }
@@ -55,13 +53,24 @@ export const UpdateReservation = async (reservation) => {
     respuesta: reservation.response,
     idEstado: reservation.idEstado,
   };
-  console.log(request)
   const response = await client.put(
     urlUpdateReservation(request.id).concat("?respuesta=true"), 
     request
   );
   return response;
 };
+
+export const MarkAsUserRead = async (reservations = []) => {
+  const request = {
+    reservations: reservations
+  }
+  const response = await client.post(
+    urlReservationsMarkAsRead, 
+    request
+  );
+  return response;
+
+}
 
 export const GetAvailableReservations = async () => {
   const request = {

@@ -15,7 +15,7 @@ import {
   AddReservation,
 } from "../api/ReservationService.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
-
+import { useNotices } from "../providers/NoticeProvider.jsx";
 export default function ReservationResponse({
   onCancel,
   onSubmit,
@@ -27,6 +27,7 @@ export default function ReservationResponse({
   },
 }) {
   const { showSnackbar } = useSnackbar();
+  const { noticeAmount, decreaseNotices } = useNotices();
 
   const handleStatusIdChange = (newStatusId) => {
     if (newStatusId !== null) {
@@ -45,6 +46,7 @@ export default function ReservationResponse({
 
       const response = await UpdateReservation(request);
       showSnackbar(response.data.message);
+      await decreaseNotices(1);
     } catch (error) {
       showSnackbar(error.message);
     }

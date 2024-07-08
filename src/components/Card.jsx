@@ -22,7 +22,10 @@ const bull = (
   </Box>
 );
 
-export default function EventCard({ props, parentHandle, isProfile }, { key }) {
+export default function EventCard(
+  { props, parentHandle, isProfile, elevated = true },
+  { key }
+) {
   const [isEvaluated, setIsEvaluated] = useState(false);
 
   const {
@@ -55,6 +58,7 @@ export default function EventCard({ props, parentHandle, isProfile }, { key }) {
         maxHeight: 250,
         bgcolor: "white",
       }}
+      elevation={elevated ? 1 : 0}
     >
       <CardContent sx={{ mb: -3 }}>
         <Stack

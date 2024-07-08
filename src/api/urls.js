@@ -15,9 +15,13 @@ export const urlEvidences = "/api/evidencias/";
 export const urlStatus = "/api/estados/";
 export const urlReservedSpaces = "/api/espacios/reservaciones/";
 export const urlReservations = "/api/solicitud?";
+export const urlReservationsMarkAsRead = "/api/solicitud/marcarLeidasUsuario";
 export const urlUpdateReservation = (id) => `/api/solicitud/${id}`;
 export const urlNewReservations = "/api/solicitud?idEstado[eq]=1";
 export const urlAvailableReservations = "/api/solicitud/disponibles";
+
+export const urlNotices = `/api/avisos?`
+export const urlNoticesMarkAsUserRead = `/api/avisos/marcarLeidasUsuario`
 
 export const urlProgramasEducativos = "/api/programaseducativos";
 
