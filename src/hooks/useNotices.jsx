@@ -9,13 +9,11 @@ export default function useNotices(idRol = 2) {
   const [userEventNotices, setUserEventNotices] = useState([]);
   const [userReservationNotices, setUserReservationNotices] = useState([]);
   const [noticeAmount, setNoticeAmount] = useState(0);
-  const { location } = useLocation();
 
   useEffect(() => {
     const getAdministratorNotices = async () => {
       const response = await GetReservations2(["porAvisosAdministrador=true"]);
       const notices = response.data.data;
-      console.log(notices);
       setAdministratorNotices(notices);
       const _noticeAmount = notices.reduce(
         (count, notice) =>
@@ -37,9 +35,12 @@ export default function useNotices(idRol = 2) {
         getAdministratorNotices();
         break;
     }
-  }, [location]);
+  }, []);
 
-  const removeNotices = async (noticeIds = []) => {};
+  const decreaseNotices = async (a) => {
+    console.log(noticeAmount);
+    setNoticeAmount(100);
+  };
 
   const notices = {
     1: {
@@ -50,5 +51,9 @@ export default function useNotices(idRol = 2) {
     5: coordinatorNotices,
   };
 
-  return { notices: notices[idRol], noticeAmount: noticeAmount };
+  return {
+    notices: notices[idRol],
+    noticeAmount: noticeAmount,
+    decreaseNotices,
+  };
 }

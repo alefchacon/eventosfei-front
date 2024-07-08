@@ -42,8 +42,6 @@ export default function BasicTabs({ children }) {
     setValue(newValue);
   };
 
-  console.log(children);
-
   return (
     <Box sx={{ width: "100%", height: "fit-content" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

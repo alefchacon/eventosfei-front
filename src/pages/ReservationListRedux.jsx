@@ -36,17 +36,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import moment from "moment";
 import "moment/locale/es";
 
-import { jsPDF } from "jspdf";
+import { useNotices } from "../providers/NoticeProvider.jsx";
 
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
+import { MarkAsUserRead } from "../api/ReservationService.js";
 
 export default function ReservationList(
   {
@@ -80,7 +74,6 @@ export default function ReservationList(
     setIsLoading(true);
 
     let filters = [`page=${currentPage}`];
-    console.log(currentPage);
     for (const filter of extraFilters) {
       filters.push(filter);
     }
@@ -90,7 +83,6 @@ export default function ReservationList(
     } else {
       filters.push(`porAvisosAdministrador=true`);
     }
-    console.log(filters);
     const response = await GetReservations2(filters);
 
     setIsLoading(false);
@@ -99,7 +91,6 @@ export default function ReservationList(
   };
 
   const handle = (FEIEvent) => {
-    console.log(FEIEvent);
     setSelectedFEIEvent(FEIEvent);
   };
 
@@ -139,46 +130,53 @@ export default function ReservationList(
     setCurrentPage(1);
   };
 
+  const { removeUserNotices } = useNotices();
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setIsLoading(true);
+      setIsLoading(true);
 
-        let response = [];
+      let response = [];
 
-        let initialFilters = [`page=${currentPage}`];
-        console.log(initialFilters);
+      let initialFilters = [`page=${currentPage}`];
 
-        if (idUsuario > 0) {
-          initialFilters.push(`idUsuario[eq]=${idUsuario}`);
-          initialFilters.push(`porAvisosUsuario=true`);
-        } else {
-          initialFilters.push(`porAvisosAdministrador=true`);
-        }
-
-        response = await GetReservations2(initialFilters);
-
-        if (!response.status === 200) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = response.data;
-        const events = data.data;
-        setQueriedEvents(events);
-        setDefaultEvents(events);
-        setQueriedPagination(data.meta);
-        setDefaultPagination(data.meta);
-
-        setLoading(false);
-        //setItems(response)
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (idUsuario > 0) {
+        initialFilters.push(`idUsuario[eq]=${idUsuario}`);
+        initialFilters.push(`porAvisosUsuario=true`);
+      } else {
+        initialFilters.push(`porAvisosAdministrador=true`);
       }
+
+      response = await GetReservations2(initialFilters);
+
+      const data = response.data;
+      const events = data.data;
+      setQueriedEvents(events);
+      setDefaultEvents(events);
+      setQueriedPagination(data.meta);
+      setDefaultPagination(data.meta);
+
+      setLoading(false);
+      //setItems(response)
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
+  useEffect(() => {
+    const updateNotifications = async () => {
+      if (idUsuario > 0) {
+        const readReservations = queriedEvents.filter(
+          (reservation) => reservation.notifyUser === 1
+        );
+        const response = await MarkAsUserRead(readReservations);
+        removeUserNotices(readReservations);
+      }
+    };
+    console.log("update");
+    updateNotifications();
+  }, [isLoading]);
+
+  console.log("ASDF");
   const handlePageChange = async (event, newPage) => {
     setCurrentPage(newPage);
   };

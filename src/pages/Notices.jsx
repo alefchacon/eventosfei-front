@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import Tabs from "../components/Tabs";
 import NoticeList from "./NoticeList";
 import ReservationList from "./ReservationListRedux";
+import NoticeListRedux from "./NoticeListRedux";
 
 export default function Notices({}) {
   return (
@@ -23,8 +24,8 @@ export default function Notices({}) {
           />
         </div>
         <div label={"Reservaciones (usuario)"}>
-          <ReservationList
-            idUsuario={1}
+          <NoticeListRedux
+            organizerView={true}
             showButtons={false}
             showFilters={false}
           />

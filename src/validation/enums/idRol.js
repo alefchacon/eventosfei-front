@@ -1,0 +1,7 @@
+export const idRol = Object.freeze({
+  ORGANIZADOR: 1,
+  ADMINISTRADOR_ESPACIOS: 2,
+  TECNICO_ACADEMICO: 3,
+  RESPONSABLE: 4,
+  COORDINADOR: 5
+});

@@ -54,7 +54,7 @@ import Reservation from "./forms/ReservationForm.jsx";
 import { GetEvents, GetNotifications } from "./api/EventService.js";
 import { LogOut } from "./api/UserService.js";
 
-import useNotices from "./hooks/useNotices.jsx";
+import { useNotices } from "./providers/NoticeProvider.jsx";
 
 import Event from "./pages/Event.jsx";
 import NewNotification from "./pages/NewNotification.jsx";
@@ -77,7 +77,7 @@ function App(props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { notices, noticeAmount } = useNotices();
+  const { noticeAmount, decreaseNotices } = useNotices();
 
   const { isLoading, setIsLoading } = useIsLoading();
 
