@@ -13,22 +13,14 @@ export default function Notices({}) {
     <>
       <Tabs>
         <div label={"Notificaciones"}>
-          <NoticeList idUsuario={0} />
+          <NoticeListRedux />
         </div>
         <div label={"Evaluaciones"}></div>
         <div label={"Reservaciones"}>
-          <ReservationList
-            idUsuario={0}
-            showButtons={false}
-            showFilters={false}
-          />
+          <NoticeListRedux />
         </div>
         <div label={"Reservaciones (usuario)"}>
-          <NoticeListRedux
-            organizerView={true}
-            showButtons={false}
-            showFilters={false}
-          />
+          <NoticeListRedux showButtons={false} showFilters={false} />
         </div>
       </Tabs>
     </>

@@ -85,23 +85,35 @@ export const StoreEvent = async (values) => {
 
   const formData = new FormData();
   for (const key in newValues) {
-    /*
-    if (key === "difusion") {
+    
+    if (key === "publicidad") {
 
-      for (let i = 0; i < newValues[key].length; i++) {
-        formData.append(`difusion[${key}-${i}]`, newValues[key][i]);
+      const publicidad = newValues["publicidad"]; 
+      for (let i = 0; i<publicidad.length; i++){
+        formData.append(`publicidad[${i}]`, publicidad[i])
       }
+      
     } else {
 
       formData.append(key, newValues[key]);
     }
-    */
-    //formData.append(key, newValues[key]);
+    
   }
-  console.log(newValues["cronograma"])
-  formData.append("cronograma", newValues["cronograma"]);
+  //formData.append("cronograma", newValues["cronograma"]);
 
-  console.log(await client.post(urlEvents, formData));
+  /*
+  const publicidad = newValues["publicidad"]; 
+  for (let i = 0; i<publicidad.length; i++){
+    formData.append(`publicidad[${i}]`, publicidad[i])
+  }*/
+
+
+  const response = await client.post(urlEvents, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  console.log(response);
   //console.log(await client.post(urlEvents, newValues));
 }
 

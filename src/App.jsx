@@ -58,6 +58,7 @@ import { useNotices } from "./providers/NoticeProvider.jsx";
 
 import Event from "./pages/Event.jsx";
 import NewNotification from "./pages/NewNotification.jsx";
+import TestForm from "./pages/TestForm.jsx";
 
 import { useIsLoading } from "./providers/LoadingProvider.jsx";
 
@@ -310,7 +311,7 @@ function App(props) {
               </Typography>
             </Stack>
 
-            {isAuthenticated && (
+            {isAuthenticated && user !== null && (
               <Stack direction={"row"} alignItems={"center"}>
                 <IconButton
                   size="large"
@@ -322,6 +323,7 @@ function App(props) {
                     <NotificationsIcon />
                   </Badge>
                 </IconButton>
+                (
                 <IconButton
                   size="large"
                   edge="end"
@@ -480,6 +482,16 @@ function App(props) {
             element={
               <RouteGuard isAuthenticated={isAuthenticated}>
                 <ProfilePage user={user}></ProfilePage>
+              </RouteGuard>
+            }
+          >
+            {" "}
+          </Route>
+          <Route
+            path="/test"
+            element={
+              <RouteGuard isAuthenticated={isAuthenticated}>
+                <TestForm />
               </RouteGuard>
             }
           >

@@ -265,7 +265,10 @@ export default function Event({ setTitle }) {
           </Box>
           <CustomTabPanel value={value} index={0}>
             <Stack spacing={4}>
+              {/*
               <Button onClick={getReport}>Reporte :D</Button>
+              
+              */}
               <Typography variant="h5">Organizador</Typography>
               <TextField
                 name="names"
