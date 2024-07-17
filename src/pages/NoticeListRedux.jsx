@@ -11,15 +11,7 @@ import { useIsLoading } from "../providers/LoadingProvider.jsx";
 import { useNotices } from "../providers/NoticeProvider.jsx";
 
 export default function NoticeList(
-  {
-    notifications,
-    handleGet,
-    organizerView = false,
-    administratorView = false,
-    coordinatorView = false,
-    showFilters = true,
-    showButtons = true,
-  },
+  { notifications, handleGet, showFilters = true, showButtons = true },
   { setSelectedFEIEvent }
 ) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,12 +26,9 @@ export default function NoticeList(
     setIsLoading(false);
   }, []);
 
-  const { getNotices, removeNotices } = useNotices();
+  const { getNotices, removeNotices, isStaff } = useNotices();
 
   useEffect(() => {
-    if (idUsuario < 1 || !organizerView) {
-      return;
-    }
     removeNotices(notices);
   }, [notices]);
 
@@ -63,13 +52,18 @@ export default function NoticeList(
   return (
     <>
       <Stack spacing={{ md: 1 }} margin={{ md: 1 }} direction={"column"}>
-        {notices.map((item) =>
+        {notices.map((item, index) =>
           item.event !== null ? (
-            <CardNotice item={item} adminView={idUsuario === 0}>
+            <CardNotice
+              key={index}
+              item={item}
+              adminView={idUsuario === 0}
+              isStaff={isStaff}
+            >
               <Card props={item.event} elevated={false}></Card>
             </CardNotice>
           ) : (
-            <CardNotice event={false} item={item}>
+            <CardNotice key={index} event={false} item={item} isStaff={isStaff}>
               <ReservationCard
                 elevated={false}
                 item={item.reservation}

@@ -153,7 +153,7 @@ export default function Reservation({ onCancel, onSubmit }) {
   const { showDialog } = useDialog();
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(moment());
-  const [start, setStart] = useState(moment());
+  const [start, setStart] = useState(moment("2024-07-09 11:11:00"));
   const [end, setEnd] = useState(moment().add(1, "hours"));
   const [isLoading, setIsLoading] = useState(true);
   const [reservations, setReservations] = useState([]);
@@ -283,12 +283,7 @@ export default function Reservation({ onCancel, onSubmit }) {
         <Typography variant="h6" paddingLeft={2}>
           Espacios de la FEI
         </Typography>
-        <Typography variant="paragraph" paddingLeft={2}>
-          Seleccione uno de los espacios para reservarlo. Si el espacio ya
-          cuenta con reservaciones para la Fecha seleccionada, estas se
-          mostrarán en color naranja. Si alguna reservación se traslapa con los
-          horarios de Inicio y Fin seleccionados, se mostrará de color rojo.
-        </Typography>
+
         <Stack
           width={"100%"}
           paddingTop={2}

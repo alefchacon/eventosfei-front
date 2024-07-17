@@ -27,13 +27,12 @@ export default function ReservationResponse({
   },
 }) {
   const { showSnackbar } = useSnackbar();
-  const { noticeAmount, decreaseNotices } = useNotices();
+  const { noticeAmount, removeNotice } = useNotices();
 
   const handleStatusIdChange = (newStatusId) => {
     if (newStatusId !== null) {
       setFieldValue("statusId", newStatusId);
     }
-    console.log(newStatusId);
   };
 
   const submitResponse = async (values, actions) => {
@@ -46,7 +45,6 @@ export default function ReservationResponse({
 
       const response = await UpdateReservation(request);
       showSnackbar(response.data.message);
-      await decreaseNotices(1);
     } catch (error) {
       showSnackbar(error.message);
     }

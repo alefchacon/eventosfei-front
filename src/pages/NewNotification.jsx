@@ -255,13 +255,14 @@ function NewNotification() {
       numParticipantesExternos: 0,
       requisitosCentroComputo: "",
 
-      difusion: [],
+      publicidad: [],
 
       adicional: "",
 
       idUsuario: 1,
       idEstado: 1,
     },
+
     // validationSchema: evaluationSchema,
     onSubmit: submitNotification,
   });
@@ -709,18 +710,18 @@ function NewNotification() {
                 ></Stack>
                 <Typography>
                   {" "}
-                  Si cuenta con material de difusion, por favor subalo en este
-                  apartado.
+                  Si cuenta con material publicitario de difusion, por favor
+                  subalo en este apartado.
                 </Typography>
                 <Fragment>
                   <input
                     multiple
                     type="file"
                     accept=".jpg"
-                    name="cronograma"
-                    id="archivo"
+                    name="publicidad"
+                    id="publicidad"
                     onChange={(event) =>
-                      setFieldValue("difusion", event.currentTarget.files)
+                      setFieldValue("publicidad", event.currentTarget.files)
                     }
                   />
                 </Fragment>

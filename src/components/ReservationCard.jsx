@@ -111,44 +111,32 @@ export default function ReservationCard({
       }}
       elevation={elevated ? 1 : 0}
     >
-      <CardActionArea>
-        <CardContent sx={{ mb: -3 }}>
-          <Stack
-            sx={{
-              padding: 0,
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-            direction={"row"}
-          >
-            <Typography variant="h6" component="div" gutterBottom>
-              {item.space.name}{" "}
-            </Typography>
-
-            <Chip
-              onClick={handleClick}
-              color={getColor()}
-              label={item.status.name}
-            />
-          </Stack>
-          <Typography variant="body1" color={"text.secondary"}>
-            {moment(item.start).format("dddd, MMMM Do YYYY")}
+      <CardContent sx={{ mb: -3 }}>
+        <Stack
+          sx={{
+            padding: 0,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+          direction={"row"}
+        >
+          <Typography variant="h6" component="div" gutterBottom>
+            {item.space.name}{" "}
           </Typography>
-          <Typography gutterBottom color={"text.secondary"}>{`${moment(
-            item.start
-          ).format("HH:mm")} - ${moment(item.end).format(
-            "HH:mm"
-          )}`}</Typography>
-        </CardContent>
-      </CardActionArea>
 
-      <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <CustomCardActions
-          isEvaluated={isEvaluated}
-          reservation={item}
-          adminView={adminView}
-        ></CustomCardActions>
-      </CardActions>
+          <Chip
+            onClick={handleClick}
+            color={getColor()}
+            label={item.status.name}
+          />
+        </Stack>
+        <Typography variant="body1" color={"text.secondary"}>
+          {moment(item.start).format("dddd, MMMM Do YYYY")}
+        </Typography>
+        <Typography gutterBottom color={"text.secondary"}>{`${moment(
+          item.start
+        ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
+      </CardContent>
     </Card>
   );
 }

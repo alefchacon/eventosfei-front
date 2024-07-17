@@ -316,6 +316,8 @@ export default function Eventos(
           </Button>
         </Stack>
 
+        {/*
+
         <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
           <DatePicker
             label={"Buscar por mes"}
@@ -339,6 +341,7 @@ export default function Eventos(
         <Button variant="outlined" onClick={handleClearSearchQuery}>
           Limpiar filtros
         </Button>
+          */}
       </Stack>
 
       <Stack

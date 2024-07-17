@@ -31,8 +31,59 @@ const bull = (
   </Box>
 );
 
-export default function CardNotice({ item = {}, event = true, children }) {
-  console.log(item);
+function CustomCardActions({ isEvaluated, reservation, adminView = true }) {
+  const { showDialog } = useDialog();
+  return (
+    <>
+      {adminView ? (
+        <Button
+          size="medium"
+          onClick={() =>
+            showDialog(
+              "Responder reservación",
+              DialogTypes.reservationResponse,
+              console.log(""),
+              reservation
+            )
+          }
+          disabled={isEvaluated}
+        >
+          Responder
+        </Button>
+      ) : (
+        <Button
+          size="medium"
+          onClick={() =>
+            showDialog(
+              "Responder reservación",
+              DialogTypes.reservationResponse,
+              console.log(""),
+              reservation
+            )
+          }
+          disabled={isEvaluated}
+        >
+          Ver respuesta
+        </Button>
+      )}
+    </>
+  );
+}
+
+export default function CardNotice({
+  item = {},
+  isStaff = false,
+  event = true,
+  children,
+}) {
+  const newNoticeBullet = () => {
+    console.log(isStaff);
+    if (isStaff) {
+      return item.notifyStaff !== 0 ? bull : "";
+    } else {
+      return item.notifyUser !== 0 ? bull : "";
+    }
+  };
 
   return (
     <Card
@@ -58,7 +109,7 @@ export default function CardNotice({ item = {}, event = true, children }) {
               alignContent={"center"}
               justifyItems={"center"}
             >
-              {item.notifyUser !== 0 || item.notifyStaff !== 0 ? bull : ""}
+              {newNoticeBullet()}{" "}
               {event
                 ? "Notificación de evento actualizada"
                 : "Reservación de espacio actualizada"}
@@ -69,6 +120,9 @@ export default function CardNotice({ item = {}, event = true, children }) {
           </Stack>
         </CardContent>
       </CardActionArea>
+      <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <CustomCardActions reservation={item.reservation}></CustomCardActions>
+      </CardActions>
     </Card>
   );
 }
