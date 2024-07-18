@@ -12,13 +12,9 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import { useDialog } from "../providers/DialogProvider.jsx";
-import DialogTypes from "../providers/DialogTypes";
+import { useIsLoading } from "../providers/LoadingProvider.jsx";
 import Chip from "@mui/material/Chip";
-import LinearProgress from "@mui/material/LinearProgress";
 
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -29,7 +25,6 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { useFormik } from "formik";
 import moment from "moment";
 
-import SearchList from "../components/CustomSelect.jsx";
 import CustomTimePicker from "../components/CustomTimePicker.jsx";
 import LoadingButton from "../components/LoadingButton.jsx";
 
@@ -61,7 +56,6 @@ function SpaceRadio({
         const start = moment(reservation.start);
         const end = moment(reservation.end);
 
-        //console.log(selectedStart.isBefore(moment(end)));
         const innerOverlap =
           selectedStart.isSameOrBefore(start) && selectedEnd.isSameOrAfter(end);
         const earlyOverlap =
@@ -82,13 +76,10 @@ function SpaceRadio({
 
     if (space.reservations !== undefined) {
       const disabled = overlaps(space.reservations);
+      space["disabled"] = disabled;
       setIsDisabled(disabled);
     }
   }, [selectedStart, selectedEnd]);
-
-  useEffect(() => {
-    console.log(radioRef);
-  }, [isDisabled]);
 
   return (
     <Box
@@ -114,6 +105,7 @@ function SpaceRadio({
             disabled={isSubmitting || isDisabled}
             ref={radioRef}
           />
+
           <Stack>
             <Typography variant="paragraph1">{space.name}</Typography>
           </Stack>
@@ -127,8 +119,8 @@ function SpaceRadio({
           flexWrap={"wrap"}
           marginLeft={5}
         >
-          <Typography variant="caption" paddingRight={1}>
-            Reservaciones:{" "}
+          <Typography variant="caption" paddingRight={0}>
+            Otras reservaciones:{" "}
           </Typography>
           {reservations.map((reservation) => (
             <Chip
@@ -150,14 +142,15 @@ function SpaceRadio({
 }
 
 export default function Reservation({ onCancel, onSubmit }) {
-  const { showDialog } = useDialog();
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(moment());
-  const [start, setStart] = useState(moment("2024-07-09 11:11:00"));
+  const [start, setStart] = useState(moment());
   const [end, setEnd] = useState(moment().add(1, "hours"));
   const [isLoading, setIsLoading] = useState(true);
   const [reservations, setReservations] = useState([]);
   const [space, setSpace] = useState();
+
+  //const {isLoading, setIsLoading} = useIsLoading();
 
   const { showSnackbar } = useSnackbar();
 
@@ -198,6 +191,7 @@ export default function Reservation({ onCancel, onSubmit }) {
     const fetchData = async (start) => {
       const response = await GetReservationsByMonth(start);
       const responseReservations = response.data.data;
+
       const availableSpace = await getFirstAvailableSpace(responseReservations);
       setSpace(availableSpace);
       setReservations(responseReservations);
@@ -214,9 +208,15 @@ export default function Reservation({ onCancel, onSubmit }) {
 
   const submitReservation = async (values, actions) => {
     try {
+      if (space.disabled) {
+        throw new Error(
+          "El espacio seleccionado ya fue reservado en el horario especificado."
+        );
+      }
+
       const reservation = {
-        start: start,
-        end: end,
+        start: start.date(date.format("YYYY-MM-DD")),
+        end: end.date(date.format("YYYY-MM-DD")),
         idEspacio: space.id,
         // CAMBIAR
         idUsuario: 1,
@@ -249,7 +249,6 @@ export default function Reservation({ onCancel, onSubmit }) {
       overflow={"hidden"}
       display={"flex"}
       flexDirection={"column"}
-      border={"1px solid black"}
     >
       <form
         className="reservation-form"
@@ -265,18 +264,51 @@ export default function Reservation({ onCancel, onSubmit }) {
               <DatePicker value={date} onChange={handleDateChange} />
             </Stack>
             <Stack direction={"row"} gap={5}>
-              <CustomTimePicker
-                label="Inicio"
-                defaultTime={start}
-                onAccept={handleStartChange}
-                disabled={isSubmitting}
-              ></CustomTimePicker>
-              <CustomTimePicker
-                label="Fin"
-                defaultTime={end}
-                onAccept={handleEndChange}
-                disabled={isSubmitting}
-              ></CustomTimePicker>
+              <Stack
+                spacing={1}
+                width={"100%"}
+                display={"flex"}
+                justifyContent={"center"}
+              >
+                <Typography variant="h6" color={"text.secondary"}>
+                  {"Inicio"}
+                </Typography>
+
+                <TimePicker
+                  value={start}
+                  onAccept={handleStartChange}
+                  ampm={false}
+                  slotProps={{
+                    textField: {
+                      InputProps: { color: "primary" },
+                      fullWidth: true,
+                    },
+                  }}
+                />
+              </Stack>
+              <Stack
+                spacing={1}
+                width={"100%"}
+                display={"flex"}
+                justifyContent={"center"}
+              >
+                <Typography variant="h6" color={"text.secondary"}>
+                  {"Fin"}
+                </Typography>
+
+                <TimePicker
+                  minTime={start}
+                  value={end}
+                  onAccept={handleEndChange}
+                  ampm={false}
+                  slotProps={{
+                    textField: {
+                      InputProps: { color: "primary" },
+                      fullWidth: true,
+                    },
+                  }}
+                />
+              </Stack>
             </Stack>
           </LocalizationProvider>
         </Stack>

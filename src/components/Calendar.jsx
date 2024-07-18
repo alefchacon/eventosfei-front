@@ -15,7 +15,13 @@ import {
   Fab,
   Container,
   Drawer,
+  IconButton,
 } from "@mui/material";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { DatePicker } from "@mui/x-date-pickers";
+
 import LinearProgress from "@mui/material/LinearProgress";
 import {
   Calendar,
@@ -41,6 +47,8 @@ import "../App.css";
 import DialogTypes from "../providers/DialogTypes";
 import { useDialog } from "../providers/DialogProvider.jsx";
 
+import { useIsLoading } from "../providers/LoadingProvider.jsx";
+
 import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
@@ -60,10 +68,10 @@ const now = new Date();
 const CustomToolbar = (props) => {
   const { date, onNavigate } = props;
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
-  //const { showDialog } = useDialog();
 
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
+    console.log(action);
     onNavigate(action);
   };
 
@@ -72,32 +80,26 @@ const CustomToolbar = (props) => {
       <div className="calendar-toolbar">
         <div className="calendar-date-control">
           <LocalizationProvider dateAdapter={AdapterMoment}>
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel>
-                <Typography variant="h6">
-                  {`${date.toLocaleString("es-MX", {
-                    month: "long",
-                  })} ${date.getFullYear()}`}
-                </Typography>
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                className="date-select"
-                fullWidth
-                style={{ minWidth: "10rem" }}
-              >
-                <DateCalendar
-                  defaultValue={moment("2022-04-17")}
-                  views={["year"]}
-                  openTo="year"
-                />{" "}
-              </Select>
-            </FormControl>
+            <DatePicker
+              value={moment(date)}
+              views={["month", "year"]}
+              onAccept={(e) => {
+                //console.log(e.toDate());
+                handleNavigate(e.toDate());
+              }}
+            />
           </LocalizationProvider>
 
-          <button onClick={() => handleNavigate("PREVIOUS")}>Previous</button>
-          <button onClick={() => handleNavigate("NEXT")}>Next</button>
+          <IconButton
+            color="primary"
+            onClick={() => handleNavigate("PREVIOUS")}
+          >
+            <ArrowBackIcon></ArrowBackIcon>
+          </IconButton>
+
+          <IconButton color="primary" onClick={() => handleNavigate("NEXT")}>
+            <ArrowForwardIcon></ArrowForwardIcon>
+          </IconButton>
         </div>
         <Stack
           direction={"row"}
@@ -114,7 +116,7 @@ const CustomToolbar = (props) => {
             }}
             variant="contained"
             onClick={
-              () => console.log("antes abría un modal")
+              () => console.log(date.getMonth())
               //showDialog("Solicitar espacio", DialogTypes.reservationForm)
             }
           >
@@ -149,7 +151,7 @@ export default function MyCalendar({
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, setIsLoading } = useIsLoading();
   const { components, defaultDate, max, views } = useMemo(
     () => ({
       components: {
@@ -182,6 +184,7 @@ export default function MyCalendar({
   const getEvents = async () => {
     setIsLoading(true);
     const response = await GetEventsByMonth(selectedMonth);
+    console.log(selectedMonth);
 
     const responseEvents = response.data.data;
     let eventsByReservation = [];
@@ -210,7 +213,9 @@ export default function MyCalendar({
         selectedMonth.setMonth(selectedMonth.getMonth() + 1);
         break;
       default:
-        setDate(new Date());
+        //setDate(action);
+        console.log(action);
+        setDate(action);
     }
 
     getEvents();
@@ -258,7 +263,6 @@ export default function MyCalendar({
         style={{ height: "100%", width: "100%", flexGrow: 2 }}
         bgcolor={"white"}
       >
-        {isLoading && <LinearProgress></LinearProgress>}
         <Calendar
           localizer={localizer}
           selectable={true}

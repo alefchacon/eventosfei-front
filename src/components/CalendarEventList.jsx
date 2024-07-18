@@ -102,7 +102,6 @@ export default function CalendarEventList({
         <Stack
           width={"50%"}
           flexGrow={1}
-          paddingLeft={3}
           sx={{
             display: { md: "block", xs: "none" },
           }}

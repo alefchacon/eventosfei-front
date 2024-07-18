@@ -39,7 +39,7 @@ main{
 
 .content{
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
   background-color: "var(--gray-bg)";
   display: flex;
   flex-flow: column;
@@ -91,16 +91,13 @@ main{
 
 
 /* --- calendar ---*/
-.calendar{
-  padding: 30px;
-}
 
 
 
 .calendar-toolbar{
   background-color: var(--gray-bg);
   display: flex;
-  padding-bottom: 10px;
+  padding: 20px;
   justify-content: space-between;
   align-items: center;
   width: 100%;
