@@ -17,6 +17,7 @@ export default function LoadingButton({
         onClick={onClick}
         variant="contained"
         type="submit"
+        disableElevation
         disabled={isLoading || !isReady}
         endIcon={
           isLoading ? (

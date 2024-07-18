@@ -123,7 +123,7 @@ function App(props) {
   };
 
   const drawer = (
-    <Stack bgcolor={"#18529d"} flexGrow={1} color={"white"}>
+    <Stack bgcolor={"#18529d"} flex={"1 1 auto"} color={"white"}>
       <Toolbar />
       <Typography variant="h4" sx={{ padding: "10px" }} align="center">
         SEAFEI
@@ -268,87 +268,27 @@ function App(props) {
   );
   return (
     <Box
+      className="app"
       flexGrow={1}
       display={"flex"}
       height={"100%"}
       width={"100%"}
-      bgcolor={"--grey-bg"}
+      border={"5px dotted red"}
+      flexDirection={"row"}
     >
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        variant="outlined"
-        elevation={0}
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          bgcolor: "inherit",
-          display: "flex",
-          flexDirection: "row",
-          color: "black",
-        }}
-      >
-        <Toolbar sx={{ width: "100%" }}>
-          <Stack
-            direction={"row"}
-            display={"flex"}
-            justifyContent={"space-between"}
-            width={"100%"}
-          >
-            <Stack direction={"row"} alignItems={"center"}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2, display: { sm: "none" } }}
-              >
-                <MenuIcon />
-              </IconButton>
 
-              <Typography variant="h6" noWrap component="div">
-                {currentSection}
-              </Typography>
-            </Stack>
-
-            {isAuthenticated && user !== null && (
-              <Stack direction={"row"} alignItems={"center"}>
-                <IconButton
-                  size="large"
-                  aria-label="show 17 new notifications"
-                  color="inherit"
-                  onClick={() => navigate("/avisos")}
-                >
-                  <Badge badgeContent={noticeAmount} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-                (
-                <IconButton
-                  size="large"
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                  <Stack spacing={-1} alignItems={"start"}>
-                    <Typography variant="caption">{user.names}</Typography>
-                    <Typography variant="caption">{user.email}</Typography>
-                  </Stack>
-                </IconButton>
-              </Stack>
-            )}
-          </Stack>
-        </Toolbar>
-      </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{
+          width: { sm: drawerWidth },
+          flexShrink: { sm: 0 },
+          bgcolor: "red",
+        }}
         aria-label="mailbox folders"
+        display={"flex"}
+        height={"100%"}
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           container={container}
           variant="temporary"
@@ -356,7 +296,7 @@ function App(props) {
           onTransitionEnd={handleDrawerTransitionEnd}
           onClose={handleDrawerClose}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -368,138 +308,199 @@ function App(props) {
         >
           {drawer}
         </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-          open
-        >
+        <Stack display={{ xs: "none", sm: "flex" }} flex="1 1 auto">
           {drawer}
-        </Drawer>
+        </Stack>
       </Box>
 
-      <div className="content">
-        {isLoading && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
-        <Routes>
-          <Route path="/avisos" element={<Notices />}>
-            {" "}
-          </Route>
-          <Route
-            path="/eventos"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <EventList
-                  notifications={false}
-                  setSelectedFEIEvent={handleFEIEventSelection}
-                  idUsuario={0}
-                />
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
+      <Stack direction={"column"} width={"100%"}>
+        <AppBar
+          position="relative"
+          variant="outlined"
+          elevation={0}
+          sx={{
+            width: "100%",
+            bgcolor: "white",
+            display: "flex",
+            flexDirection: "row",
+            color: "black",
+            flex: "0 0 40px",
+          }}
+        >
+          <Toolbar sx={{ width: "100%" }}>
+            <Stack
+              direction={"row"}
+              display={"flex"}
+              justifyContent={"space-between"}
+              width={"100%"}
+            >
+              <Stack direction={"row"} alignItems={"center"}>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, display: { sm: "none" } }}
+                >
+                  <MenuIcon />
+                </IconButton>
 
-          <Route
-            path="/usuarios"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <Users />
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/calendario"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <Calendar />
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
+                <Typography variant="h6" noWrap component="div">
+                  {currentSection}
+                </Typography>
+              </Stack>
 
-          <Route
-            path="/"
-            element={<LogInPage onLoginIn={handleLogIn}></LogInPage>}
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/Notificaciones"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <NewNotification></NewNotification>
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route path="/Evaluaciones" element={<Evaluation />}>
-            {" "}
-          </Route>
-          <Route
-            path="/eventos/:eventId"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <Event
-                  FEIEvent={selectedFEIEvent}
-                  setTitle={setCurrentSection}
-                />
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/reservar"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <Reservation></Reservation>
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/reservaciones"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <ReservationList></ReservationList>
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/usuario"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <ProfilePage user={user}></ProfilePage>
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-          <Route
-            path="/test"
-            element={
-              <RouteGuard isAuthenticated={isAuthenticated}>
-                <TestForm />
-              </RouteGuard>
-            }
-          >
-            {" "}
-          </Route>
-        </Routes>
-      </div>
+              {isAuthenticated && user !== null && (
+                <Stack direction={"row"} alignItems={"center"}>
+                  <IconButton
+                    size="large"
+                    aria-label="show 17 new notifications"
+                    color="inherit"
+                    onClick={() => navigate("/avisos")}
+                  >
+                    <Badge badgeContent={noticeAmount} color="error">
+                      <NotificationsIcon />
+                    </Badge>
+                  </IconButton>
 
+                  <IconButton
+                    size="large"
+                    edge="end"
+                    aria-label="account of current user"
+                    aria-haspopup="true"
+                    onClick={handleProfileMenuOpen}
+                    color="inherit"
+                  >
+                    <AccountCircle />
+                    <Stack spacing={-1} alignItems={"start"}>
+                      <Typography variant="caption">{user.names}</Typography>
+                      <Typography variant="caption">{user.email}</Typography>
+                    </Stack>
+                  </IconButton>
+                </Stack>
+              )}
+            </Stack>
+          </Toolbar>
+        </AppBar>
+        <Stack className="content" padding={{ xs: 1, md: 5 }}>
+          {isLoading && (
+            <LinearProgress sx={{ height: "5px" }}></LinearProgress>
+          )}
+          <Routes>
+            <Route path="/avisos" element={<Notices />}>
+              {" "}
+            </Route>
+            <Route
+              path="/eventos"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <EventList
+                    notifications={false}
+                    setSelectedFEIEvent={handleFEIEventSelection}
+                    idUsuario={0}
+                  />
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+
+            <Route
+              path="/usuarios"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <Users />
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/calendario"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <Calendar />
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+
+            <Route
+              path="/"
+              element={<LogInPage onLoginIn={handleLogIn}></LogInPage>}
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/Notificaciones"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <NewNotification></NewNotification>
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route path="/Evaluaciones" element={<Evaluation />}>
+              {" "}
+            </Route>
+            <Route
+              path="/eventos/:eventId"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <Event
+                    FEIEvent={selectedFEIEvent}
+                    setTitle={setCurrentSection}
+                  />
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/reservar"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <Reservation></Reservation>
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/reservaciones"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <ReservationList></ReservationList>
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/usuario"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <ProfilePage user={user}></ProfilePage>
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+            <Route
+              path="/test"
+              element={
+                <RouteGuard isAuthenticated={isAuthenticated}>
+                  <TestForm />
+                </RouteGuard>
+              }
+            >
+              {" "}
+            </Route>
+          </Routes>
+        </Stack>
+      </Stack>
       {renderMenu}
     </Box>
   );
