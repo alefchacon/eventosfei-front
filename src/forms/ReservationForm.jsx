@@ -243,60 +243,60 @@ export default function Reservation({ onCancel, onSubmit }) {
   });
 
   return (
-    <Stack width={{ lg: "50%", sm: "100%" }}>
-      <form autoComplete="off" onSubmit={handleSubmit}>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <ListItemButton
-            onClick={handleOpenDatePicker}
-            disabled={isSubmitting}
-          >
+    <Stack
+      width={{ md: "100%", xs: "100%" }}
+      flex={1}
+      overflow={"hidden"}
+      display={"flex"}
+      flexDirection={"column"}
+      border={"1px solid black"}
+    >
+      <form
+        className="reservation-form"
+        autoComplete="off"
+        onSubmit={handleSubmit}
+      >
+        <Stack flex={"0 1 auto"} gap={3}>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
             <Stack spacing={0} width={"100%"}>
-              <Typography variant="h6">Fecha</Typography>
-              <DatePicker
-                open={openDatePicker}
-                value={date}
-                onChange={handleDateChange}
-                slotProps={{
-                  textField: {
-                    InputProps: { color: "primary" },
-                    fullWidth: true,
-                  },
-                }}
-              />{" "}
+              <Typography variant="h6" color={"text.secondary"}>
+                Fecha
+              </Typography>
+              <DatePicker value={date} onChange={handleDateChange} />
             </Stack>
-          </ListItemButton>
-          <Stack direction={"row"}>
-            <CustomTimePicker
-              label="Inicio"
-              defaultTime={start}
-              onAccept={handleStartChange}
-              disabled={isSubmitting}
-            ></CustomTimePicker>
-            <CustomTimePicker
-              label="Fin"
-              defaultTime={end}
-              onAccept={handleEndChange}
-              disabled={isSubmitting}
-            ></CustomTimePicker>
-          </Stack>
-        </LocalizationProvider>
-        <Typography variant="h6" paddingLeft={2}>
+            <Stack direction={"row"} gap={5}>
+              <CustomTimePicker
+                label="Inicio"
+                defaultTime={start}
+                onAccept={handleStartChange}
+                disabled={isSubmitting}
+              ></CustomTimePicker>
+              <CustomTimePicker
+                label="Fin"
+                defaultTime={end}
+                onAccept={handleEndChange}
+                disabled={isSubmitting}
+              ></CustomTimePicker>
+            </Stack>
+          </LocalizationProvider>
+        </Stack>
+        <Typography
+          variant="h6"
+          paddingTop={3}
+          paddingLeft={0}
+          color={"text.secondary"}
+        >
           Espacios de la FEI
         </Typography>
-
         <Stack
-          width={"100%"}
-          paddingTop={2}
-          paddingLeft={2}
-          paddingRight={2}
+          flex={"1 1 auto"}
           overflow={"auto"}
-          minHeight={"300px"}
-          maxHeight={"300px"}
+          border={"1px solid lightgray"}
+          borderRadius={1}
+          padding={2}
         >
           <FormControl fullWidth disabled={isSubmitting}>
-            {isLoading ? (
-              <LinearProgress></LinearProgress>
-            ) : (
+            {!isLoading && (
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
                 value={space.id}
@@ -329,20 +329,14 @@ export default function Reservation({ onCancel, onSubmit }) {
             )}
           </FormControl>
         </Stack>
-        <Stack
-          direction={"row"}
-          spacing={3}
-          justifyContent={"end"}
-          paddingTop={5}
-        >
-          <Button autoFocus onClick={onCancel} disabled={isSubmitting}>
-            Cerrar
-          </Button>
-          <LoadingButton
-            isReady={space !== null}
-            label="Solicitar reservación"
-            isLoading={isSubmitting}
-          ></LoadingButton>
+        <Stack flex={"0 1 auto"} padding={2}>
+          <Stack justifyContent={{ xs: "end", md: "start" }} direction={"row"}>
+            <LoadingButton
+              isReady={space !== null}
+              label="Reservar espacio"
+              isLoading={isSubmitting}
+            ></LoadingButton>
+          </Stack>
         </Stack>
       </form>
     </Stack>

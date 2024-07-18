@@ -38,14 +38,22 @@ main{
 }
 
 .content{
-  margin-top: 65px;
-  height: 100%;
   width: 100%;
-  overflow: auto;
-  background-color: var(--gray-bg);
-
+  overflow: hidden;
+  background-color: "var(--gray-bg)";
+  display: flex;
+  flex-flow: column;
+  height: 100%;
 }
 
+.reservation-form{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  max-height: 100%;
+  
+}
 
 .progress-horizontal{
   position: relative;
@@ -142,9 +150,11 @@ main{
   .calendar{
     padding: 0px;
   }
-  .content{
-    margin-top: 56px;
+
+  .column{
+    flex-direction: column-reverse;
   }
+
 }
 
 @media (max-width:900px) {

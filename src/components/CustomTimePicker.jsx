@@ -22,28 +22,28 @@ export default function CustomTimePicker({
 }) {
   return (
     <>
-      <ListItemButton disabled={disabled}>
-        <Stack
-          spacing={1}
-          width={"100%"}
-          display={"flex"}
-          justifyContent={"center"}
-        >
-          <Typography variant="h6">{label}</Typography>
+      <Stack
+        spacing={1}
+        width={"100%"}
+        display={"flex"}
+        justifyContent={"center"}
+      >
+        <Typography variant="h6" color={"text.secondary"}>
+          {label}
+        </Typography>
 
-          <TimePicker
-            value={defaultTime}
-            onAccept={onAccept}
-            ampm={false}
-            slotProps={{
-              textField: {
-                InputProps: { color: "primary" },
-                fullWidth: true,
-              },
-            }}
-          />
-        </Stack>
-      </ListItemButton>
+        <TimePicker
+          value={defaultTime}
+          onAccept={onAccept}
+          ampm={false}
+          slotProps={{
+            textField: {
+              InputProps: { color: "primary" },
+              fullWidth: true,
+            },
+          }}
+        />
+      </Stack>
     </>
   );
 }
