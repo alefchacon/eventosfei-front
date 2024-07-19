@@ -382,7 +382,7 @@ function App(props) {
           </Toolbar>
         </AppBar>
         {isLoading && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
-        <Stack className="content" padding={{ xs: 1, md: 0 }}>
+        <Stack className="content" padding={{ xs: 0, md: 3 }}>
           <Routes>
             <Route path="/avisos" element={<Notices />}>
               {" "}

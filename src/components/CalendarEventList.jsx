@@ -12,6 +12,8 @@ import {
   Button,
 } from "@mui/material";
 
+import { useNavigate } from "react-router-dom";
+
 import useWindowSize from "../hooks/useWindowSize.jsx";
 function parseDate(date) {
   return `${date.toLocaleString("es-MX", {
@@ -33,12 +35,13 @@ export default function CalendarEventList({
   isOpen,
   isEvents = false,
 }) {
+  const navigate = useNavigate();
   const { width } = useWindowSize();
   const isMobile = width < 900; // Define mobile view as less than 768px
 
   const EventList = () => {
     return (
-      <Stack bgcolor={"white"} height={"100%"} borderRadius={1}>
+      <Stack bgcolor={"white"} height={"100%"} borderRadius={1} marginLeft={3}>
         <Stack direction={"row"}>
           <Stack padding={2} spacing={-0.5} width={"100%"}>
             <Typography variant="h6">{parseDate(selectedDate)}</Typography>
@@ -47,13 +50,11 @@ export default function CalendarEventList({
         <Divider></Divider>
         <List>
           <Stack spacing={0.5}>
-            {selectedEvents.map((FEIEvent) => (
-              <ListItem
-                className="calendar-event"
-                key={FEIEvent.space.id}
-                disablePadding
-              >
-                <ListItemButton>
+            {selectedEvents.map((FEIEvent, index) => (
+              <ListItem className="calendar-event" key={index} disablePadding>
+                <ListItemButton
+                  onClick={() => navigate(`/eventos/${FEIEvent.id}`)}
+                >
                   <Stack direction={"row"} spacing={4}>
                     {" "}
                     <ListItemText
