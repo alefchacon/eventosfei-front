@@ -39,8 +39,8 @@ main{
 
 .content{
   width: 100%;
-  overflow: hidden;
-  background-color: "var(--gray-bg)";
+  overflow: auto;
+  background-color: var(--gray-bg);
   display: flex;
   flex-flow: column;
   height: 100%;
@@ -91,22 +91,48 @@ main{
 
 
 /* --- calendar ---*/
-.calendar{
-  padding: 30px;
+
+.rbc-now{
+  font-weight: 800;
+}
+
+.rbc-date-cell > button{
+  padding: 5px;
+  
+}
+
+.rbc-now > button{
+  color: white;
+  font-weight: 600;
+  background-color: #18529d;
+  border-radius: 100px;
+}
+
+.rbc-button-link{
+  background-color: black;
+}
+
+.css-1c06ulf{
+  background-color: red !important;
+  touch-action: none !important;
+}
+.PrivateSwipeArea-root{
+  background-color: red !important;
+  touch-action: none !important;
 }
 
 
-
-.calendar-toolbar{
-  background-color: var(--gray-bg);
-  display: flex;
-  padding-bottom: 10px;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+.rbc-day-bg,.rbc-header{
+  background-color: white;
+}
+.rbc-day-bg:hover {
+  background-color: #18529d1f;
+  box-shadow: inset 0 0 0 1px #18529d;
 }
 
-
+.rbc-today{
+  background-color: white !important;
+}
 
 .calendar-date-control{
   display: flex;
@@ -122,14 +148,13 @@ main{
 }
 
 .rbc-date-cell {
-  padding: 5px; /* Adjust padding to ensure it doesn't block cell selection */
+  padding: 2px; 
   width: 100%;
   height: 100%;
+  display: flex;
 }
 
-.rbc-day-bg:hover {
-  background-color: #cceeff; /* Light blue background on hover */
-}
+
 
 .selected-date {
   background-color: #ffcccc; /* Light red background for selected date */

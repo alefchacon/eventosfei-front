@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <SnackbarProvider>
             <DialogProvider>
               <main>
-                <App />,
+                <App />
               </main>
             </DialogProvider>
           </SnackbarProvider>

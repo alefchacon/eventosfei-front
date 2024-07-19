@@ -273,7 +273,6 @@ function App(props) {
       display={"flex"}
       height={"100%"}
       width={"100%"}
-      border={"5px dotted red"}
       flexDirection={"row"}
     >
       <CssBaseline />
@@ -382,10 +381,8 @@ function App(props) {
             </Stack>
           </Toolbar>
         </AppBar>
-        <Stack className="content" padding={{ xs: 1, md: 5 }}>
-          {isLoading && (
-            <LinearProgress sx={{ height: "5px" }}></LinearProgress>
-          )}
+        {isLoading && <LinearProgress sx={{ height: "5px" }}></LinearProgress>}
+        <Stack className="content" padding={{ xs: 0, md: 3 }}>
           <Routes>
             <Route path="/avisos" element={<Notices />}>
               {" "}

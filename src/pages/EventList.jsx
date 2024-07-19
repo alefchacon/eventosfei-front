@@ -273,7 +273,7 @@ export default function Eventos(
   };
 
   return (
-    <>
+    <Stack>
       <Stack
         direction={{ lg: "row", sm: "column" }}
         padding={2}
@@ -400,6 +400,6 @@ export default function Eventos(
           />
         </Stack>
       )}
-    </>
+    </Stack>
   );
 }
