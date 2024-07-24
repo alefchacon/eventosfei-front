@@ -33,6 +33,9 @@ export const urlUsers = {
 export const urlCronogram = (id = 0) => {
   return `/api/cronogramas/${id}`;
 }
+export const urlPublicity = (id = 0) => {
+  return `/api/publicidad/${id}`;
+}
 
 export const urlProfile = '/api/perfil'
 

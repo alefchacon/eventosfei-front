@@ -6,13 +6,11 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Evaluation from "../pages/Evaluation";
 
-function CustomTabPanel(props) {
-  const { children, value, index, fetch, onSelect, ...other } = props;
-
+function CustomTabPanel({ children, value, index, onSelect }) {
   useEffect(() => {
     const isSelected = index === value;
-    if (isSelected && fetch) {
-      onSelect(fetch);
+    if (isSelected && onSelect) {
+      onSelect();
     }
   }, [value]);
 
@@ -22,9 +20,8 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
     </div>
   );
 }
@@ -33,6 +30,11 @@ CustomTabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  onSelect: PropTypes.func,
+};
+
+CustomTabPanel.defaultProps = {
+  onSelect: null,
 };
 
 function a11yProps(index) {
@@ -72,7 +74,7 @@ export default function BasicTabs({ children, onSelect }) {
           value={value}
           index={index}
           fetch={tab.props.fetch}
-          onSelect={onSelect}
+          onSelect={tab.props.onSelect}
         >
           {tab}
         </CustomTabPanel>
