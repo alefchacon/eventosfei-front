@@ -5,13 +5,16 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useParams } from "react-router-dom";
 
 import { GetCronogram } from "../api/CronogramService.js";
+import { GetPublicity } from "../api/PublicityService.js";
 
 import PropTypes from "prop-types";
+
+import BasicTable from "../components/Table.jsx";
 
 import GetFullDateString from "../util/GetFullDateString.js";
 
 import moment from "moment";
-
+import DownloadIcon from "@mui/icons-material/Download";
 import CheckboxList from "../components/CheckboxList.jsx";
 import ReservationCheckboxList from "../components/ReservationCheckboxList.jsx";
 
@@ -28,6 +31,9 @@ import {
   IconButton,
   InputAdornment,
   ListItem,
+  ListItemButton,
+  List,
+  ListItemText,
 } from "@mui/material";
 
 import SendIcon from "@mui/icons-material/Send";
@@ -56,10 +62,46 @@ function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   );
 }
 
+function FileItem({ fileObject }) {
+  return (
+    <ListItemButton divider onClick={() => downloadFile(fileObject)}>
+      <ListItem>
+        <ListItemText primary={fileObject.name}></ListItemText>
+        <DownloadIcon color="primary"></DownloadIcon>
+      </ListItem>
+    </ListItemButton>
+  );
+}
+
+function downloadFile(fileObject) {
+  const binaryString = atob(fileObject.file);
+
+  const len = binaryString.length;
+  const byteArray = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    byteArray[i] = binaryString.charCodeAt(i);
+  }
+
+  const blob = new Blob([byteArray], { type: fileObject.type });
+
+  const blobUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = fileObject.name;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(blobUrl);
+}
+
 export default function Event({ setTitle }) {
   const [FEIEvent, setEvent] = useState(null);
   const [cronogram, setCronogram] = useState(null);
+  const [publicity, setPublicity] = useState([]);
   const [fetchedCronogram, setFetchedCronogram] = useState(false);
+  const [fetchedPublicity, setFetchedPublicity] = useState(false);
   const { isLoading, setIsLoading } = useIsLoading();
 
   let { eventId } = useParams();
@@ -221,52 +263,11 @@ export default function Event({ setTitle }) {
     //doc.output("dataurlnewwindow");
   };
 
-  function downloadFile(fileObject) {
-    const binaryString = atob(fileObject.file);
-
-    const len = binaryString.length;
-    const byteArray = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      byteArray[i] = binaryString.charCodeAt(i);
-    }
-
-    const blob = new Blob([byteArray], { type: fileObject.type });
-
-    const blobUrl = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = fileObject.name;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(blobUrl);
-  }
-
-  const FetchTypes = Object.freeze({
-    CRONOGRAM: 1,
-    PUBLICITY: 2,
-  });
-
-  const lazyFetch = async (fetchType = 0) => {
-    setIsLoading(true);
-    switch (fetchType) {
-      case FetchTypes.CRONOGRAM:
-        await fetchCronogram();
-        break;
-      case FetchTypes.PUBLICITY:
-        console.log("fetching publicity??? O:");
-        break;
-      default:
-    }
-    setIsLoading(false);
-  };
-
   async function fetchCronogram() {
     if (fetchedCronogram) {
       return;
     }
+    console.log("fetching cronogram!!!");
 
     setIsLoading(true);
 
@@ -275,12 +276,32 @@ export default function Event({ setTitle }) {
 
     setIsLoading(false);
   }
+  async function fetchPublicity() {
+    if (fetchedPublicity) {
+      return;
+    }
+    console.log("fetching publicity!!!");
+
+    setIsLoading(true);
+
+    setPublicity((await GetPublicity(FEIEvent.id)).data.data);
+    setFetchedPublicity(true);
+
+    setIsLoading(false);
+  }
+
+  function Evaluation(evaluation) {
+    return asdf;
+  }
 
   return (
     <>
       <NotificationResponse idEvento={eventId}></NotificationResponse>
       {FEIEvent && (
-        <BasicTabs onSelect={lazyFetch}>
+        <BasicTabs>
+          <Stack label="Evaluacion">
+            <BasicTable evaluation={FEIEvent.evaluation}></BasicTable>
+          </Stack>
           <div label="Organizador">
             {/*
               <Button onClick={getReport}>Reporte :D</Button>
@@ -312,14 +333,14 @@ export default function Event({ setTitle }) {
 
             <Typography color="text.secondary">Audiencia(s)</Typography>
             <ul>
-              {FEIEvent.audiences.split(";").map((audience) => (
-                <li>{audience}</li>
+              {FEIEvent.audiences.split(";").map((audience, index) => (
+                <li key={index}>{audience}</li>
               ))}
             </ul>
             <Typography color="text.secondary">Temática(s)</Typography>
             <ul>
-              {FEIEvent.themes.split(";").map((theme) => (
-                <li>{theme}</li>
+              {FEIEvent.themes.split(";").map((theme, index) => (
+                <li key={index}>{theme}</li>
               ))}
             </ul>
 
@@ -330,7 +351,7 @@ export default function Event({ setTitle }) {
             ></InfoItem>
           </Stack>
 
-          <Stack label="Logística" fetch={FetchTypes.CRONOGRAM} gap={2}>
+          <Stack label="Logística" onSelect={fetchCronogram} gap={2}>
             <Typography variant="h5">Detalles logísticos</Typography>
             <Stack direction={{ md: "row", xs: "column" }}>
               <InfoItem
@@ -349,12 +370,7 @@ export default function Event({ setTitle }) {
             <Typography variant="h5">Cronograma</Typography>
 
             {fetchedCronogram ? (
-              <Button
-                variant="contained"
-                onClick={() => downloadFile(cronogram)}
-              >
-                Descargar
-              </Button>
+              <FileItem fileObject={cronogram} />
             ) : (
               <Stack alignItems={"center"} gap={2}>
                 <Typography color={"text.secondary"}>
@@ -379,21 +395,21 @@ export default function Event({ setTitle }) {
               selectable={false}
             ></ReservationCheckboxList>
           </Stack>
-          <Stack label="Recursos" gap={2} fetch={FetchTypes.PUBLICITY}>
+          <Stack label="Recursos" gap={2} onSelect={fetchPublicity}>
             <Typography variant="h5">Recursos</Typography>
             <ul>
               {Object.entries({
-                needsComputerCenterSupport: "Requiere notificar a la Prensa UV",
-                needsConductor: "Requiere estacionamiento",
-                needsNotifyUVPress: "Requiere maestro de obras",
-                needsParking:
+                needsComputerCenterSupport:
                   "Requiere apoyo del personal del Centro de Cómputo",
+                needsConductor: "Requiere maestro de obras",
+                needsNotifyUVPress: "Requiere notificar a la Prensa UV",
+                needsParking: "Requiere estacionamiento",
                 needsWeekend: "Requiere acceso el fin de semana",
               }).map(
                 ([key, value]) =>
                   FEIEvent[key] > 0 && (
                     <li key={key}>
-                      <Typography variant="h6">{value}</Typography>
+                      <Typography variant="body1">{value}</Typography>
                     </li>
                   )
               )}
@@ -409,6 +425,22 @@ export default function Event({ setTitle }) {
               value={FEIEvent.computerCenterRequirements}
             ></InfoItem>
             <Typography variant="h5">Publicidad</Typography>
+
+            {fetchedPublicity && publicity ? (
+              <List>
+                {publicity.map((publicity) => (
+                  <FileItem fileObject={publicity} />
+                ))}
+              </List>
+            ) : (
+              <Stack alignItems={"center"} gap={2}>
+                <Typography color={"text.secondary"}>
+                  {fetchedPublicity && !publicity
+                    ? "Sin publicidad"
+                    : "Obteniendo publicidad..."}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
 
           <Stack label="Adicional" gap={2}>
