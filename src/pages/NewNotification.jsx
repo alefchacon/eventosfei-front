@@ -252,6 +252,7 @@ function NewNotification() {
       requiereFinDeSemana: 0,
       requiereMaestroDeObra: 0,
       requiereNotificarPrensaUV: 0,
+      requiereApoyoCentroComputo: 0,
       numParticipantesExternos: 0,
       requisitosCentroComputo: "",
 
@@ -662,6 +663,31 @@ function NewNotification() {
                       name="requiereNotificarPrensaUV"
                       column
                       value={values.requiereNotificarPrensaUV}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      <FormControlLabel
+                        value="1"
+                        control={<Radio />}
+                        label="Si"
+                      />
+                      <FormControlLabel
+                        value="0"
+                        control={<Radio />}
+                        label="No"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel id="demo-radio-buttons-group-label" required>
+                      ¿Requiere notificar a prensa UV?
+                    </FormLabel>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue=""
+                      name="requiereApoyoCentroComputo"
+                      column
+                      value={values.requiereApoyoCentroComputo}
                       onChange={handleChange}
                       onBlur={handleBlur}
                     >

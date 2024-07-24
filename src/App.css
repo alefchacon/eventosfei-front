@@ -121,6 +121,11 @@ main{
   touch-action: none !important;
 }
 
+.a{
+  color: white;
+  display: flex;
+}
+
 
 .rbc-day-bg,.rbc-header{
   background-color: white;
@@ -201,4 +206,8 @@ main{
 
 .white{
   background-color: white !important;
+}
+
+ul{
+  margin: 0;
 }

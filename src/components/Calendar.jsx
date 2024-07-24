@@ -1,30 +1,20 @@
-import React, { Fragment, useMemo, useState, useEffect } from "react";
+import React, {
+  Fragment,
+  useMemo,
+  useState,
+  useEffect,
+  Children,
+  cloneElement,
+} from "react";
 import PropTypes from "prop-types";
-import {
-  Stack,
-  Button,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  Divider,
-  FormControl,
-  InputLabel,
-  Select,
-  Fab,
-  Container,
-  Drawer,
-  IconButton,
-} from "@mui/material";
+import { Stack, Button, Typography, Fab, IconButton } from "@mui/material";
 
-import BottomDrawer from "./BottomDrawer.jsx";
+import { Link, useNavigate } from "react-router-dom";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { DatePicker } from "@mui/x-date-pickers";
 
-import LinearProgress from "@mui/material/LinearProgress";
 import {
   Calendar,
   Views,
@@ -34,11 +24,8 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { YearCalendar } from "@mui/x-date-pickers/YearCalendar";
-import { MonthCalendar } from "@mui/x-date-pickers/MonthCalendar";
 
 import moment from "moment";
 import "moment/locale/es";
@@ -46,14 +33,14 @@ import "moment/locale/es";
 import * as dates from "./dates";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../App.css";
-import DialogTypes from "../providers/DialogTypes";
-import { useDialog } from "../providers/DialogProvider.jsx";
 
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
 import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
+
+import useWindowSize from "../hooks/useWindowSize.jsx";
 
 moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
@@ -69,7 +56,6 @@ const now = new Date();
 
 const CustomToolbar = (props) => {
   const { date, onNavigate, view, setView } = props;
-  const [openEventSidebar, setOpenEventSidebar] = useState(false);
 
   const handleNavigate = (action) => {
     // Call the onNavigate prop with the action type
@@ -138,13 +124,15 @@ const CustomToolbar = (props) => {
             }}
           >
             <Fab color="primary" variant="extended" aria-label="add">
-              <AddIcon /> Notificar evento
+              <Link className="a" to={"/notificaciones"}>
+                <AddIcon /> Notificar evento
+              </Link>
             </Fab>
           </Stack>
         </>
       ) : (
         <Stack alignItems={"center"} direction={"row"}>
-          <IconButton color="primary" onClick={() => setView(Views.MONTH)}>
+          <IconButton color="primary" onClick={() => onNavigate("MONTH")}>
             <ArrowBackIcon></ArrowBackIcon>
           </IconButton>
           <Typography variant="h6" color={"text.secondary"}>
@@ -166,13 +154,13 @@ export default function MyCalendar({
   showDemoLink = true,
   ...props
 }) {
-  const [selectedMonth, setDate] = React.useState(new Date());
+  const [date, setDate] = React.useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
   const { isLoading, setIsLoading } = useIsLoading();
-
+  const navigate = useNavigate();
   const [openBottomDrawer, setOpenBottomDrawer] = useState(false);
 
   const [view, setView] = useState(Views.MONTH);
@@ -181,6 +169,9 @@ export default function MyCalendar({
     () => ({
       components: {
         toolbar: (props) => CustomToolbar({ ...props }, view, setView),
+        dateCellWrapper: (props) => (
+          <TouchCellWrapper {...props} onSelectSlot={handleSelectSlot} />
+        ),
       },
       defaultDate: new Date(2015, 3, 1),
       max: dates.add(dates.endOf(new Date(2015, 17, 1), "day"), -1, "hours"),
@@ -189,30 +180,27 @@ export default function MyCalendar({
     []
   );
 
-  const handleOpenEventSidebar = () => {
-    setOpenEventSidebar(!openEventSidebar);
-  };
-
   const handleSelectSlot = (slotInfo) => {
-    console.log(slotInfo);
-
-    setOpenBottomDrawer(!openBottomDrawer);
-
     const { start, end } = slotInfo;
-
-    // Filter events to find those that are within the selected range
-    const eventsInRange = events.filter(
-      (event) =>
-        moment(event.start).isSameOrAfter(moment(start)) &&
-        moment(event.end).isSameOrBefore(moment(end))
-    );
-    setSelectedEvents(eventsInRange);
-    setSelectedDate(slotInfo.start);
+    if (start) {
+      console.log(slotInfo);
+      const eventsInRange = events.filter(
+        (event) =>
+          moment(event.start).isSameOrAfter(moment(start)) &&
+          moment(event.end).isSameOrBefore(moment(end))
+      );
+      setSelectedEvents(eventsInRange);
+      setSelectedDate(slotInfo.start);
+    } else {
+      console.log(slotInfo.slots[0]);
+      setDate(slotInfo.slots[0]);
+      setView(Views.DAY);
+    }
   };
 
   const getEvents = async () => {
     setIsLoading(true);
-    const response = await GetEventsByMonth(selectedMonth);
+    const response = await GetEventsByMonth(date);
 
     const responseEvents = response.data.data;
     let eventsByReservation = [];
@@ -233,24 +221,33 @@ export default function MyCalendar({
   };
 
   const handleNavigation = async (newDate, view, action) => {
+    let date2 = new Date();
+    console.log(action);
     switch (action) {
       case "PREVIOUS":
-        selectedMonth.setMonth(selectedMonth.getMonth() - 1);
+        date2.setMonth(date.getMonth() - 1);
+        setDate(date2);
         break;
       case "NEXT":
-        selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+        date2.setMonth(date.getMonth() + 1);
+        setDate(date2);
         break;
       case "DATE":
         setView(Views.DAY);
         break;
+      case "MONTH":
+        setView(Views.MONTH);
+      case "TODAY":
+        setDate(date2);
+        break;
       default:
-        //setDate(action);
-        console.log(action);
         setDate(new Date(action));
     }
-
-    getEvents();
   };
+
+  useEffect(() => {
+    getEvents();
+  }, [date]);
 
   const formats = {
     dateFormat: "DD", // day of month
@@ -264,9 +261,14 @@ export default function MyCalendar({
         culture
       )}`,
   };
-  useEffect(() => {
-    getEvents();
-  }, []);
+
+  const TouchCellWrapper = ({ children, value, onSelectSlot }) =>
+    cloneElement(Children.only(children), {
+      onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
+      style: {
+        className: `${children}`,
+      },
+    });
 
   return (
     <Stack
@@ -282,12 +284,13 @@ export default function MyCalendar({
           selectable={true}
           startAccessor="start"
           endAccessor="end"
-          view={view}
           components={components}
           onSelectSlot={handleSelectSlot}
-          date={selectedMonth}
+          date={date}
+          onView={(e) => console.log(e)}
+          view={view}
           onNavigate={handleNavigation}
-          onSelectEvent={() => console.log("EVENT")}
+          onSelectEvent={(e) => navigate(`/eventos/${e.id}`)}
           defaultDate={moment()}
           formats={formats}
           events={events}

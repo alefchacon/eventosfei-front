@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 
+import CircularProgress from "@mui/material/CircularProgress";
+
 import { useParams } from "react-router-dom";
+
+import { GetCronogram } from "../api/CronogramService.js";
 
 import PropTypes from "prop-types";
 
+import GetFullDateString from "../util/GetFullDateString.js";
+
 import moment from "moment";
+
+import CheckboxList from "../components/CheckboxList.jsx";
+import ReservationCheckboxList from "../components/ReservationCheckboxList.jsx";
 
 import { jsPDF } from "jspdf";
 
@@ -18,60 +27,44 @@ import {
   TextField,
   IconButton,
   InputAdornment,
+  ListItem,
 } from "@mui/material";
 
 import SendIcon from "@mui/icons-material/Send";
+import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
 import Evaluation from "../pages/Evaluation";
 import EventResponseMobile from "../components/EventResponseMobile.jsx";
 import NotificationResponse from "../components/NotificationResponse.jsx";
 
+import BasicTabs from "../components/Tabs.jsx";
+
 import { GetEventById } from "../api/EventService.js";
 
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
+function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
+    <ListItem disableGutters>
+      <Stack display={"flex"} width={maxWidth} maxWidth={maxWidth}>
+        <Typography color={"text.secondary"}>{label}</Typography>
+        <Stack bgcolor={"lightgray"} padding={"0.77em"} borderRadius={1}>
+          <Typography color={"text.primary"} variant="body1">
+            {value ? value : "N/A"}
+          </Typography>
+        </Stack>
+      </Stack>
+    </ListItem>
   );
 }
 
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
 export default function Event({ setTitle }) {
-  const [value, setValue] = useState(0);
   const [FEIEvent, setEvent] = useState(null);
+  const [cronogram, setCronogram] = useState(null);
+  const [fetchedCronogram, setFetchedCronogram] = useState(false);
+  const { isLoading, setIsLoading } = useIsLoading();
 
   let { eventId } = useParams();
 
   useEffect(() => {
-    const updateOrientation = () => {
-      //setShowEventResponseMobile(window.innerWidth < 600);
-    };
-
-    window.addEventListener("resize", updateOrientation);
-
-    updateOrientation();
-
     const fetchData = async () => {
       try {
         const response = await GetEventById(eventId);
@@ -89,13 +82,7 @@ export default function Event({ setTitle }) {
     };
 
     fetchData();
-
-    return () => window.removeEventListener("resize", updateOrientation);
   }, []);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
   const getReport = () => {
     const doc = new jsPDF("p", "mm", "a4");
@@ -234,100 +221,201 @@ export default function Event({ setTitle }) {
     //doc.output("dataurlnewwindow");
   };
 
+  function downloadFile(fileObject) {
+    const binaryString = atob(fileObject.file);
+
+    const len = binaryString.length;
+    const byteArray = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      byteArray[i] = binaryString.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteArray], { type: fileObject.type });
+
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = fileObject.name;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  }
+
+  const FetchTypes = Object.freeze({
+    CRONOGRAM: 1,
+    PUBLICITY: 2,
+  });
+
+  const lazyFetch = async (fetchType = 0) => {
+    setIsLoading(true);
+    switch (fetchType) {
+      case FetchTypes.CRONOGRAM:
+        await fetchCronogram();
+        break;
+      case FetchTypes.PUBLICITY:
+        console.log("fetching publicity??? O:");
+        break;
+      default:
+    }
+    setIsLoading(false);
+  };
+
+  async function fetchCronogram() {
+    if (fetchedCronogram) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    setCronogram((await GetCronogram(FEIEvent.id)).data.data);
+    setFetchedCronogram(true);
+
+    setIsLoading(false);
+  }
+
   return (
     <>
       <NotificationResponse idEvento={eventId}></NotificationResponse>
       {FEIEvent && (
-        <Box
-          sx={{
-            width: "100%",
-            paddingTop: 3,
-            height: "100%",
-          }}
-        >
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              variant="scrollable"
-              scrollButtons
-            >
-              <Tab label="Organizador" {...a11yProps(0)} />
-              <Tab label="Evento" {...a11yProps(1)} />
-              <Tab label="Logística" {...a11yProps(2)} />
-              <Tab label="Espacios" {...a11yProps(3)} />
-              <Tab label="Recursos" {...a11yProps(4)} />
-              <Tab label="Difusión" {...a11yProps(5)} />
-              <Tab label="Comentarios" {...a11yProps(6)} />
-              <Tab label="Evaluación" {...a11yProps(7)} />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={value} index={0}>
-            <Stack spacing={4}>
-              {/*
+        <BasicTabs onSelect={lazyFetch}>
+          <div label="Organizador">
+            {/*
               <Button onClick={getReport}>Reporte :D</Button>
               
               */}
-              <Typography variant="h5">Organizador</Typography>
-              <TextField
-                name="names"
-                value={`${FEIEvent.user.names} ${FEIEvent.user.paternalName} ${FEIEvent.user.maternalName}`}
-                id="names"
-                InputProps={{
-                  readOnly: true,
-                }}
-                variant="filled"
-                label="Nombre"
-              ></TextField>
-              <TextField
-                name="job"
-                id="job"
-                value={`${FEIEvent.user.job}`}
-                variant="filled"
-                label="Puesto"
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
-              <TextField
-                name="email"
-                id="email"
-                value={`${FEIEvent.user.email}`}
-                variant="filled"
-                label="Email"
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
+            <Typography variant="h5">Información del organizador</Typography>
+            <InfoItem
+              label={"Nombre"}
+              value={`${FEIEvent.user.names} ${FEIEvent.user.paternalName}
+              ${FEIEvent.user.maternalName}`}
+            ></InfoItem>
+            <InfoItem label={"Puesto"} value={FEIEvent.user.job}></InfoItem>
+            <InfoItem label={"Email"} value={FEIEvent.user.email}></InfoItem>
+          </div>
+
+          <Stack label="Evento" gap={2}>
+            <Typography variant="h5">Detalles del evento</Typography>
+            <InfoItem label={"Nombre"} value={FEIEvent.name}></InfoItem>
+            <InfoItem
+              label={"Descripción"}
+              value={FEIEvent.description}
+            ></InfoItem>
+
+            <CheckboxList
+              label="Programas educativos"
+              items={FEIEvent.programs}
+              selectable={false}
+            ></CheckboxList>
+
+            <Typography color="text.secondary">Audiencia(s)</Typography>
+            <ul>
+              {FEIEvent.audiences.split(";").map((audience) => (
+                <li>{audience}</li>
+              ))}
+            </ul>
+            <Typography color="text.secondary">Temática(s)</Typography>
+            <ul>
+              {FEIEvent.themes.split(";").map((theme) => (
+                <li>{theme}</li>
+              ))}
+            </ul>
+
+            <InfoItem label={"Eje"} value={FEIEvent.axi}></InfoItem>
+            <InfoItem
+              label={"Tipo de evento"}
+              value={FEIEvent.type.name}
+            ></InfoItem>
+          </Stack>
+
+          <Stack label="Logística" fetch={FetchTypes.CRONOGRAM} gap={2}>
+            <Typography variant="h5">Detalles logísticos</Typography>
+            <Stack direction={{ md: "row", xs: "column" }}>
+              <InfoItem
+                label={"Inicio"}
+                value={GetFullDateString(new Date(FEIEvent.start))}
+              ></InfoItem>
+              <InfoItem
+                label={"Fin"}
+                value={GetFullDateString(new Date(FEIEvent.end))}
+              ></InfoItem>
             </Stack>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            Item Two
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
-            Three
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={3}>
-            Four
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={4}>
-            Four
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={5}>
-            Four
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={6}>
-            Four
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={7}>
-            <Evaluation
-              idEvento={eventId}
-              FEIEvent={FEIEvent}
-              onSubmit={setEvent}
-            ></Evaluation>
-          </CustomTabPanel>
-        </Box>
+            <InfoItem
+              label={"Número estimado de participantes"}
+              value={FEIEvent.numParticipants}
+            ></InfoItem>
+            <Typography variant="h5">Cronograma</Typography>
+
+            {fetchedCronogram ? (
+              <Button
+                variant="contained"
+                onClick={() => downloadFile(cronogram)}
+              >
+                Descargar
+              </Button>
+            ) : (
+              <Stack alignItems={"center"} gap={2}>
+                <Typography color={"text.secondary"}>
+                  {fetchedCronogram && !cronogram
+                    ? "Sin cronograma"
+                    : "Obteniendo cronograma..."}
+                </Typography>
+              </Stack>
+            )}
+          </Stack>
+
+          <Stack label="Espacios" gap={2}>
+            <Typography variant="h5">Espacios del evento</Typography>
+            <InfoItem
+              label={"Plataformas"}
+              value={FEIEvent.platforms}
+            ></InfoItem>
+
+            <ReservationCheckboxList
+              label="Espacios"
+              items={FEIEvent.reservations}
+              selectable={false}
+            ></ReservationCheckboxList>
+          </Stack>
+          <Stack label="Recursos" gap={2} fetch={FetchTypes.PUBLICITY}>
+            <Typography variant="h5">Recursos</Typography>
+            <ul>
+              {Object.entries({
+                needsComputerCenterSupport: "Requiere notificar a la Prensa UV",
+                needsConductor: "Requiere estacionamiento",
+                needsNotifyUVPress: "Requiere maestro de obras",
+                needsParking:
+                  "Requiere apoyo del personal del Centro de Cómputo",
+                needsWeekend: "Requiere acceso el fin de semana",
+              }).map(
+                ([key, value]) =>
+                  FEIEvent[key] > 0 && (
+                    <li key={key}>
+                      <Typography variant="h6">{value}</Typography>
+                    </li>
+                  )
+              )}
+            </ul>
+
+            <InfoItem
+              label={"Número estimado de participantes externos"}
+              value={FEIEvent.numExternalParticipants}
+            ></InfoItem>
+            <InfoItem
+              label={"Requisitos técnicos del Centro de Cómputo"}
+              maxWidth={"auto"}
+              value={FEIEvent.computerCenterRequirements}
+            ></InfoItem>
+            <Typography variant="h5">Publicidad</Typography>
+          </Stack>
+
+          <Stack label="Adicional" gap={2}>
+            <Typography variant="h5">Comentarios adicionales</Typography>
+            <InfoItem label={""} value={FEIEvent.additional}></InfoItem>
+          </Stack>
+        </BasicTabs>
       )}
     </>
   );

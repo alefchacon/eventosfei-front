@@ -30,6 +30,10 @@ export const urlUsers = {
   addUser: '/api/usuarios',
 }
 
+export const urlCronogram = (id = 0) => {
+  return `/api/cronogramas/${id}`;
+}
+
 export const urlProfile = '/api/perfil'
 
 export const urlRoles = {

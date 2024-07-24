@@ -100,11 +100,11 @@ function App(props) {
 
   const handleFEIEventSelection = (FEIEvent) => {
     setSelectedFEIEvent(FEIEvent);
-    setCurrentSection(FEIEvent.name);
+    //setCurrentSection(FEIEvent.name);
   };
 
   const handleSelection = (event) => {
-    setCurrentSection(event.currentTarget.id);
+    //setCurrentSection(event.currentTarget.id);
   };
 
   const handleDrawerClose = () => {
@@ -345,7 +345,7 @@ function App(props) {
                 </IconButton>
 
                 <Typography variant="h6" noWrap component="div">
-                  {currentSection}
+                  hey man
                 </Typography>
               </Stack>
 

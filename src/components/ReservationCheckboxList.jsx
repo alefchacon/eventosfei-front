@@ -17,6 +17,7 @@ import ReservationCard from "./ReservationCard";
 export default function CheckboxList({
   valueName = "",
   onClick,
+  selectable = true,
   label = "lav",
   max = null,
   required = false,
@@ -39,12 +40,19 @@ export default function CheckboxList({
   const [checked, setChecked] = React.useState([{ id: 0 }]);
 
   React.useEffect(() => {
+    if (!selectable) {
+      return;
+    }
     const defaultChecked = [items.at(0)];
     setChecked(defaultChecked);
     onClick(valueName, defaultChecked);
   }, [items.length > 1]);
 
   const handleToggle = (value) => () => {
+    if (!selectable) {
+      return;
+    }
+
     const currentIndex = checked.findIndex((item) => item.id === value.id);
     const newChecked = [...checked];
 
@@ -87,6 +95,7 @@ export default function CheckboxList({
                   onClick={handleToggle(item)}
                   dense
                   divider
+                  disableGutters
                 >
                   <Stack
                     direction={{ sm: "row", xs: "row-reverse" }}
@@ -95,20 +104,27 @@ export default function CheckboxList({
                     justifyContent={{ sm: "start", xs: "space-between" }}
                     width={"100%"}
                   >
-                    <Stack>
-                      <Checkbox
-                        edge="start"
-                        checked={
-                          checked.findIndex((_item) => _item.id === item.id) !==
-                          -1
-                        }
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </Stack>
-
-                    <ReservationCard item={item}></ReservationCard>
+                    {selectable ? (
+                      <Stack>
+                        <Checkbox
+                          edge="start"
+                          checked={
+                            checked.findIndex(
+                              (_item) => _item.id === item.id
+                            ) !== -1
+                          }
+                          tabIndex={-1}
+                          disableRipple
+                          inputProps={{ "aria-labelledby": labelId }}
+                        />
+                      </Stack>
+                    ) : (
+                      <div></div>
+                    )}
+                    <ReservationCard
+                      elevated={false}
+                      item={item}
+                    ></ReservationCard>
                   </Stack>
                 </ListItemButton>
               </ListItem>
