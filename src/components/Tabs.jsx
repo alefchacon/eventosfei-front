@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -7,7 +7,14 @@ import Box from "@mui/material/Box";
 import Evaluation from "../pages/Evaluation";
 
 function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, fetch, onSelect, ...other } = props;
+
+  useEffect(() => {
+    const isSelected = index === value;
+    if (isSelected && fetch) {
+      onSelect(fetch);
+    }
+  }, [value]);
 
   return (
     <div
@@ -35,8 +42,8 @@ function a11yProps(index) {
   };
 }
 
-export default function BasicTabs({ children }) {
-  const [value, setValue] = React.useState(0);
+export default function BasicTabs({ children, onSelect }) {
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -49,6 +56,10 @@ export default function BasicTabs({ children }) {
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
+          variant="scrollable"
+          sx={{
+            width: "100%",
+          }}
         >
           {children.map((tab, index) => (
             <Tab key={index} label={tab.props.label} {...a11yProps(index)} />
@@ -56,7 +67,13 @@ export default function BasicTabs({ children }) {
         </Tabs>
       </Box>
       {children.map((tab, index) => (
-        <CustomTabPanel key={index} value={value} index={index}>
+        <CustomTabPanel
+          key={index}
+          value={value}
+          index={index}
+          fetch={tab.props.fetch}
+          onSelect={onSelect}
+        >
           {tab}
         </CustomTabPanel>
       ))}

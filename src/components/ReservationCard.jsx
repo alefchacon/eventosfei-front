@@ -124,11 +124,13 @@ export default function ReservationCard({
             {item.space.name}{" "}
           </Typography>
 
-          <Chip
-            onClick={handleClick}
-            color={getColor()}
-            label={item.status.name}
-          />
+          {item.status && (
+            <Chip
+              onClick={handleClick}
+              color={getColor()}
+              label={item.status.name}
+            />
+          )}
         </Stack>
         <Typography variant="body1" color={"text.secondary"}>
           {moment(item.start).format("dddd, MMMM Do YYYY")}

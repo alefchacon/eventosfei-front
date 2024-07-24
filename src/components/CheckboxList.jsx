@@ -18,6 +18,7 @@ export default function CheckboxList({
   required = false,
   useId = false,
   selectedValues = [{}],
+  selectable = true,
   items = [
     { id: 0, name: "Nombre 0" },
     { id: 1, name: "Nombre 1" },
@@ -70,45 +71,53 @@ export default function CheckboxList({
     <Stack>
       <FormControl>
         <FormLabel>{label}</FormLabel>
-        <List sx={{ bgcolor: "background.paper" }}>
-          {items.map((item) => {
-            const labelId = `checkbox-list-label-${item.id}`;
 
-            return (
-              <ListItem key={item.id} disablePadding>
-                <ListItemButton
-                  role={undefined}
-                  onClick={handleToggle(item)}
-                  dense
-                  divider
-                >
-                  <Stack
-                    direction={{ sm: "row", xs: "row-reverse" }}
-                    display={"flex"}
-                    alignItems={"center"}
-                    justifyContent={"space-between"}
-                    width={"100%"}
+        {items.length > 0 ? (
+          <List sx={{ bgcolor: "background.paper" }}>
+            {items.map((item) => {
+              const labelId = `checkbox-list-label-${item.id}`;
+
+              return (
+                <ListItem key={item.id} disablePadding>
+                  <ListItemButton
+                    role={undefined}
+                    onClick={handleToggle(item)}
+                    dense
+                    divider
                   >
-                    <Stack>
-                      <Checkbox
-                        edge="start"
-                        checked={
-                          checked.findIndex((_item) => _item.id === item.id) !==
-                          -1
-                        }
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </Stack>
+                    <Stack
+                      direction={{ sm: "row", xs: "row-reverse" }}
+                      display={"flex"}
+                      alignItems={"center"}
+                      justifyContent={"space-between"}
+                      width={"100%"}
+                    >
+                      {selectable && (
+                        <Stack>
+                          <Checkbox
+                            edge="start"
+                            checked={
+                              checked.findIndex(
+                                (_item) => _item.id === item.id
+                              ) !== -1
+                            }
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </Stack>
+                      )}
 
-                    <ListItemText id={labelId} primary={`${item.name}`} />
-                  </Stack>
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
+                      <ListItemText id={labelId} primary={`${item.name}`} />
+                    </Stack>
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        ) : (
+          <Typography>N/A</Typography>
+        )}
       </FormControl>
     </Stack>
   );
