@@ -1,51 +1,25 @@
-import { useEffect } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material/styles";
-import { Opacity } from "@mui/icons-material";
 import { Stack } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
 
-function createData(question, answer) {
-  return { question, answer };
-}
-
-const StyledRating = styled(Rating)({
-  "&&& .MuiRating-iconFilled": {
-    color: "blue",
-    opacity: 1,
-  },
-  "&&& .Mui-disabled": {
-    opacity: 1.0,
-  },
-  "& .MuiRating-iconHover": {
-    color: "#ff3d47",
-  },
-});
-
-const rows = [
-  createData(
-    <Typography fontSize={{ xs: "small", md: "medium" }}>
-      ¿Cómo calificaría la atención recibida por parte de la Coordinación de
-      Eventos Académicos?
-    </Typography>,
-    <StyledRating disabled value={5}></StyledRating>
-  ),
-  createData("Ice cream sandwich", 237),
-  createData("Eclair", 262),
-  createData("Cupcake", 305),
-  createData("Gingerbread", 356),
-];
+import FileItem from "./FileItem";
+import { GetEvidences } from "../api/EvidenceService";
 
 export default function BasicTable({ evaluation }) {
-  function wrapCell(content) {
+  //
+  const [evidences, setEvidencies] = useState([]);
+  useEffect(() => {
+    const fetchEvidence = async () => {
+      const response = await GetEvidences(evaluation.id);
+      setEvidencies(response.data.data);
+    };
+    fetchEvidence();
+  }, []);
+
+  function wrapCell(content = "sin contenido") {
     if (isNumeric(content)) {
       return <Rating value={content}></Rating>;
     }
@@ -64,7 +38,6 @@ export default function BasicTable({ evaluation }) {
   function Question({ question, answer }) {
     return (
       <ListItem
-        divider
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -72,17 +45,141 @@ export default function BasicTable({ evaluation }) {
           alignItems: "start",
         }}
       >
-        {wrapCell(question)}
+        <Typography fontSize={{ xs: "small", md: "medium" }}>
+          <b>{question}</b>
+        </Typography>
         {wrapCell(answer)}
       </ListItem>
     );
   }
 
   return (
-    <Stack gap={2}>
-      {Object.entries(evaluation).map(([key, value]) => (
-        <Question question={key} answer={value}></Question>
-      ))}
+    <Stack gap={3}>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>
+          Coordinación de Eventos Académicos
+        </Typography>
+        <Question
+          question={
+            "¿Cómo calificaría la atención recibida por parte de la Coordinación de Eventos Académicos?"
+          }
+          answer={evaluation.ratingAttention}
+        ></Question>
+        <Question
+          question={
+            "Por favor, explique los factores que contribuyeron a su calificación anterior"
+          }
+          answer={evaluation.ratingAttentionReason}
+        ></Question>
+        <Question
+          question={
+            "¿Hubo algún aspecto en el que el apoyo de la Coordinación de Eventos pudiera haber mejorado? (Describa brevemente)"
+          }
+          answer={evaluation.improvementsSupport}
+        ></Question>
+      </Stack>
+      <Divider></Divider>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>Espacio</Typography>
+        <Question
+          question={
+            "¿Cómo calificaría el espacio donde se llevó acabo el evento, en términos de cumplir con sus expectativas y requisitos?"
+          }
+          answer={evaluation.ratingSpace}
+        ></Question>
+        <Question
+          question={
+            "¿Hubo algún problema relacionado con el espacio (por ejemplo, capacidad, comodidad, equipamiento, limpieza)? (Describa brevemente)"
+          }
+          answer={evaluation.problemsSpace}
+        ></Question>
+      </Stack>
+      <Divider></Divider>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>Apoyo del Centro de Cómputo</Typography>
+        <Question
+          question={
+            "¿Cómo calificaría la eficiencia del apoyo del Centro de Cómputo para la atención de su evento?"
+          }
+          answer={evaluation.ratingComputerCenter}
+        ></Question>
+        <Question
+          question={
+            "Por favor, explique los factores que contribuyeron a su calificación anterior"
+          }
+          answer={evaluation.ratingComputerCenterReason}
+        ></Question>
+        <Question
+          question={
+            "¿Cómo calificaría la adecuación de los recursos técnicos proporcionados para satisfacer las necesidades del evento?"
+          }
+          answer={evaluation.ratingResources}
+        ></Question>
+        <Question
+          question={
+            "Por favor, explique los factores que contribuyeron a su calificación anterior"
+          }
+          answer={evaluation.ratingResourcesReason}
+        ></Question>
+        <Question
+          question={
+            "¿Hubo algún aspecto en el que el apoyo técnico pudiera haber mejorado? (Describa brevemente)"
+          }
+          answer={evaluation.improvementsResources}
+        ></Question>
+      </Stack>
+      <Divider></Divider>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>Apoyo del Centro de Cómputo</Typography>
+        <Question
+          question={
+            "¿Cómo calificaría la eficiencia del apoyo del Centro de Cómputo para la atención de su evento?"
+          }
+          answer={evaluation.ratingComputerCenter}
+        ></Question>
+        <Question
+          question={
+            "Por favor, explique los factores que contribuyeron a su calificación anterior"
+          }
+          answer={evaluation.ratingComputerCenterReason}
+        ></Question>
+        <Question
+          question={
+            "¿Cómo calificaría la adecuación de los recursos técnicos proporcionados para satisfacer las necesidades del evento?"
+          }
+          answer={evaluation.ratingResources}
+        ></Question>
+        <Question
+          question={
+            "Por favor, explique los factores que contribuyeron a su calificación anterior"
+          }
+          answer={evaluation.ratingResourcesReason}
+        ></Question>
+        <Question
+          question={
+            "¿Hubo algún aspecto en el que el apoyo técnico pudiera haber mejorado? (Describa brevemente)"
+          }
+          answer={evaluation.improvementsResources}
+        ></Question>
+      </Stack>
+      <Divider></Divider>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>Comentarios Adicionales</Typography>
+        <Question
+          question={
+            "Por favor, comparta cualquier comentario que quiera agregar sobre la organización y ejecución del evento."
+          }
+          answer={evaluation.additional}
+        ></Question>
+      </Stack>
+      <Divider></Divider>
+      <Stack gap={2}>
+        <Typography variant={"h6"}>Evidencia</Typography>
+        {evidences.map((evidence, index) => (
+          <FileItem fileObject={evidence} key={index} />
+        ))}
+      </Stack>
+      <Divider></Divider>
     </Stack>
   );
 }

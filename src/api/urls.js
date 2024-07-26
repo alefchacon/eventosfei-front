@@ -11,7 +11,6 @@ export const urlNewEvents = "/api/eventos?idEstado[eq]=1&estado=true";
 export const urlEventById = (id) => `/api/eventos/${id}`
 
 export const urlEvaluations = "/api/evaluaciones/";
-export const urlEvidences = "/api/evidencias/";
 export const urlStatus = "/api/estados/";
 export const urlReservedSpaces = "/api/espacios/reservaciones/";
 export const urlReservations = "/api/solicitud?";
@@ -36,6 +35,8 @@ export const urlCronogram = (id = 0) => {
 export const urlPublicity = (id = 0) => {
   return `/api/publicidad/${id}`;
 }
+export const urlEvidences = `/api/evidencias/`;
+
 
 export const urlProfile = '/api/perfil'
 
