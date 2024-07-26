@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, isValidElement } from "react";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -50,6 +50,8 @@ export default function BasicTabs({ children, onSelect }) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  children = children.filter((child) => isValidElement(child));
 
   return (
     <Box sx={{ width: "100%", height: "fit-content" }}>

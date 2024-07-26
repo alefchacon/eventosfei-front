@@ -36,6 +36,8 @@ import {
   ListItemText,
 } from "@mui/material";
 
+import FileItem from "../components/FileItem.jsx";
+
 import SendIcon from "@mui/icons-material/Send";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
@@ -60,40 +62,6 @@ function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
       </Stack>
     </ListItem>
   );
-}
-
-function FileItem({ fileObject }) {
-  return (
-    <ListItemButton divider onClick={() => downloadFile(fileObject)}>
-      <ListItem>
-        <ListItemText primary={fileObject.name}></ListItemText>
-        <DownloadIcon color="primary"></DownloadIcon>
-      </ListItem>
-    </ListItemButton>
-  );
-}
-
-function downloadFile(fileObject) {
-  const binaryString = atob(fileObject.file);
-
-  const len = binaryString.length;
-  const byteArray = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    byteArray[i] = binaryString.charCodeAt(i);
-  }
-
-  const blob = new Blob([byteArray], { type: fileObject.type });
-
-  const blobUrl = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = blobUrl;
-  link.download = fileObject.name;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(blobUrl);
 }
 
 export default function Event({ setTitle }) {
@@ -267,7 +235,6 @@ export default function Event({ setTitle }) {
     if (fetchedCronogram) {
       return;
     }
-    console.log("fetching cronogram!!!");
 
     setIsLoading(true);
 
@@ -280,7 +247,6 @@ export default function Event({ setTitle }) {
     if (fetchedPublicity) {
       return;
     }
-    console.log("fetching publicity!!!");
 
     setIsLoading(true);
 
@@ -290,23 +256,22 @@ export default function Event({ setTitle }) {
     setIsLoading(false);
   }
 
-  function Evaluation(evaluation) {
-    return asdf;
-  }
-
   return (
     <>
       <NotificationResponse idEvento={eventId}></NotificationResponse>
+
+      <Stack direction={"row"} padding={1} gap={2}>
+        <Button variant="outlined" onClick={getReport}>
+          Generar reporte
+        </Button>
+      </Stack>
+
       {FEIEvent && (
         <BasicTabs>
-          <Stack label="Evaluacion">
-            <BasicTable evaluation={FEIEvent.evaluation}></BasicTable>
-          </Stack>
+          {FEIEvent.hasEvaluation && (
+            <BasicTable label={"Evaluación"} evaluation={FEIEvent.evaluation} />
+          )}
           <div label="Organizador">
-            {/*
-              <Button onClick={getReport}>Reporte :D</Button>
-              
-              */}
             <Typography variant="h5">Información del organizador</Typography>
             <InfoItem
               label={"Nombre"}
@@ -428,8 +393,8 @@ export default function Event({ setTitle }) {
 
             {fetchedPublicity && publicity ? (
               <List>
-                {publicity.map((publicity) => (
-                  <FileItem fileObject={publicity} />
+                {publicity.map((publicity, index) => (
+                  <FileItem key={index} fileObject={publicity} />
                 ))}
               </List>
             ) : (

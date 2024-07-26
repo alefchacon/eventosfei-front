@@ -20,7 +20,7 @@ import { evaluationSchema } from "../validation/modelSchemas/evaluationSchema.js
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
 import AddEvaluation from "../api/EvaluationService.js";
-import AddEvidence from "../api/EvidenceService.js";
+import { AddEvidence } from "../api/EvidenceService.js";
 
 import LoadingButton from "../components/LoadingButton.jsx";
 
