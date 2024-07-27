@@ -80,6 +80,8 @@ export default function UploadArea({ files, setFiles }) {
 
     try {
       const parsedFiles = await parsePickedFile(items);
+      console.log(parsedFiles);
+
       setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
     } catch (e) {
       showSnackbar(e.message);

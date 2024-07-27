@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import CircularProgress from "@mui/material/CircularProgress";
-
 import { useParams } from "react-router-dom";
 
 import { GetCronogram } from "../api/CronogramService.js";
@@ -9,32 +7,17 @@ import { GetPublicity } from "../api/PublicityService.js";
 
 import PropTypes from "prop-types";
 
-import BasicTable from "../components/Table.jsx";
+import BasicTable from "./EvaluationView.jsx";
 
 import GetFullDateString from "../util/GetFullDateString.js";
 
 import moment from "moment";
-import DownloadIcon from "@mui/icons-material/Download";
 import CheckboxList from "../components/CheckboxList.jsx";
 import ReservationCheckboxList from "../components/ReservationCheckboxList.jsx";
 
 import { jsPDF } from "jspdf";
 
-import {
-  Tabs,
-  Tab,
-  Typography,
-  Box,
-  Button,
-  Stack,
-  TextField,
-  IconButton,
-  InputAdornment,
-  ListItem,
-  ListItemButton,
-  List,
-  ListItemText,
-} from "@mui/material";
+import { Typography, Button, Stack, ListItem, List } from "@mui/material";
 
 import FileItem from "../components/FileItem.jsx";
 
@@ -48,6 +31,7 @@ import NotificationResponse from "../components/NotificationResponse.jsx";
 import BasicTabs from "../components/Tabs.jsx";
 
 import { GetEventById } from "../api/EventService.js";
+import EvaluationView from "./EvaluationView.jsx";
 
 function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   return (
@@ -268,8 +252,13 @@ export default function Event({ setTitle }) {
 
       {FEIEvent && (
         <BasicTabs>
-          {FEIEvent.hasEvaluation && (
-            <BasicTable label={"Evaluación"} evaluation={FEIEvent.evaluation} />
+          {FEIEvent.hasEvaluation ? (
+            <EvaluationView
+              label={"Evaluación"}
+              evaluation={FEIEvent.evaluation}
+            />
+          ) : (
+            <Evaluation FEIEvent={FEIEvent} label={"Evaluación"}></Evaluation>
           )}
           <div label="Organizador">
             <Typography variant="h5">Información del organizador</Typography>

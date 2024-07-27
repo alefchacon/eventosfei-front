@@ -2,8 +2,7 @@ import { urlEvaluations } from "./urls"
 import { client } from "./Client";
 import messages from "../validation/messages";
 
-export default async function AddEvaluation(evaluation){
-  console.log(evaluation)
+export default async function AddEvaluation(evaluation, evidences){
   const data = {
     "calificacionAtencion": evaluation.ratingAttention,
     "razonCalificacionAtencion":evaluation.ratingAttentionReason,
@@ -19,8 +18,21 @@ export default async function AddEvaluation(evaluation){
     "adicional":evaluation.additional ?? messages.campoOpcional,
     "idEvento":evaluation.idEvento,
   }
-  console.log(data)
 
-  const response = await client.post(urlEvaluations, data);
+  let formData = new FormData();
+  for (const key in data){
+    formData.append(key, data[key]);
+  }
+
+  for (let i = 0; i<evidences.length; i++){
+    formData.append(`evidencias[${i}]`, evidences[i])
+  }
+
+
+  const response = await client.post(urlEvaluations, formData,  {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response;
 }
