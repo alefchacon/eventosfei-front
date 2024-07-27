@@ -5,10 +5,10 @@ import { Stack } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import Divider from "@mui/material/Divider";
 
-import FileItem from "./FileItem";
+import FileItem from "../components/FileItem";
 import { GetEvidences } from "../api/EvidenceService";
 
-export default function BasicTable({ evaluation }) {
+export default function EvaluationView({ evaluation }) {
   //
   const [evidences, setEvidencies] = useState([]);
   useEffect(() => {

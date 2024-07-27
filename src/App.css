@@ -1,7 +1,7 @@
 :root{
   --main-blue: #18529d;
   --main-green: #2E8E49;
-  --gray-bg: #f3f3f3;
+  --gray-bg: white;
   --secondary-blue: #DFE7F1;
 }
 
@@ -18,7 +18,6 @@
 
 .form-box{
   background-color: white;
-  margin: 0 10px 0 10px;
 }
 
 .form-page{

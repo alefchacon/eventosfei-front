@@ -37,7 +37,7 @@ function CustomTabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 0 }}>
         <div>{children}</div>
       </Box>
     </div>
@@ -58,8 +58,8 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
   const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
-    setFEIEvent(FEIEvent);
-    setIsEvaluated(FEIEvent && FEIEvent.evaluation !== null);
+    //setFEIEvent(FEIEvent);
+    //setIsEvaluated(FEIEvent && FEIEvent.evaluation !== null);
 
     const updateOrientation = () => {
       setShowProgressHorizontal(window.innerWidth < 900);
@@ -110,30 +110,19 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
     }
   };
 
-  const communicationOptions = [
-    { id: 1, name: "No" },
-    { id: 2, name: "En parte" },
-    { id: 3, name: "Si" },
-  ];
-
   const submitEvaluation = async (values, actions) => {
     try {
-      console.log(FEIEvent);
+      console.log(values);
       values.idEvento = FEIEvent.id;
-      const response = await AddEvaluation(values);
-
-      const idEvaluacion = response.data.data.id;
-      if (response.status === 201) {
-        submitEvidences(idEvaluacion, evidences);
-      }
+      const response = await AddEvaluation(values, evidences);
 
       FEIEvent.evaluation = values;
-      setFEIEvent(FEIEvent);
-      setIsEvaluated(true);
+      //setFEIEvent(FEIEvent);
+      //setIsEvaluated(true);
 
       showSnackbar(response.data.message);
     } catch (error) {
-      console.log(error);
+      showSnackbar(error);
     }
   };
 
@@ -175,8 +164,14 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
 
   return (
     <>
-      <Stack direction={{ md: "row", xs: "column" }}>
-        <Box noValidate autoComplete="off" className="form-box" width={"100%"}>
+      <Stack direction={{ md: "row", xs: "column" }} className="fuck">
+        <Box
+          noValidate
+          autoComplete="off"
+          width={"100%"}
+          padding={0}
+          margin={0}
+        >
           <form autoComplete="off" onSubmit={handleSubmit}>
             <CustomTabPanel value={value} index={4}>
               <div className="form-page">
@@ -235,16 +230,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                     ></TextField>
                   </Stack>
 
-                  <Stack spacing={questionSpacing}>
-                    <Typography variant={typographyVariant}>
-                      ¿La comunicación fue clara y oportuna?
-                    </Typography>
-                    <CustomToggleButton
-                      value={values.ratingCommunication}
-                      options={communicationOptions}
-                      onChange={handleRatingCommunicationChange}
-                    ></CustomToggleButton>
-                  </Stack>
                   <Stack spacing={questionSpacing}>
                     <Typography variant={typographyVariant}>
                       ¿Hubo algún aspecto en el que el apoyo de la Coordinación

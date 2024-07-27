@@ -54,7 +54,7 @@ export default function BasicTabs({ children, onSelect }) {
   children = children.filter((child) => isValidElement(child));
 
   return (
-    <Box sx={{ width: "100%", height: "fit-content" }}>
+    <Box sx={{ width: "100%", height: "fit-content" }} className={"asdf"}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
