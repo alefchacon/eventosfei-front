@@ -11,18 +11,7 @@ import NoticeListRedux from "./NoticeListRedux";
 export default function Notices({}) {
   return (
     <>
-      <Tabs>
-        <div label={"Notificaciones"}>
-          <NoticeListRedux />
-        </div>
-        <div label={"Evaluaciones"}></div>
-        <div label={"Reservaciones"}>
-          <NoticeListRedux />
-        </div>
-        <div label={"Reservaciones (usuario)"}>
-          <NoticeListRedux showButtons={false} showFilters={false} />
-        </div>
-      </Tabs>
+      <NoticeListRedux />
     </>
   );
 }

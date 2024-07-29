@@ -23,7 +23,7 @@ const bull = (
 );
 
 export default function EventCard(
-  { props, parentHandle, isProfile, elevated = true },
+  { props, parentHandle, padding = 2, isProfile, elevated = true },
   { key }
 ) {
   const [isEvaluated, setIsEvaluated] = useState(false);
@@ -60,9 +60,9 @@ export default function EventCard(
       }}
       elevation={elevated ? 1 : 0}
     >
-      <CardContent sx={{ mb: -3 }}>
+      <CardContent sx={{ padding: padding }}>
         <Stack
-          sx={{ padding: 0, display: "flex", justifyContent: "space-between" }}
+          sx={{ display: "flex", justifyContent: "space-between" }}
           direction={"row"}
         >
           <Typography variant="h6" component="div">
@@ -89,14 +89,6 @@ export default function EventCard(
           Inicio: {moment(start).format("DD MMMM, YYYY")}
         </Typography>
       </CardContent>
-      <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button size="medium" onClick={handle} disabled={isEvaluated}>
-          Editar
-        </Button>
-        <Button size="medium" color="error" disabled={isEvaluated}>
-          Cancelar
-        </Button>
-      </CardActions>
     </Card>
   );
 }

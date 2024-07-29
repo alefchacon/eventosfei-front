@@ -29,7 +29,9 @@ export default function NoticeList(
   const { getNotices, removeNotices, isStaff } = useNotices();
 
   useEffect(() => {
-    removeNotices(notices);
+    if (!isStaff) {
+      removeNotices(notices);
+    }
   }, [notices]);
 
   const handlePageChange = async (event, newPage) => {
@@ -49,6 +51,10 @@ export default function NoticeList(
     setNotices(response.data);
   };
 
+  const removeNotice = async (notice) => {
+    await removeNotices([notice]);
+  };
+
   return (
     <>
       <Stack spacing={{ md: 1 }} margin={{ md: 1 }} direction={"column"}>
@@ -60,7 +66,7 @@ export default function NoticeList(
               adminView={idUsuario === 0}
               isStaff={isStaff}
             >
-              <Card props={item.event} elevated={false}></Card>
+              <Card props={item.event} padding={0} elevated={false}></Card>
             </CardNotice>
           ) : (
             <CardNotice key={index} event={false} item={item} isStaff={isStaff}>
