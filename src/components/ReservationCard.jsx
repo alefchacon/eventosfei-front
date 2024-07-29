@@ -53,7 +53,6 @@ function CustomCardActions({ isEvaluated, reservation, adminView = true }) {
     </>
   );
 }
-
 function Organizer({ user }) {
   return (
     <>
@@ -109,9 +108,9 @@ export default function ReservationCard({
         minWidth: "30%",
         maxHeight: 250,
       }}
-      elevation={elevated ? 1 : 0}
+      elevation={0}
     >
-      <CardContent sx={{ mb: -3 }}>
+      <CardContent sx={{ mb: -3, padding: 0 }}>
         <Stack
           sx={{
             padding: 0,
@@ -139,6 +138,11 @@ export default function ReservationCard({
           item.start
         ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
       </CardContent>
+      <CardActions
+        sx={{ display: "flex", justifyContent: "flex-end", padding: 0 }}
+      >
+        <CustomCardActions reservation={item}></CustomCardActions>
+      </CardActions>
     </Card>
   );
 }

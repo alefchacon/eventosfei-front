@@ -21,7 +21,7 @@ function CustomTabPanel({ children, value, index, onSelect }) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
     >
-      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
     </div>
   );
 }
@@ -55,7 +55,7 @@ export default function BasicTabs({ children, onSelect }) {
 
   return (
     <Box sx={{ width: "100%", height: "fit-content" }} className={"asdf"}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }} className={"asdf"}>
         <Tabs
           value={value}
           onChange={handleChange}

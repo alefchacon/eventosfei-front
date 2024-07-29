@@ -16,6 +16,9 @@ import MultiUserForm from "../forms/MultiUserForm";
 import ReservationForm from "../forms/ReservationForm";
 import ReservationResponseForm from "../forms/ReservationResponseForm";
 
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+
 import DialogTypes from "./DialogTypes";
 
 const DialogContext = createContext(null);
@@ -31,6 +34,9 @@ export function DialogProvider({ children }) {
   const [value, setValue] = useState("Dione");
   const [onSubmit, setOnSubmit] = useState(null);
   const [type, setType] = useState("");
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const DialogTypeForms = {};
 
@@ -63,7 +69,6 @@ export function DialogProvider({ children }) {
         sx={{
           padding: 0,
           width: "100%",
-          maxWidth: 460,
           bgcolor: "background.paper",
         }}
       >
@@ -75,20 +80,16 @@ export function DialogProvider({ children }) {
               maxHeight: "100%",
             },
           }}
-          maxWidth="xs"
+          fullScreen={fullScreen}
           open={open}
           PaperProps={{
             style: {
               padding: 0,
               margin: 0,
-              width: type.width,
-              minWidth: type.minWidth,
-              maxWidth: type.maxWidth,
             },
           }}
         >
-          <DialogTitle>{title}</DialogTitle>
-          <DialogContent dividers>
+          <DialogContent dividers sx={{ padding: 2 }}>
             {type === DialogTypes.userForm && (
               <UserForm
                 onCancel={handleClose}

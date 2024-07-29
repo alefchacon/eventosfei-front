@@ -5,10 +5,6 @@ import { useParams } from "react-router-dom";
 import { GetCronogram } from "../api/CronogramService.js";
 import { GetPublicity } from "../api/PublicityService.js";
 
-import PropTypes from "prop-types";
-
-import BasicTable from "./EvaluationView.jsx";
-
 import GetFullDateString from "../util/GetFullDateString.js";
 
 import moment from "moment";
@@ -33,6 +29,8 @@ import BasicTabs from "../components/Tabs.jsx";
 import { GetEventById } from "../api/EventService.js";
 import EvaluationView from "./EvaluationView.jsx";
 
+import { useNotices } from "../providers/NoticeProvider.jsx";
+
 function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   return (
     <ListItem disableGutters>
@@ -48,7 +46,7 @@ function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   );
 }
 
-export default function Event({ setTitle }) {
+export default function Event({ setTitle, notice }) {
   const [FEIEvent, setEvent] = useState(null);
   const [cronogram, setCronogram] = useState(null);
   const [publicity, setPublicity] = useState([]);
@@ -57,6 +55,8 @@ export default function Event({ setTitle }) {
   const { isLoading, setIsLoading } = useIsLoading();
 
   let { eventId } = useParams();
+
+  const { removeNotices } = useNotices();
 
   useEffect(() => {
     const fetchData = async () => {

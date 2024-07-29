@@ -8,15 +8,23 @@ import Divider from "@mui/material/Divider";
 import FileItem from "../components/FileItem";
 import { GetEvidences } from "../api/EvidenceService";
 
+import { useNotices } from "../providers/NoticeProvider";
+
 export default function EvaluationView({ evaluation }) {
   //
   const [evidences, setEvidencies] = useState([]);
+
+  const { removeNoticeEvent } = useNotices();
+
   useEffect(() => {
     const fetchEvidence = async () => {
       const response = await GetEvidences(evaluation.id);
       setEvidencies(response.data.data);
     };
+
     fetchEvidence();
+
+    removeNoticeEvent(evaluation.idEvento);
   }, []);
 
   function wrapCell(content = "sin contenido") {

@@ -14,6 +14,8 @@ import { useDialog } from "../providers/DialogProvider.jsx";
 import DialogTypes from "../providers/DialogTypes";
 import CircleIcon from "@mui/icons-material/Circle";
 
+import { estado } from "../validation/enums/estado.js";
+
 import Divider from "@mui/material/Divider";
 
 const bull = (
@@ -75,9 +77,29 @@ export default function CardNotice({
   isStaff = false,
   event = true,
   children,
+  onClick,
 }) {
+  const eventMessages = {
+    1: "Nueva notificación",
+    2: "Su evento ha sido programado",
+    3: "Evento evaluado",
+    4: "Su evento fue rechazado",
+  };
+  const reservationMessages = {
+    1: "Nueva reservación",
+    2: "Su reservación fue aceptada",
+    3: "Evento evaluado",
+    4: "Su reservación fue rechazada",
+  };
+
+  function getNoticeMessage(event = false) {
+    if (!event) {
+      return reservationMessages[item.reservation.idEstado];
+    }
+    return eventMessages[item.event.idEstado];
+  }
+
   const newNoticeBullet = () => {
-    console.log(isStaff);
     if (isStaff) {
       return item.notifyStaff !== 0 ? bull : "";
     } else {
@@ -93,8 +115,8 @@ export default function CardNotice({
       }}
       elevation={1}
     >
-      <CardActionArea>
-        <CardContent sx={{ mb: 0 }}>
+      <CardActionArea onClick={() => onClick(item)}>
+        <CardContent sx={{ mb: 0, padding: "1em 1em 0 1em" }}>
           <Stack
             padding={0}
             display={"flex"}
@@ -109,20 +131,14 @@ export default function CardNotice({
               alignContent={"center"}
               justifyItems={"center"}
             >
-              {newNoticeBullet()}{" "}
-              {event
-                ? "Notificación de evento actualizada"
-                : "Reservación de espacio actualizada"}
+              {newNoticeBullet()} {getNoticeMessage(event)}
             </Typography>
-            <Divider></Divider>
 
             {children}
           </Stack>
         </CardContent>
       </CardActionArea>
-      <CardActions sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <CustomCardActions reservation={item.reservation}></CustomCardActions>
-      </CardActions>
+      <Divider></Divider>
     </Card>
   );
 }

@@ -17,7 +17,7 @@ export function NoticeProvider({ children }) {
 
   const location = useLocation();
 
-  const [currentIdRol, setIdRol] = useState(5);
+  const [currentIdRol, setIdRol] = useState(idRol.ORGANIZADOR);
   const [idUsuario, setIdUsuario] = useState(1);
   const [isStaff, setIsStaff] = useState(currentIdRol > idRol.ORGANIZADOR);
 
@@ -41,6 +41,7 @@ export function NoticeProvider({ children }) {
     const response = await GetNotices(filters);
 
     const noticeData = response.data.data;
+    setNotices(noticeData.data);
     const newNoticeAmount = response.data.noticeAmount;
     setNoticeAmount(newNoticeAmount);
 
@@ -49,7 +50,6 @@ export function NoticeProvider({ children }) {
   };
 
   useEffect(() => {
-    console.log(isStaff);
     getNotices(1);
   }, [location]);
 
@@ -58,10 +58,19 @@ export function NoticeProvider({ children }) {
   };
 
   const removeNotices = async (notices = []) => {
+    console.log(isStaff);
     const response = await MarkAsUserRead(notices, isStaff);
     if (noticeAmount >= response.noticesUpdated) {
       setNoticeAmount((prev) => prev - response.noticesUpdated);
     }
+    console.log(response);
+  };
+
+  const removeNoticeEvent = async (idEvento = 0) => {
+    const filteredNotice = notices.filter(
+      (notice) => notice.idEvento === idEvento
+    );
+    await MarkAsUserRead(filteredNotice, isStaff);
   };
 
   return (
@@ -69,6 +78,7 @@ export function NoticeProvider({ children }) {
       value={{
         noticeAmount,
         removeNotice,
+        removeNoticeEvent,
         getNotices,
         removeNotices,
         isStaff,

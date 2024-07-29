@@ -13,9 +13,9 @@ export const MarkAsUserRead = async (notices, forStaff) => {
   const body = {
     "notices": notices,
   }
-  const url = urlNoticesMarkAsUserRead;
+  let url = urlNoticesMarkAsUserRead;
   if (forStaff){
-    url.concat("?type=staff")
+    url = url.concat("?tipo=staff")
   }
-  return await client.post(urlNoticesMarkAsUserRead, body);
+  return await client.post(url, body);
 }
