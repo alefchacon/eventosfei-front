@@ -5,7 +5,6 @@ import CardUser from "./CardUser.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "./CircularProgress.jsx";
 import { Container } from "@mui/material";
 
 export default function UserList({ notifications }, { setSelectedFEIEvent }) {
@@ -48,22 +47,6 @@ export default function UserList({ notifications }, { setSelectedFEIEvent }) {
 
   return (
     <>
-      {loading && (
-        <Container
-          sx={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress></CircularProgress>
-        </Container>
-      )}
       <Stack spacing={2} margin={5}>
         {items.map((item) => (
           <CardUser user={item} key={item.id} parentHandle={handle}></CardUser>

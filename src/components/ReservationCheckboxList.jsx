@@ -124,6 +124,7 @@ export default function CheckboxList({
                     <ReservationCard
                       elevated={false}
                       item={item}
+                      adminView={false}
                     ></ReservationCard>
                   </Stack>
                 </ListItemButton>

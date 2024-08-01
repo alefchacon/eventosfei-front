@@ -74,6 +74,7 @@ export default function ReservationCard({
   },
   parentHandle,
   adminView = false,
+  showActions = false,
   elevated = true,
 }) {
   const [isEvaluated, setIsEvaluated] = useState(false);
@@ -123,7 +124,7 @@ export default function ReservationCard({
             {item.space.name}{" "}
           </Typography>
 
-          {item.status && (
+          {item.status && showActions && (
             <Chip
               onClick={handleClick}
               color={getColor()}
@@ -138,11 +139,16 @@ export default function ReservationCard({
           item.start
         ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
       </CardContent>
-      <CardActions
-        sx={{ display: "flex", justifyContent: "flex-end", padding: 0 }}
-      >
-        <CustomCardActions reservation={item}></CustomCardActions>
-      </CardActions>
+      {showActions && (
+        <CardActions
+          sx={{ display: "flex", justifyContent: "flex-end", padding: 0 }}
+        >
+          <CustomCardActions
+            adminView={adminView}
+            reservation={item}
+          ></CustomCardActions>
+        </CardActions>
+      )}
     </Card>
   );
 }

@@ -59,8 +59,8 @@ export default function Progress({
         alignItems={"center"}
         bgcolor={"white"}
         margin={1.5}
-        padding={3}
-        paddingBottom={7}
+        padding={0}
+        paddingBottom={0}
       >
         <Slider
           onChangeCommitted={handleChange}
@@ -79,8 +79,8 @@ export default function Progress({
             width: "80%",
             // Increase the size of the marks
             "& .MuiSlider-mark": {
-              width: "5vh",
-              height: "5vh",
+              width: "3vh",
+              height: "3vh",
 
               borderRadius: "50%",
               backgroundColor: "#a7caed",
@@ -95,9 +95,9 @@ export default function Progress({
             },
             // Custom styling for the thumb to ensure it doesn't get overshadowed
             "& .MuiSlider-thumb": {
-              width: "6vh",
-              height: "6vh",
-              marginLeft: "20px",
+              width: "4vh",
+              height: "4vh",
+              marginLeft: "10px",
             },
             // Make sure the rail doesn't overshadow the marks
           }}

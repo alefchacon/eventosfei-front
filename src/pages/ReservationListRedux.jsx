@@ -9,7 +9,6 @@ import {
   GetReservations2,
 } from "../api/ReservationService.js";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "../components/CircularProgress.jsx";
 import { Container } from "@mui/material";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";

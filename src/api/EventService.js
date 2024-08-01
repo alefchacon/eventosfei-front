@@ -70,18 +70,13 @@ export const StoreEvent = async (values) => {
 
   const newValues = {...values};
 
-  //newValues.programas = parseIdCatalog(newValues.programas);
   newValues.audiencias = parseStringCatalog(newValues.audiencias);
   newValues.tematicas = parseStringCatalog(newValues.tematicas);
+  newValues.medios = parseStringCatalog(newValues.medios);
   newValues.inicio = moment(newValues.inicio).format("YYYY-MM-DD");
   newValues.fin = moment(newValues.fin).format("YYYY-MM-DD");
-
-  
   newValues.programas = JSON.stringify(newValues.programas);
-  newValues.reservaciones = JSON.stringify(newValues.reservaciones);
-
-  //newValues.cronograma = await toBase64(newValues.cronograma);
-  
+  newValues.reservaciones = JSON.stringify(newValues.reservaciones);  
 
   const formData = new FormData();
   for (const key in newValues) {
@@ -99,15 +94,6 @@ export const StoreEvent = async (values) => {
     }
     
   }
-  //formData.append("cronograma", newValues["cronograma"]);
-
-  /*
-  const publicidad = newValues["publicidad"]; 
-  for (let i = 0; i<publicidad.length; i++){
-    formData.append(`publicidad[${i}]`, publicidad[i])
-  }*/
-
-
   const response = await client.post(urlEvents, formData, {
     headers: {
       "Content-Type": "multipart/form-data",

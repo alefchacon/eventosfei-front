@@ -4,7 +4,6 @@ import Card from "../components/Card.jsx";
 import CardNotice from "../components/CardNotice.jsx";
 import ReservationCard from "../components/ReservationCard.jsx";
 import { Stack } from "@mui/material";
-import CircularProgress from "../components/CircularProgress.jsx";
 import Pagination from "@mui/material/Pagination";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
