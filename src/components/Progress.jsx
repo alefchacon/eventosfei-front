@@ -3,26 +3,6 @@ import Slider from "@mui/material/Slider";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-/*
-const marks = [
-  {
-    value: 4,
-  },
-  {
-    value: 3,
-  },
-  {
-    value: 2,
-  },
-  {
-    value: 1,
-  },
-  {
-    value: 0,
-  },
-];
-*/
-
 export default function Progress({
   stepAmount = 7,
   value,
@@ -50,7 +30,7 @@ export default function Progress({
         sx={{
           height: "70vh",
           padding: 5,
-          paddingTop: 10,
+          paddingTop: 5,
           bgcolor: "white",
           flexDirection: "column",
           justifyContent: "center",
@@ -68,30 +48,27 @@ export default function Progress({
           value={value}
           min={0}
           step={1}
-          max={5}
+          max={stepAmount}
           valueLabelDisplay="off"
           disabled={isDisabled}
           marks={steps}
           sx={{
-            // Increase the size of the marks
             "& .MuiSlider-mark": {
-              width: "5vh",
-              height: "5vh",
+              width: "2em",
+              height: "2em",
               borderRadius: "50%",
               backgroundColor: "#a7caed",
               "&.MuiSlider-markActive": {
                 opacity: 1,
-                backgroundColor: "primary.main", // Custom color for the active mark
+                backgroundColor: "primary.main",
               },
             },
 
-            // Custom styling for the thumb to ensure it doesn't get overshadowed
             "& .MuiSlider-thumb": {
-              width: "6vh",
-              height: "6vh",
-              marginBottom: "2vh",
+              width: "3em",
+              height: "3em",
+              marginBottom: "1em",
             },
-            // Make sure the rail doesn't overshadow the marks
             "& .MuiSlider-rail": {
               width: "5px",
             },

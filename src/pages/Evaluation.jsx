@@ -120,9 +120,10 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
       //setFEIEvent(FEIEvent);
       //setIsEvaluated(true);
 
-      showSnackbar(response.data.message);
+      //showSnackbar(response.data.message);
     } catch (error) {
-      showSnackbar(error);
+      console.log(error);
+      //showSnackbar(error);
     }
   };
 

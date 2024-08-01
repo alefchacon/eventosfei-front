@@ -70,7 +70,7 @@ export default function CheckboxList({
   return (
     <Stack>
       <FormControl>
-        <FormLabel>{label}</FormLabel>
+        <FormLabel required={required}>{label}</FormLabel>
 
         {items.length > 0 ? (
           <List sx={{ bgcolor: "background.paper" }}>

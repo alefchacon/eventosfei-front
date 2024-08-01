@@ -5,7 +5,6 @@ import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
 import { GetReservations } from "../api/ReservationService.js";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "../components/CircularProgress.jsx";
 import { Container } from "@mui/material";
 import { useDialog } from "../providers/DialogProvider.jsx";
 
@@ -57,22 +56,6 @@ export default function ReservationList(
 
   return (
     <>
-      {loading && (
-        <Container
-          sx={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <CircularProgress></CircularProgress>
-        </Container>
-      )}
       <Stack spacing={2} margin={5}>
         {items.map((item) => (
           <ReservationCard reservation={item} key={item.id}></ReservationCard>

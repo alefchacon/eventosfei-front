@@ -70,8 +70,10 @@ export default function RadioList({
           value={selected}
           row={false}
         >
-          {items.map((item) => {
-            return <CustomRadio item={item} onClick={handleSelection} />;
+          {items.map((item, index) => {
+            return (
+              <CustomRadio key={index} item={item} onClick={handleSelection} />
+            );
           })}
         </RadioGroup>
       </FormControl>
