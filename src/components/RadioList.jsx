@@ -14,6 +14,7 @@ import IconButton from "@mui/material/IconButton";
 import CommentIcon from "@mui/icons-material/Comment";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import FormHelperText from "@mui/material/FormHelperText";
 
 function CustomRadio({ item, onClick }) {
   return (
@@ -36,8 +37,12 @@ function CustomRadio({ item, onClick }) {
 export default function RadioList({
   onClick,
   label = "lav",
-  valueName = "name",
+  valueName: name = "name",
+  onTouch,
+  error = true,
   selectedValue = "",
+  helperText = "Debe seleccionar al menos una opción",
+
   items = [
     { id: 0, name: "Nombre 0" },
     { id: 1, name: "Nombre 1" },
@@ -58,25 +63,26 @@ export default function RadioList({
 
   const handleSelection = (value) => {
     setSelected(value);
-    onClick(valueName, value);
+    onClick(name, value);
+    onTouch(name, true, true);
   };
 
   return (
-    <Stack direction={"column"}>
-      <FormControl>
-        <FormLabel id="demo-radio-buttons-group-label">{label}</FormLabel>
-        <RadioGroup
-          aria-labelledby="demo-radio-buttons-group-label"
-          value={selected}
-          row={false}
-        >
-          {items.map((item, index) => {
-            return (
-              <CustomRadio key={index} item={item} onClick={handleSelection} />
-            );
-          })}
-        </RadioGroup>
-      </FormControl>
-    </Stack>
+    <FormControl error={Boolean(error)}>
+      <FormLabel id="demo-radio-buttons-group-label">{label}</FormLabel>
+      <FormHelperText>{helperText}</FormHelperText>
+
+      <RadioGroup
+        aria-labelledby="demo-radio-buttons-group-label"
+        row={false}
+        value={selected}
+      >
+        {items.map((item, index) => {
+          return (
+            <CustomRadio key={index} item={item} onClick={handleSelection} />
+          );
+        })}
+      </RadioGroup>
+    </FormControl>
   );
 }

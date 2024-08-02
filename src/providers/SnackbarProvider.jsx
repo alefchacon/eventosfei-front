@@ -3,7 +3,7 @@ import { Fragment, createContext, useContext, useState } from "react";
 import { Snackbar, Button, IconButton } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
-
+import useWindowSize from "../hooks/useWindowSize";
 const SnackbarContext = createContext(null);
 
 export function useSnackbar() {
@@ -15,6 +15,8 @@ export function SnackbarProvider({ children }) {
   const [message, setMessage] = useState("");
   const [handleUndo, setHandleUndo] = useState(null);
   const [content, setContent] = useState(null);
+  const { width } = useWindowSize();
+  const isMobile = width < 600;
 
   const showSnackbar = (message, buttonLabel, content = null, onUndo) => {
     setMessage(message);
@@ -35,9 +37,11 @@ export function SnackbarProvider({ children }) {
   const action = (
     <Fragment>
       {content}
+      {/*
       <Button color="secondary" size="small" onClick={handleUndo}>
         DESHACER
       </Button>
+        */}
       <IconButton
         size="small"
         aria-label="close"
@@ -53,7 +57,13 @@ export function SnackbarProvider({ children }) {
     <SnackbarContext.Provider value={{ showSnackbar }}>
       {children}
       <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{
+          vertical: isMobile ? "top" : "bottom",
+          horizontal: "right",
+        }}
+        sx={{
+          marginTop: 7,
+        }}
         open={open}
         onClose={handleClose}
         autoHideDuration={6000}

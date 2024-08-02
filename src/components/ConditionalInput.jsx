@@ -1,6 +1,7 @@
 import { useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
 import FormLabel from "@mui/material/FormLabel";
 import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
@@ -14,41 +15,55 @@ export default function ConditionalInput({
   required = false,
   positiveLabel = "Sí",
   negativeLabel = "No",
+  error = false,
+  helperText = "error",
+  onBlur,
+  onChange,
 }) {
-  const [showChildren, setShowChildren] = useState(false);
+  const [showChildren, setShowChildren] = useState(value);
 
   const handleChange = (e) => {
-    const boolValue = e.target.value === "true";
-    setShowChildren(boolValue);
-    console.log(showChildren);
+    const newShowChildren = e.target.value;
+    setShowChildren(newShowChildren);
+    onChange(name, newShowChildren);
+
+    if (newShowChildren === "1") {
+      return;
+    }
+
+    for (let child of children) {
+      onChange(child.props.name, "");
+    }
   };
 
   return (
     <>
-      <FormControl>
+      <FormControl error={error}>
         <FormLabel id={name} required={required}>
           {label}
         </FormLabel>
+        {error && <FormHelperText>{helperText}</FormHelperText>}
         <RadioGroup
           aria-labelledby={name}
           name={name}
           row={false}
           defaultValue={false}
-          value={showChildren}
+          value={value}
           onChange={handleChange}
+          onBlur={onBlur}
         >
           <FormControlLabel
-            value={true}
+            value={1}
             control={<Radio />}
             label={positiveLabel}
           />
           <FormControlLabel
-            value={false}
+            value={0}
             control={<Radio />}
             label={negativeLabel}
           />
         </RadioGroup>
-        {showChildren && (
+        {showChildren === "1" && (
           <Stack gap={3} paddingTop={3}>
             {children}
           </Stack>

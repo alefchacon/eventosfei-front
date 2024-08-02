@@ -40,8 +40,6 @@ import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
 
-import useWindowSize from "../hooks/useWindowSize.jsx";
-
 moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
 

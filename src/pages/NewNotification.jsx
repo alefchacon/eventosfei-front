@@ -7,7 +7,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useFormik } from "formik";
-import { TextField } from "@mui/material";
+import { FormHelperText, TextField } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -17,6 +17,8 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
+import LoadingButton from "../components/LoadingButton.jsx";
+import { Link } from "react-router-dom";
 
 import ConditionalInput from "../components/ConditionalInput.jsx";
 
@@ -41,31 +43,35 @@ import useWindowSize from "../hooks/useWindowSize.jsx";
 
 import Typography from "@mui/material/Typography";
 import moment from "moment";
+import { eventSchema } from "../validation/modelSchemas/eventSchema.js";
 
 function BooleanRadio({
   label = "Pregunta",
   name = "name",
   value = false,
   onChange,
+  error = false,
+  helperText = "Hay un error",
   onBlur,
   required = false,
 }) {
   return (
-    <FormControl>
+    <FormControl error={error}>
       <FormLabel id={`id-${name}`} required={required}>
         {label}
       </FormLabel>
+      {error && <FormHelperText>{helperText}</FormHelperText>}
       <RadioGroup
         aria-labelledby={`id-${name}`}
         defaultValue=""
-        name="requiereTransmisionEnVivo"
+        name={name}
         row={false}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
       >
-        <FormControlLabel value="1" control={<Radio />} label="Si" />
-        <FormControlLabel value="0" control={<Radio />} label="No" />
+        <FormControlLabel value={1} control={<Radio />} label="Si" />
+        <FormControlLabel value={0} control={<Radio />} label="No" />
       </RadioGroup>
     </FormControl>
   );
@@ -98,13 +104,16 @@ function NewNotification() {
   const { width } = useWindowSize();
   const isMobile = width < 600;
   const [cronograma, setCronograma] = useState(null);
-  const [material, setMaterial] = useState([]);
   const [currentStep, setCurrentStep] = useState(numSteps - 1);
   const [showReservations, setShowReservations] = useState(false);
   const [showPlatforms, setShowPlatforms] = useState(false);
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [showComputerCenterRequirements, setShowComputerCenterRequirements] =
     useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const noReservationMessage =
+    "Para notificar un evento presencial o híbrido, primero debe contar con reservaciones de espacios aprobadas por administración, de lo contrario sólo podrá notificar eventos virtuales.";
 
   const navigate = useNavigate();
 
@@ -174,7 +183,13 @@ function NewNotification() {
   }, []);
 
   const handleSubmitEvent = async () => {
-    await StoreEvent(values);
+    console.log("submitting");
+    try {
+      await StoreEvent(values);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async function getReservations() {
@@ -182,6 +197,7 @@ function NewNotification() {
     const fetchedReservations = response.data.data;
     setReservations(fetchedReservations);
     setShowReservationModal(fetchedReservations.length < 1);
+    setShowPlatforms(fetchedReservations.length < 1);
   }
 
   const handleChangeSteps = (newStep) => {
@@ -221,18 +237,19 @@ function NewNotification() {
     handleChange,
     handleSubmit,
     setFieldValue,
+    setFieldTouched,
     isSubmitting,
   } = useFormik({
     initialValues: {
       nombre: "",
       descripcion: "",
       pagina: "",
-      ambito: ambitos[0].name,
-      audiencias: [audiencias[0]],
-      eje: ejes[0].name,
-      tematicas: [tematicas[0]],
+      ambito: "",
+      audiencias: [],
+      eje: "",
+      tematicas: [],
       idTipo: 1,
-      programas: [programasEducativos[0]],
+      programas: [],
 
       //DETALLES LOGISTICOS
       inicio: moment(),
@@ -247,19 +264,22 @@ function NewNotification() {
       reservaciones: [],
 
       // RECURSOS ADICIONALES
+      requiereCentroComputo: "",
       requisitosCentroComputo: "",
-      requiereTransmisionEnVivo: 0,
+      requiereTransmisionEnVivo: "",
       presidium: "",
       decoracion: "",
       numParticipantesExternos: 0,
-      requiereEstacionamiento: 0,
-      requiereFinDeSemana: 0,
+      asistiraPublicoExterno: "",
+      requiereEstacionamiento: "",
+      requiereFinDeSemana: "",
 
-      medios: [medios[0]],
+      medios: [],
 
-      requiereConstancias: 0,
+      requiereConstancias: "",
       ponientes: "",
 
+      proporcionaraPublicidad: "",
       publicidad: [],
 
       adicional: "",
@@ -268,7 +288,7 @@ function NewNotification() {
       idEstado: 1,
     },
 
-    // validationSchema: evaluationSchema,
+    validationSchema: eventSchema,
     onSubmit: handleSubmitEvent,
   });
 
@@ -293,17 +313,30 @@ function NewNotification() {
       <ResponsiveDialog
         title="No ha reservado espacios"
         secondaryLabel="Notificar evento virtual"
-        primaryLabel="Reservar espacio"
-        responsive
+        primaryLabel="Solicitar reservación"
         onPrimaryClick={() => navigate("/reservar")}
         onClose={() => setShowReservationModal(false)}
         open={showReservationModal}
         oneTimeOnly
       >
+        <DialogContentText>{noReservationMessage}</DialogContentText>
+      </ResponsiveDialog>
+      <ResponsiveDialog
+        title="Notificación enviada"
+        secondaryLabel="Regresar al calendario"
+        showPrimary={false}
+        onPrimaryClick={() => navigate("/reservar")}
+        onClose={() => {
+          setShowSuccessModal(false);
+          navigate("/calendario");
+        }}
+        open={showSuccessModal}
+        oneTimeOnly
+      >
         <DialogContentText>
-          Para notificar un evento presencial, primero debe contar con
-          reservaciones aprobadas por administración, de lo contrario sólo podrá
-          notificar eventos virtuales.
+          ¡Gracias por notificarnos de su evento! En breve nos pondremos en
+          contacto con usted por correo electrónico para la programación del
+          mismo.
         </DialogContentText>
       </ResponsiveDialog>
       <form autoComplete="off" onSubmit={handleSubmit}>
@@ -327,14 +360,15 @@ function NewNotification() {
                   Detalles del evento
                 </Typography>
                 <TextField
-                  variant="outlined"
+                  inputProps={{ maxLength: 1000 }}
                   name="nombre"
+                  label="Nombre del evento *"
+                  variant="outlined"
                   value={values.nombre}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  label="Nombre del evento"
-                  required
-                  inputProps={{ maxLength: 1000 }}
+                  error={Boolean(errors.nombre) && touched.nombre}
+                  helperText={touched.nombre && errors.nombre}
                 />
                 <TextField
                   variant="outlined"
@@ -342,8 +376,9 @@ function NewNotification() {
                   value={values.descripcion}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  label="Descripción del evento"
-                  required
+                  error={Boolean(errors.descripcion) && touched.descripcion}
+                  helperText={touched.descripcion && errors.descripcion}
+                  label="Descripción del evento *"
                   multiline
                   maxRows={maxRows}
                   inputProps={{ maxLength: 1000 }}
@@ -354,6 +389,8 @@ function NewNotification() {
                   value={values.pagina}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  error={Boolean(errors.pagina) && touched.pagina}
+                  helperText={touched.pagina && errors.pagina}
                   label="Página web para consultar mayores detalles"
                   inputProps={{ maxLength: 1000 }}
                 />
@@ -383,23 +420,34 @@ function NewNotification() {
 
                 {programasEducativos.length > 0 && (
                   <CheckboxList
+                    name="programas"
                     label="Programa educativo"
                     selectedValues={values.programas}
                     items={programasEducativos}
                     required={true}
+                    onTouch={setFieldTouched}
+                    error={Boolean(errors.programas) && touched.programas}
+                    helperText={touched.programas && errors.programas}
                   ></CheckboxList>
                 )}
 
                 <CheckboxList
+                  name="audiencias"
                   label="Evento dirigido a"
                   selectedValues={values.audiencias}
                   items={audiencias}
                   required={true}
+                  onTouch={setFieldTouched}
+                  error={Boolean(errors.audiencias) && touched.audiencias}
+                  helperText={touched.audiencias && errors.audiencias}
                 ></CheckboxList>
                 <RadioList
                   label="Ámbito"
                   onClick={setFieldValue}
                   valueName="ambito"
+                  onTouch={setFieldTouched}
+                  error={Boolean(errors.ambito) && touched.ambito}
+                  helperText={touched.ambito && errors.ambito}
                   selectedValue={values.ambito}
                   items={ambitos}
                   required={true}
@@ -408,16 +456,23 @@ function NewNotification() {
                   label="Eje del Programa de Trabajo al que impacta"
                   onClick={setFieldValue}
                   valueName="eje"
+                  onTouch={setFieldTouched}
+                  error={Boolean(errors.eje) && touched.eje}
+                  helperText={touched.eje && errors.eje}
                   selectedValue={values.eje}
                   items={ejes}
                   required={true}
                 ></RadioList>
                 <CheckboxList
+                  name="tematicas"
                   label="Temáticas principales que aborda el evento (mínimo 1, máximo 3)"
                   selectedValues={values.tematicas}
                   items={tematicas}
                   required={true}
                   max={3}
+                  onTouch={setFieldTouched}
+                  error={Boolean(errors.tematicas) && touched.tematicas}
+                  helperText={touched.tematicas && errors.tematicas}
                 ></CheckboxList>
               </Stack>
             </CustomTabPanel>
@@ -484,7 +539,7 @@ function NewNotification() {
                 <Typography variant="h5" textAlign={"center"}>
                   Espacios del evento
                 </Typography>
-                {modalidades.length > 0 && (
+                {modalidades.length > 0 && reservations.length > 0 && (
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
                       Modalidad
@@ -506,16 +561,26 @@ function NewNotification() {
                     </Select>
                   </FormControl>
                 )}
-                {showReservations & (reservations.length > 0) ? (
+                {showReservations & (reservations.length > 0) && (
                   <ReservationCheckboxList
                     valueName="reservaciones"
                     onClick={setFieldValue}
-                    label="Espacios reservados"
+                    label="Espacios físicos reservados donde se realizará"
                     items={reservations}
                     required
                   ></ReservationCheckboxList>
-                ) : (
-                  <></>
+                )}
+
+                {reservations.length < 1 && (
+                  <FormLabel
+                    sx={{ bgcolor: "#f3ecc1", padding: 2, borderRadius: 2 }}
+                  >
+                    {noReservationMessage}
+                    <Link to={"/reservar"}>
+                      {" "}
+                      Solicite sus reservaciones aquí.
+                    </Link>
+                  </FormLabel>
                 )}
 
                 {showPlatforms && (
@@ -524,11 +589,11 @@ function NewNotification() {
                     value={values.plataformas}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    label={"Plataformas virtuales"}
-                    required
-                    helperText={"Ejemplo: Zoom, Google Meet"}
+                    label={"Plataformas virtuales donde se realizará"}
                     maxRows={maxRows}
                     inputProps={{ maxLength: 1000 }}
+                    error={Boolean(errors.plataformas) && touched.plataformas}
+                    helperText={touched.plataformas && errors.plataformas}
                   ></TextField>
                 )}
               </Stack>
@@ -545,9 +610,19 @@ function NewNotification() {
                   justifyContent={"start"}
                 >
                   <ConditionalInput
-                    label="¿Se requiere apoyo del personal del Centro de Cómputo durante el evento?"
-                    name="show-computer-center-requirements"
-                    required
+                    label="¿Se requiere apoyo del personal del Centro de Cómputo durante el evento? *"
+                    name="requiereCentroComputo"
+                    value={values.requiereCentroComputo}
+                    onChange={setFieldValue}
+                    onBlur={handleBlur}
+                    error={
+                      Boolean(errors.requiereCentroComputo) &&
+                      touched.requiereCentroComputo
+                    }
+                    helperText={
+                      touched.requiereCentroComputo &&
+                      errors.requiereCentroComputo
+                    }
                   >
                     <FormControl>
                       <FormLabel>
@@ -573,6 +648,14 @@ function NewNotification() {
                       value={values.requiereTransmisionEnVivo}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      error={
+                        Boolean(errors.requiereTransmisionEnVivo) &&
+                        touched.requiereTransmisionEnVivo
+                      }
+                      helperText={
+                        touched.requiereTransmisionEnVivo &&
+                        errors.requiereTransmisionEnVivo
+                      }
                     />
 
                     <FormControl>
@@ -611,10 +694,24 @@ function NewNotification() {
                     </FormControl>
                   </ConditionalInput>
 
-                  <ConditionalInput label="¿Asistirá público externo?">
+                  <ConditionalInput
+                    label="¿Asistirá público externo? *"
+                    name="asistiraPublicoExterno"
+                    value={values.asistiraPublicoExterno}
+                    onChange={setFieldValue}
+                    onBlur={handleBlur}
+                    error={
+                      Boolean(errors.asistiraPublicoExterno) &&
+                      touched.asistiraPublicoExterno
+                    }
+                    helperText={
+                      touched.asistiraPublicoExterno &&
+                      errors.asistiraPublicoExterno
+                    }
+                  >
                     <Spinner
                       onClick={setFieldValue}
-                      valueName="numParticipantesExternos"
+                      name="numParticipantesExternos"
                       label="¿Cuántas personas externas estiman recibir en el evento?"
                       min={0}
                       max={1000000}
@@ -622,18 +719,34 @@ function NewNotification() {
                     ></Spinner>
 
                     <BooleanRadio
-                      label="¿Se requiere autorización para que público externo ingrese al estacionamiento durante el evento?"
-                      name="requiereTransmisionEnVivo"
+                      label="¿Se requiere autorización para que público externo ingrese al estacionamiento durante el evento? *"
+                      name="requiereEstacionamiento"
                       value={values.requiereEstacionamiento}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      error={
+                        Boolean(errors.requiereEstacionamiento) &&
+                        touched.requiereEstacionamiento
+                      }
+                      helperText={
+                        touched.requiereEstacionamiento &&
+                        errors.requiereEstacionamiento
+                      }
                     />
                     <BooleanRadio
-                      label="¿Necesita autorización para el ingreso en fin de semana?"
-                      name="requiereTransmisionEnVivo"
+                      label="¿Necesita autorización para el ingreso en fin de semana? *"
+                      name="requiereFinDeSemana"
                       value={values.requiereFinDeSemana}
                       onChange={handleChange}
                       onBlur={handleBlur}
+                      error={
+                        Boolean(errors.requiereFinDeSemana) &&
+                        touched.requiereFinDeSemana
+                      }
+                      helperText={
+                        touched.requiereFinDeSemana &&
+                        errors.requiereFinDeSemana
+                      }
                     />
                   </ConditionalInput>
                 </Stack>
@@ -647,15 +760,30 @@ function NewNotification() {
                 </Typography>
 
                 <CheckboxList
-                  label="Seleccione los medios donde se requiere hacer difusión del evento"
+                  label="Seleccione los medios donde se requiere hacer difusión del evento *"
                   selectedValues={values.medios}
                   items={medios}
-                  required
+                  name="medios"
+                  onTouch={setFieldTouched}
+                  error={Boolean(errors.medios) && touched.medios}
+                  helperText={touched.medios && errors.medios}
                 ></CheckboxList>
 
                 <ConditionalInput
-                  label="¿Se proporcionará material promocional?"
+                  label="¿Se proporcionará material promocional? *"
                   negativeLabel="No (En caso de no contar con un diseño específico, se empleará un diseño básico preestablecido por la facultad)"
+                  name="proporcionaraPublicidad"
+                  value={values.proporcionaraPublicidad}
+                  onChange={setFieldValue}
+                  onBlur={handleBlur}
+                  error={
+                    Boolean(errors.proporcionaraPublicidad) &&
+                    touched.proporcionaraPublicidad
+                  }
+                  helperText={
+                    touched.proporcionaraPublicidad &&
+                    errors.proporcionaraPublicidad
+                  }
                 >
                   <FormLabel required>
                     Por favor, proporcione los recursos que se van a publicar.
@@ -682,13 +810,37 @@ function NewNotification() {
                 </Typography>
 
                 <BooleanRadio
-                  label="¿Requiere la generación de constancias para ponentes u organizadores?"
+                  label="¿Requiere la generación de constancias para ponentes u organizadores? *"
                   name="requiereConstancias"
                   value={values.requiereConstancias}
-                  required
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  error={
+                    Boolean(errors.requiereConstancias) &&
+                    touched.requiereConstancias
+                  }
+                  helperText={
+                    touched.requiereConstancias && errors.requiereConstancias
+                  }
                 />
+
+                {/*
+                <BooleanRadio
+                  label="¿Se requiere autorización para que público externo ingrese al estacionamiento durante el evento? *"
+                  name="requiereEstacionamiento"
+                  value={values.requiereEstacionamiento}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={
+                    Boolean(errors.requiereEstacionamiento) &&
+                    touched.requiereEstacionamiento
+                  }
+                  helperText={
+                    touched.requiereEstacionamiento &&
+                    errors.requiereEstacionamiento
+                  }
+                />
+                    */}
 
                 <FormControl>
                   <FormLabel required>
@@ -730,7 +882,7 @@ function NewNotification() {
                 />
               </Stack>
             </CustomTabPanel>
-
+            <LoadingButton label="submit"></LoadingButton>
             {!isMobile && (
               <Stack
                 direction={"row"}

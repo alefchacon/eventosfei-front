@@ -37,7 +37,7 @@ export default function CalendarEventList({
 }) {
   const navigate = useNavigate();
   const { width } = useWindowSize();
-  const isMobile = width < 900; // Define mobile view as less than 768px
+  const isMobile = width < 900;
 
   const EventList = () => {
     return (
