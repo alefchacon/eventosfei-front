@@ -14,6 +14,8 @@ import useWindowSize from "../hooks/useWindowSize";
 export default function ResponsiveDialog({
   children,
   title = "Título",
+  showPrimary = true,
+  showSecondary = true,
   primaryLabel = "Enviar",
   secondaryLabel = "Cancelar",
   onPrimaryClick,
@@ -54,12 +56,16 @@ export default function ResponsiveDialog({
             gap: 2,
           }}
         >
-          <Button autoFocus onClick={handleClose}>
-            {secondaryLabel}
-          </Button>
-          <Button variant="contained" onClick={onPrimaryClick} autoFocus>
-            {primaryLabel}
-          </Button>
+          {showSecondary && (
+            <Button autoFocus onClick={handleClose}>
+              {secondaryLabel}
+            </Button>
+          )}
+          {showPrimary && (
+            <Button variant="contained" onClick={onPrimaryClick} autoFocus>
+              {primaryLabel}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>

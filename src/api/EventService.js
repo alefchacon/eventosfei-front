@@ -78,6 +78,20 @@ export const StoreEvent = async (values) => {
   newValues.programas = JSON.stringify(newValues.programas);
   newValues.reservaciones = JSON.stringify(newValues.reservaciones);  
 
+  /*
+  Object.entries(newValues).map(([key, value])=> {
+    if (!value){
+
+      delete newValues[key]
+    }
+  })*/
+
+  console.log(newValues)
+
+  /*
+  Transformar datos a FormData, para poder enviar 
+  los archivos del cronograma y publicidad.
+  */
   const formData = new FormData();
   for (const key in newValues) {
     
@@ -94,11 +108,16 @@ export const StoreEvent = async (values) => {
     }
     
   }
+
+
   const response = await client.post(urlEvents, formData, {
     headers: {
+      /*Este header es vital para que el back
+      encuentre los archivos en el request*/
       "Content-Type": "multipart/form-data",
     },
   });
+  
   console.log(response);
   //console.log(await client.post(urlEvents, newValues));
 }
@@ -124,8 +143,4 @@ Aquí se parsean esos datos, dependiendo de si el catalogo maneja id o name varc
 function parseStringCatalog(catalog){
   console.log(catalog)
   return catalog.map(item => item["name"]).join(";")
-}
-function parseIdCatalog(catalog){
-  console.log(catalog)
-  return catalog.map(item => item["id"]);
 }

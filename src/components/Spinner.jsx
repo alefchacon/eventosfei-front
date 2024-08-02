@@ -9,7 +9,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 export default function Spinner({
   onClick,
-  valueName = "valueName",
+  name = "valueName",
   label = "Número",
   step = 1,
   min = 0,
@@ -23,7 +23,7 @@ export default function Spinner({
     }
     const newValue = value + valueToAdd;
     setValue(newValue);
-    onClick(valueName, newValue);
+    onClick(name, newValue);
   };
 
   return (
