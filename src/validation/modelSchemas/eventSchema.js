@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import {alphanumericSchema, numericSchema, arraySchema} from '../generalSchemas'
 import messages from '../messages';
+import { modalidad } from '../enums/modalidad';
 
 const ratingSchema = yup.object().shape({
     value: numericSchema
@@ -18,7 +19,7 @@ export const eventSchema = yup.object().shape({
     
     idModalidad: yup.number().required(messages.required),
     plataformas: yup.number().when('idModalidad', {
-        is: 2 ||3,
+        is: (id) => id === modalidad.VIRTUAL || id === modalidad.HIBRIDA,
         then: () => yup.string().required(messages.required),
         otherwise: () => yup.string().notRequired(),
     }),

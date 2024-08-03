@@ -68,7 +68,7 @@ export default function RadioList({
   };
 
   return (
-    <FormControl error={Boolean(error)}>
+    <FormControl error={error}>
       <FormLabel id="demo-radio-buttons-group-label">{label}</FormLabel>
       <FormHelperText>{helperText}</FormHelperText>
 

@@ -40,15 +40,14 @@ import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
 
+import { modalidad } from "../validation/enums/modalidad.js";
+
+import ResponsiveDialog from "./Dialog.jsx";
+
+import useWindowSize from "../hooks/useWindowSize.jsx";
+
 moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
-
-const ColoredDateCellWrapper = ({ children }) =>
-  React.cloneElement(React.Children.only(children), {
-    style: {
-      backgroundColor: "lightblue",
-    },
-  });
 
 const now = new Date();
 
@@ -98,19 +97,17 @@ const CustomToolbar = (props) => {
             <Button variant="outlined" onClick={() => handleNavigate("TODAY")}>
               Hoy
             </Button>
-            <Button
-              sx={{
-                backgroundColor: "var(--main-green)",
-                display: { md: "block", xs: "none" },
-              }}
-              variant="contained"
-              onClick={
-                () => console.log(date.getMonth())
-                //showDialog("Solicitar espacio", DialogTypes.reservationForm)
-              }
-            >
-              Nueva Notificación
-            </Button>
+            <Link className="a" to={"/notificaciones"}>
+              <Button
+                sx={{
+                  backgroundColor: "var(--main-green)",
+                  display: { md: "block", xs: "none" },
+                }}
+                variant="contained"
+              >
+                Nueva Notificación
+              </Button>
+            </Link>
           </Stack>
           <Stack
             position={"absolute"}
@@ -159,41 +156,83 @@ export default function MyCalendar({
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
   const { isLoading, setIsLoading } = useIsLoading();
   const navigate = useNavigate();
-  const [openBottomDrawer, setOpenBottomDrawer] = useState(false);
-
+  const [showEventModal, setShowEventModal] = useState(false);
+  const { width } = useWindowSize();
   const [view, setView] = useState(Views.MONTH);
 
-  const { components, defaultDate, max, views } = useMemo(
-    () => ({
-      components: {
-        toolbar: (props) => CustomToolbar({ ...props }, view, setView),
-        dateCellWrapper: (props) => (
-          <TouchCellWrapper {...props} onSelectSlot={handleSelectSlot} />
-        ),
-      },
-      defaultDate: new Date(2015, 3, 1),
-      max: dates.add(dates.endOf(new Date(2015, 17, 1), "day"), -1, "hours"),
-      views: Object.keys(Views).map((k) => Views[k]),
-    }),
-    []
-  );
+  const components = {
+    toolbar: (props) => CustomToolbar({ ...props }, view, setView),
+    dateCellWrapper: (props) => (
+      <TouchCellWrapper {...props} onSelectSlot={filterEventsInDateRange} />
+    ),
+  };
 
-  const handleSelectSlot = (slotInfo) => {
-    const { start, end } = slotInfo;
-    if (start) {
-      console.log(slotInfo);
-      const eventsInRange = events.filter(
-        (event) =>
-          moment(event.start).isSameOrAfter(moment(start)) &&
-          moment(event.end).isSameOrBefore(moment(end))
-      );
-      setSelectedEvents(eventsInRange);
-      setSelectedDate(slotInfo.start);
-    } else {
-      console.log(slotInfo.slots[0]);
-      setDate(slotInfo.slots[0]);
-      setView(Views.DAY);
+  const TouchCellWrapper = ({ children, value, onSelectSlot }) =>
+    cloneElement(Children.only(children), {
+      onTouchEnd: () =>
+        onSelectSlot({
+          action: "click",
+          date: value,
+          userIsMobile: true,
+        }),
+      style: {
+        className: `${children}`,
+      },
+    });
+
+  const filterEventsInDateRange = (slotInfo) => {
+    let { start, end } = slotInfo;
+
+    if (slotInfo.userIsMobile) {
+      start = slotInfo.date;
+      end = new Date(slotInfo.date);
+      end.setDate(end.getDate() + 1);
     }
+
+    const eventsInDateRange = events.filter(
+      (event) =>
+        moment(event.start).isBetween(
+          moment(start),
+          moment(end),
+          "day",
+          "[)"
+        ) ||
+        moment(start).isBetween(
+          moment(event.start),
+          moment(event.end),
+          "day",
+          "[)"
+        )
+    );
+
+    for (let event of eventsInDateRange) {
+      if (event.mode.id !== modalidad.PRESENCIAL) {
+        continue;
+      }
+      const dateReservations = event.reservations.filter((reservation) =>
+        moment(reservation.start).isSame(start, "day")
+      );
+
+      if (dateReservations.length === 0) {
+        event.currentReservation = {
+          space: {
+            name: "?",
+          },
+          startTime: "?",
+        };
+      } else {
+        event.currentReservation = dateReservations[0];
+      }
+    }
+
+    console.log(start);
+    console.log(end);
+    console.log(eventsInDateRange);
+    console.log(events);
+    setSelectedDate(start);
+    setSelectedEvents(eventsInDateRange);
+
+    setShowEventModal(slotInfo.userIsMobile);
   };
 
   const getEvents = async () => {
@@ -201,16 +240,16 @@ export default function MyCalendar({
     const response = await GetEventsByMonth(date);
 
     const responseEvents = response.data.data;
+
     let eventsByReservation = [];
     for (const event of responseEvents) {
-      event.reservations.map((reservation) => {
-        eventsByReservation.push({
-          id: event.id,
-          title: event.name,
-          space: reservation.space,
-          start: new Date(reservation.start),
-          end: new Date(reservation.end),
-        });
+      eventsByReservation.push({
+        id: event.id,
+        title: event.name,
+        reservations: event.reservations,
+        start: event.start,
+        end: event.end,
+        mode: event.mode,
       });
     }
 
@@ -231,7 +270,7 @@ export default function MyCalendar({
         setDate(date2);
         break;
       case "DATE":
-        setView(Views.DAY);
+        //setView(Views.DAY);
         break;
       case "MONTH":
         setView(Views.MONTH);
@@ -260,48 +299,65 @@ export default function MyCalendar({
       )}`,
   };
 
-  const TouchCellWrapper = ({ children, value, onSelectSlot }) =>
-    cloneElement(Children.only(children), {
-      onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
-      style: {
-        className: `${children}`,
-      },
-    });
+  const eventList = (
+    <CalendarEventList
+      selectedEvents={selectedEvents}
+      selectedDate={selectedDate}
+      isOpen={openEventSidebar}
+    ></CalendarEventList>
+  );
 
   return (
-    <Stack
-      display={"flex"}
-      className="calendar"
-      width={"100%"}
-      height={"100%"}
-      direction={"row"}
-    >
-      <Stack style={{ height: "100%", width: "100%", flexGrow: 2 }}>
-        <Calendar
-          localizer={localizer}
-          selectable={true}
-          startAccessor="start"
-          endAccessor="end"
-          components={components}
-          onSelectSlot={handleSelectSlot}
-          date={date}
-          onView={(e) => console.log(e)}
-          view={view}
-          onNavigate={handleNavigation}
-          onSelectEvent={(e) => navigate(`/eventos/${e.id}`)}
-          defaultDate={moment()}
-          formats={formats}
-          events={events}
-          style={{ height: "100%", width: "100%", flexGrow: 2 }}
-        />
-      </Stack>
+    <>
+      <ResponsiveDialog
+        title="Eventos"
+        open={showEventModal}
+        onClose={() => setShowEventModal(false)}
+        secondaryLabel="regresar"
+        showPrimary={false}
+        responsive
+      >
+        {eventList}
+      </ResponsiveDialog>
+      <Stack
+        display={"flex"}
+        className="calendar"
+        width={"100%"}
+        height={"100%"}
+        direction={"row"}
+        gap={1}
+      >
+        <Stack style={{ flexGrow: 2 }} width={"100%"}>
+          <Calendar
+            localizer={localizer}
+            selectable={true}
+            startAccessor="start"
+            endAccessor="end"
+            components={components}
+            onSelectSlot={filterEventsInDateRange}
+            date={date}
+            onView={(e) => console.log(e)}
+            view={view}
+            onNavigate={handleNavigation}
+            onSelectEvent={(e) => navigate(`/eventos/${e.id}`)}
+            defaultDate={moment()}
+            formats={formats}
+            events={events}
+            style={{ height: "100%", width: "100%", flexGrow: 2 }}
+          />
+        </Stack>
 
-      <CalendarEventList
-        selectedEvents={selectedEvents}
-        selectedDate={selectedDate}
-        isOpen={openEventSidebar}
-      ></CalendarEventList>
-    </Stack>
+        <Stack
+          sx={{
+            display: { md: "flex", xs: "none" },
+            flexGrow: 1,
+            width: { md: "30%", xs: "100%" },
+          }}
+        >
+          {eventList}
+        </Stack>
+      </Stack>
+    </>
   );
 }
 MyCalendar.propTypes = {

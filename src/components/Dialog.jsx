@@ -45,7 +45,7 @@ export default function ResponsiveDialog({
         aria-labelledby="responsive-dialog-title"
       >
         <DialogTitle id="responsive-dialog-title">{title}</DialogTitle>
-        <DialogContent>{children}</DialogContent>
+        <DialogContent sx={{ width: "100%" }}>{children}</DialogContent>
         <DialogActions
           sx={{
             display: "flex",
