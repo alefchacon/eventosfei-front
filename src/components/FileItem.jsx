@@ -28,11 +28,32 @@ export default function FileItem({ fileObject }) {
   }
 
   return (
-    <ListItemButton divider onClick={() => downloadFile(fileObject)}>
-      <ListItem>
-        <ListItemText primary={fileObject.name}></ListItemText>
-        <DownloadIcon color="primary"></DownloadIcon>
+    <ListItemButton
+      sx={{ display: "flex" }}
+      divider
+      onClick={() => downloadFile(fileObject)}
+    >
+      <ListItem
+        sx={{
+          flex: 1,
+          width: "1px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        <p
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            margin: 0,
+          }}
+        >
+          {fileObject.name}
+        </p>
       </ListItem>
+      <DownloadIcon color="primary"></DownloadIcon>
     </ListItemButton>
   );
 }

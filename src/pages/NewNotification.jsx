@@ -877,7 +877,6 @@ function NewNotification() {
                 />
               </Stack>
             </CustomTabPanel>
-            <LoadingButton label="submit"></LoadingButton>
             {!isMobile && (
               <Stack
                 direction={"row"}
