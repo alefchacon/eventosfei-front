@@ -27,6 +27,8 @@ import { useFormik } from "formik";
 import { loginSchema } from "../validation/modelSchemas/loginSchema";
 import { LogIn } from "../api/UserService";
 
+import { useAuth } from "../providers/AuthProvider";
+
 export default function LogInPage({ onLoginIn }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -36,13 +38,11 @@ export default function LogInPage({ onLoginIn }) {
     event.preventDefault();
   };
 
+  const { logIn } = useAuth();
+
   const onSubmit = async (values, actions) => {
     try {
-      const response = await LogIn(values);
-      const authenticationOK = response.status === 200;
-      if (authenticationOK) {
-        onLoginIn(authenticationOK);
-      }
+      const response = await logIn(values);
     } catch (error) {
       console.log(error);
     }

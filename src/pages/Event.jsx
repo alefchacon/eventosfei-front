@@ -31,15 +31,16 @@ import EvaluationView from "./EvaluationView.jsx";
 
 import { useNotices } from "../providers/NoticeProvider.jsx";
 
+import { useAuth } from "../providers/AuthProvider.jsx";
+import { idRol } from "../validation/enums/idRol.js";
+
 function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
   return (
     <ListItem disableGutters>
       <Stack display={"flex"} width={maxWidth} maxWidth={maxWidth}>
         <Typography color={"text.secondary"}>{label}</Typography>
         <Stack bgcolor={"lightgray"} padding={"0.77em"} borderRadius={1}>
-          <Typography color={"text.primary"} variant="body1">
-            {value ? value : "N/A"}
-          </Typography>
+          {value ? value : "N/A"}
         </Stack>
       </Stack>
     </ListItem>
@@ -57,6 +58,8 @@ export default function Event({ setTitle, notice }) {
   let { eventId } = useParams();
 
   const { removeNotices } = useNotices();
+
+  const { user, isCoordinator } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -222,7 +225,8 @@ export default function Event({ setTitle, notice }) {
 
     setIsLoading(true);
 
-    setCronogram((await GetCronogram(FEIEvent.id)).data.data);
+    const cronogram = (await GetCronogram(FEIEvent.id)).data.data[0];
+    setCronogram(cronogram);
     setFetchedCronogram(true);
 
     setIsLoading(false);
@@ -234,32 +238,49 @@ export default function Event({ setTitle, notice }) {
 
     setIsLoading(true);
 
-    setPublicity((await GetPublicity(FEIEvent.id)).data.data);
+    const publicity = (await GetPublicity(FEIEvent.id)).data.data;
+    console.log(publicity.length);
+    setPublicity(publicity);
     setFetchedPublicity(true);
 
     setIsLoading(false);
+  }
+
+  function showEvaluation(FEIEvent) {
+    const isOrganizer = user.id === FEIEvent.user.id;
+
+    const userCanSee = isOrganizer || isCoordinator;
+
+    if (!userCanSee) {
+      return;
+    }
+
+    if (FEIEvent.hasEvaluation && userCanSee) {
+      return (
+        <EvaluationView label={"Evaluación"} evaluation={FEIEvent.evaluation} />
+      );
+    }
+
+    if (isOrganizer) {
+      return <Evaluation FEIEvent={FEIEvent} label={"Evaluación"}></Evaluation>;
+    }
   }
 
   return (
     <>
       <NotificationResponse idEvento={eventId}></NotificationResponse>
 
-      <Stack direction={"row"} padding={1} gap={2}>
-        <Button variant="outlined" onClick={getReport}>
-          Generar reporte
-        </Button>
-      </Stack>
+      {isCoordinator && (
+        <Stack direction={"row"} padding={1} gap={2}>
+          <Button variant="outlined" onClick={getReport}>
+            Generar reporte
+          </Button>
+        </Stack>
+      )}
 
       {FEIEvent && (
         <BasicTabs>
-          {FEIEvent.hasEvaluation ? (
-            <EvaluationView
-              label={"Evaluación"}
-              evaluation={FEIEvent.evaluation}
-            />
-          ) : (
-            <Evaluation FEIEvent={FEIEvent} label={"Evaluación"}></Evaluation>
-          )}
+          {showEvaluation(FEIEvent)}
           <div label="Organizador">
             <Typography variant="h5">Información del organizador</Typography>
             <InfoItem
@@ -285,18 +306,27 @@ export default function Event({ setTitle, notice }) {
               selectable={false}
             ></CheckboxList>
 
-            <Typography color="text.secondary">Audiencia(s)</Typography>
-            <ul>
-              {FEIEvent.audiences.split(";").map((audience, index) => (
-                <li key={index}>{audience}</li>
-              ))}
-            </ul>
-            <Typography color="text.secondary">Temática(s)</Typography>
-            <ul>
-              {FEIEvent.themes.split(";").map((theme, index) => (
-                <li key={index}>{theme}</li>
-              ))}
-            </ul>
+            <InfoItem
+              label={"Audiencia(s)"}
+              value={
+                <ul>
+                  {FEIEvent.audiences.split(";").map((audience, index) => (
+                    <li key={index}>{audience}</li>
+                  ))}
+                </ul>
+              }
+            ></InfoItem>
+
+            <InfoItem
+              label={"Temática(s)"}
+              value={
+                <ul>
+                  {FEIEvent.themes.split(";").map((theme, index) => (
+                    <li key={index}>{theme}</li>
+                  ))}
+                </ul>
+              }
+            ></InfoItem>
 
             <InfoItem label={"Eje"} value={FEIEvent.axi}></InfoItem>
             <InfoItem
@@ -323,12 +353,12 @@ export default function Event({ setTitle, notice }) {
             ></InfoItem>
             <Typography variant="h5">Cronograma</Typography>
 
-            {fetchedCronogram ? (
+            {fetchedCronogram && cronogram ? (
               <FileItem fileObject={cronogram} />
             ) : (
               <Stack alignItems={"center"} gap={2}>
                 <Typography color={"text.secondary"}>
-                  {fetchedCronogram && !cronogram
+                  {fetchedCronogram
                     ? "Sin cronograma"
                     : "Obteniendo cronograma..."}
                 </Typography>
@@ -380,7 +410,7 @@ export default function Event({ setTitle, notice }) {
             ></InfoItem>
             <Typography variant="h5">Publicidad</Typography>
 
-            {fetchedPublicity && publicity ? (
+            {fetchedPublicity && publicity.length > 0 ? (
               <List>
                 {publicity.map((publicity, index) => (
                   <FileItem key={index} fileObject={publicity} />
@@ -389,7 +419,7 @@ export default function Event({ setTitle, notice }) {
             ) : (
               <Stack alignItems={"center"} gap={2}>
                 <Typography color={"text.secondary"}>
-                  {fetchedPublicity && !publicity
+                  {fetchedPublicity
                     ? "Sin publicidad"
                     : "Obteniendo publicidad..."}
                 </Typography>
