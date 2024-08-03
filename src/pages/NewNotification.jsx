@@ -20,6 +20,8 @@ import FormLabel from "@mui/material/FormLabel";
 import LoadingButton from "../components/LoadingButton.jsx";
 import { Link } from "react-router-dom";
 
+import { modalidad } from "../validation/enums/modalidad.js";
+
 import ConditionalInput from "../components/ConditionalInput.jsx";
 
 import DotMobileStepper from "../components/MobileStepper.jsx";
@@ -106,6 +108,7 @@ function NewNotification() {
   const [cronograma, setCronograma] = useState(null);
   const [currentStep, setCurrentStep] = useState(numSteps - 1);
   const [showReservations, setShowReservations] = useState(false);
+  const [reservationsFetched, setReservationsFetched] = useState(false);
   const [showPlatforms, setShowPlatforms] = useState(false);
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [showComputerCenterRequirements, setShowComputerCenterRequirements] =
@@ -253,7 +256,7 @@ function NewNotification() {
 
       //DETALLES LOGISTICOS
       inicio: moment(),
-      fin: moment().add("3", "days"),
+      fin: moment(),
       numParticipantes: 10,
 
       cronograma: null,
@@ -288,22 +291,32 @@ function NewNotification() {
       idEstado: 1,
     },
 
+    validateOnChange: false,
     validationSchema: eventSchema,
     onSubmit: handleSubmitEvent,
   });
 
   useEffect(() => {
+    if (!reservationsFetched) {
+      getReservations();
+      setReservationsFetched(true);
+    }
+
+    if (reservations.length === 0) {
+      setFieldValue("idModalidad", modalidad.VIRTUAL);
+    }
+
     const _showReservations =
-      values.idModalidad === 1 || values.idModalidad === 3;
-    const _showPlatforms = values.idModalidad === 2 || values.idModalidad === 3;
+      (values.idModalidad === modalidad.PRESENCIAL ||
+        values.idModalidad === modalidad.HIBRIDA) &&
+      reservations.length > 0;
+
+    const _showPlatforms =
+      values.idModalidad === modalidad.VIRTUAL ||
+      values.idModalidad === modalidad.HIBRIDA;
+
     setShowReservations(_showReservations);
     setShowPlatforms(_showPlatforms);
-
-    const reservationsWhereFetched = reservations.length > 0;
-
-    if (_showReservations && !reservationsWhereFetched) {
-      getReservations();
-    }
   }, [values.idModalidad]);
 
   const maxRows = 4;
@@ -490,7 +503,7 @@ function NewNotification() {
                         minDate={moment()}
                         value={values.inicio}
                         label="Fecha de inicio"
-                        onChange={(date) => setFieldValue("fechaInicio", date)}
+                        onChange={(date) => setFieldValue("inicio", date)}
                       />
                     </LocalizationProvider>
                   </Stack>
@@ -500,8 +513,8 @@ function NewNotification() {
                         minDate={values.inicio}
                         value={values.fin}
                         label="Fecha de finalización"
-                        name="fechaFin"
-                        onChange={(date) => setFieldValue("fechaFin", date)}
+                        name="fin"
+                        onChange={(date) => setFieldValue("fin", date)}
                       />
                     </LocalizationProvider>
                   </Stack>
@@ -561,7 +574,7 @@ function NewNotification() {
                     </Select>
                   </FormControl>
                 )}
-                {showReservations & (reservations.length > 0) && (
+                {showReservations && (
                   <ReservationCheckboxList
                     valueName="reservaciones"
                     onClick={setFieldValue}
@@ -571,7 +584,7 @@ function NewNotification() {
                   ></ReservationCheckboxList>
                 )}
 
-                {reservations.length < 1 && (
+                {reservationsFetched && reservations.length === 0 && (
                   <FormLabel
                     sx={{ bgcolor: "#f3ecc1", padding: 2, borderRadius: 2 }}
                   >
@@ -589,7 +602,7 @@ function NewNotification() {
                     value={values.plataformas}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    label={"Plataformas virtuales donde se realizará"}
+                    label={"Plataformas virtuales donde se realizará *"}
                     maxRows={maxRows}
                     inputProps={{ maxLength: 1000 }}
                     error={Boolean(errors.plataformas) && touched.plataformas}
@@ -666,7 +679,7 @@ function NewNotification() {
                         especiales.
                       </FormLabel>
                       <TextField
-                        name="requisitosCentroComputo"
+                        name="presidium"
                         value={values.presidium}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -683,7 +696,7 @@ function NewNotification() {
                         personificadores, banderas, entre otros)
                       </FormLabel>
                       <TextField
-                        name="requisitosCentroComputo"
+                        name="decoracion"
                         value={values.decoracion}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -824,26 +837,8 @@ function NewNotification() {
                   }
                 />
 
-                {/*
-                <BooleanRadio
-                  label="¿Se requiere autorización para que público externo ingrese al estacionamiento durante el evento? *"
-                  name="requiereEstacionamiento"
-                  value={values.requiereEstacionamiento}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={
-                    Boolean(errors.requiereEstacionamiento) &&
-                    touched.requiereEstacionamiento
-                  }
-                  helperText={
-                    touched.requiereEstacionamiento &&
-                    errors.requiereEstacionamiento
-                  }
-                />
-                    */}
-
                 <FormControl>
-                  <FormLabel required>
+                  <FormLabel>
                     Proporcione el grado y nombres de los ponentes u
                     organizadores, especificando su rol.
                   </FormLabel>
