@@ -11,7 +11,7 @@ import LoadingButton from "../components/LoadingButton.jsx";
 import ToggleButton from "../components/ToggleButton.jsx";
 
 import {
-  UpdateReservation,
+  RespondToReservation,
   AddReservation,
 } from "../api/ReservationService.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
@@ -43,7 +43,7 @@ export default function ReservationResponse({
         idEstado: values.statusId,
       };
 
-      const response = await UpdateReservation(request);
+      const response = await RespondToReservation(request);
       showSnackbar(response.data.message);
     } catch (error) {
       showSnackbar(error.message);
