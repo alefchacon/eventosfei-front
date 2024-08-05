@@ -42,10 +42,10 @@ export const GetEventById = async (id) => {
   return response;
 };
 
-export const RespondToEvent = async (event, id) => {
+export const RespondToEvent = async (notification, id) => {
   const data = {
-    respuesta: event.response,
-    idEstado: event.idEstado,
+    respuesta: notification.response,
+    idEstado: notification.idEstado,
   };
   const response = await client.put(urlEventById(id), data);
   return response;

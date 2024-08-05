@@ -47,7 +47,7 @@ export const AddReservation = async (reservation) => {
   return response;
 };
 
-export const UpdateReservation = async (reservation) => {
+export const RespondToReservation = async (reservation) => {
   const request = {
     id: reservation.id,
     respuesta: reservation.response,

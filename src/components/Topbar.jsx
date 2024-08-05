@@ -11,6 +11,10 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Badge from "@mui/material/Badge";
 import { ListItemButton } from "@mui/material";
+import { useIsLoading } from "../providers/LoadingProvider";
+import LinearProgress from "@mui/material/LinearProgress";
+import { useNavigate } from "react-router-dom";
+
 export default function Topbar({
   noticeAmount = 0,
   user = {
@@ -20,6 +24,9 @@ export default function Topbar({
   onLogOutClick,
   onMenuIconClick,
 }) {
+  const { isLoading } = useIsLoading();
+  const navigate = useNavigate();
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -65,7 +72,7 @@ export default function Topbar({
   );
 
   return (
-    <Stack direction={"column"} width={"100%"}>
+    <Stack direction={"column"} width={"100%"} padding={0}>
       <AppBar
         position="relative"
         variant="outlined"
@@ -136,6 +143,12 @@ export default function Topbar({
           </Stack>
         </Toolbar>
       </AppBar>
+      {isLoading ? (
+        <LinearProgress sx={{ height: "5px" }}></LinearProgress>
+      ) : (
+        <Stack sx={{ height: "5px", bgcolor: "white", width: "100%" }}>f</Stack>
+      )}
+
       {renderMenu}
     </Stack>
   );

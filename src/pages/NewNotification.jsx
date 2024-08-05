@@ -47,6 +47,8 @@ import Typography from "@mui/material/Typography";
 import moment from "moment";
 import { eventSchema } from "../validation/modelSchemas/eventSchema.js";
 
+import DialogContent from "@mui/material/DialogContent";
+
 function BooleanRadio({
   label = "Pregunta",
   name = "name",
@@ -332,7 +334,9 @@ function NewNotification() {
         open={showReservationModal}
         oneTimeOnly
       >
-        <DialogContentText>{noReservationMessage}</DialogContentText>
+        <DialogContent>
+          <DialogContentText>{noReservationMessage}</DialogContentText>
+        </DialogContent>
       </ResponsiveDialog>
       <ResponsiveDialog
         title="Notificación enviada"

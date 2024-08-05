@@ -22,7 +22,8 @@ import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
 import Evaluation from "../pages/Evaluation";
 import EventResponseMobile from "../components/EventResponseMobile.jsx";
-import NotificationResponse from "../components/NotificationResponse.jsx";
+import NotificationResponse from "../components/NotificationResponseRedux.jsx";
+import DialogContentText from "@mui/material/DialogContentText";
 
 import BasicTabs from "../components/Tabs.jsx";
 
@@ -33,19 +34,12 @@ import { useNotices } from "../providers/NoticeProvider.jsx";
 
 import { useAuth } from "../providers/AuthProvider.jsx";
 import { idRol } from "../validation/enums/idRol.js";
+import { estado } from "../validation/enums/estado.js";
+import { stringConstants } from "../validation/enums/stringConstants.js";
 
-function InfoItem({ label = "label", value = "N/A", maxWidth = "auto" }) {
-  return (
-    <ListItem disableGutters>
-      <Stack display={"flex"} width={maxWidth} maxWidth={maxWidth}>
-        <Typography color={"text.secondary"}>{label}</Typography>
-        <Stack bgcolor={"lightgray"} padding={"0.77em"} borderRadius={1}>
-          {value ? value : "N/A"}
-        </Stack>
-      </Stack>
-    </ListItem>
-  );
-}
+import ResponsiveDialog from "../components/Dialog.jsx";
+
+import InfoItem from "../components/InfoItem.jsx";
 
 export default function Event({ setTitle, notice }) {
   const [FEIEvent, setEvent] = useState(null);
@@ -53,13 +47,15 @@ export default function Event({ setTitle, notice }) {
   const [publicity, setPublicity] = useState([]);
   const [fetchedCronogram, setFetchedCronogram] = useState(false);
   const [fetchedPublicity, setFetchedPublicity] = useState(false);
+  const [showResponseModal, setShowResponseModal] = useState(false);
+
   const { isLoading, setIsLoading } = useIsLoading();
 
   let { eventId } = useParams();
 
   const { removeNotices } = useNotices();
 
-  const { user, isCoordinator } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -246,16 +242,19 @@ export default function Event({ setTitle, notice }) {
     setIsLoading(false);
   }
 
+  const isCoordinator = user.rol.id === idRol.COORDINADOR;
+
   function showEvaluation(FEIEvent) {
     const isOrganizer = user.id === FEIEvent.user.id;
 
-    const userCanSee = isOrganizer || isCoordinator;
+    const canShow =
+      (isOrganizer || isCoordinator) && FEIEvent.idEstado === estado.ACEPTADO;
 
-    if (!userCanSee) {
+    if (!canShow) {
       return;
     }
 
-    if (FEIEvent.hasEvaluation && userCanSee) {
+    if (FEIEvent.hasEvaluation && canShow) {
       return (
         <EvaluationView label={"Evaluación"} evaluation={FEIEvent.evaluation} />
       );
@@ -266,9 +265,59 @@ export default function Event({ setTitle, notice }) {
     }
   }
 
+  function SimpleResponseTab() {
+    return (
+      <>
+        <Typography variant="h5">Respuesta</Typography>
+
+        <InfoItem label={"Estado"} value={FEIEvent.status.name}></InfoItem>
+        <InfoItem label={"Observaciones"} value={FEIEvent.response}></InfoItem>
+      </>
+    );
+  }
+
+  function showResponse(FEIEvent) {
+    const canShow = user.id === FEIEvent.user.id || isCoordinator;
+
+    if (!canShow) {
+      return;
+    }
+
+    if (
+      FEIEvent.response === stringConstants.EMPTY_COLUM &&
+      FEIEvent.status.id === estado.NUEVO
+    ) {
+      FEIEvent.response =
+        "El evento aún no ha sido revisado por la Coordinación de Eventos";
+    }
+
+    if (!isCoordinator) {
+      return <SimpleResponseTab label={"Respuesta"} />;
+    }
+
+    return (
+      <Stack label="Responder">
+        <Typography variant="h5">Responder notificación</Typography>
+        <NotificationResponse
+          idEvento={eventId}
+          notification={FEIEvent}
+          type="event"
+        ></NotificationResponse>
+      </Stack>
+    );
+  }
+
   return (
     <>
-      <NotificationResponse idEvento={eventId}></NotificationResponse>
+      <ResponsiveDialog
+        open={showResponseModal}
+        onClose={() => setShowResponseModal(!showResponseModal)}
+        title="Responder notificación"
+        responsive
+        isForm={true}
+      >
+        <NotificationResponse idEvento={eventId}></NotificationResponse>
+      </ResponsiveDialog>
 
       {isCoordinator && (
         <Stack direction={"row"} padding={1} gap={2}>
@@ -281,6 +330,8 @@ export default function Event({ setTitle, notice }) {
       {FEIEvent && (
         <BasicTabs>
           {showEvaluation(FEIEvent)}
+          {showResponse(FEIEvent)}
+
           <div label="Organizador">
             <Typography variant="h5">Información del organizador</Typography>
             <InfoItem

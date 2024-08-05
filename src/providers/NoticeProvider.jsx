@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import { GetNotices, MarkAsUserRead } from "../api/NoticeService";
 import { idRol } from "../validation/enums/idRol";
 
+import { useAuth } from "./AuthProvider";
+
 const NoticesContext = createContext(null);
 
 export function useNotices() {
@@ -19,26 +21,34 @@ export function NoticeProvider({ children }) {
 
   const [currentIdRol, setIdRol] = useState(idRol.ORGANIZADOR);
   const [idUsuario, setIdUsuario] = useState(1);
-  const [isStaff, setIsStaff] = useState(currentIdRol > idRol.ORGANIZADOR);
+  const [isStaff, setIsStaff] = useState();
 
   const { isLoading, setIsLoading } = useIsLoading();
+
+  const { isCoordinator, isAdministrator, isOrganizer, user } = useAuth();
 
   const getNotices = async (page = 1) => {
     setIsLoading(true);
 
+    setIsStaff(user.id > idRol.COORDINADOR);
+
     let filters = [];
-    if (currentIdRol === idRol.ORGANIZADOR) {
-      filters.push(`idUsuario=${idUsuario}`);
+    if (user.rol.id === idRol.ORGANIZADOR) {
+      filters.push(`idUsuario=${user.id}`);
     }
-    if (currentIdRol === idRol.ADMINISTRADOR_ESPACIOS) {
+    if (user.rol.id === idRol.ADMINISTRADOR_ESPACIOS) {
       filters.push(`vista=admin`);
     }
-    if (currentIdRol === idRol.COORDINADOR) {
+    if (user.rol.id === idRol.COORDINADOR) {
       filters.push(`vista=coord`);
     }
     filters.push(`page=${page}`);
 
+    console.log(filters);
+
     const response = await GetNotices(filters);
+
+    console.log(response.data.data);
 
     const noticeData = response.data.data;
     setNotices(noticeData.data);

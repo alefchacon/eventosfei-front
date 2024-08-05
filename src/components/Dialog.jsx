@@ -43,30 +43,34 @@ export default function ResponsiveDialog({
         fullScreen={fullScreen}
         open={open && !dismissed}
         aria-labelledby="responsive-dialog-title"
+        fullWidth
       >
         <DialogTitle id="responsive-dialog-title">{title}</DialogTitle>
-        <DialogContent sx={{ width: "100%" }}>{children}</DialogContent>
-        <DialogActions
-          sx={{
-            display: "flex",
-            flexDirection: {
-              md: "row",
-              xs: "column-reverse",
-            },
-            gap: 2,
-          }}
-        >
-          {showSecondary && (
-            <Button autoFocus onClick={handleClose}>
-              {secondaryLabel}
-            </Button>
-          )}
-          {showPrimary && (
-            <Button variant="contained" onClick={onPrimaryClick} autoFocus>
-              {primaryLabel}
-            </Button>
-          )}
-        </DialogActions>
+
+        <Stack>
+          {children}
+          <DialogActions
+            sx={{
+              display: "flex",
+              flexDirection: {
+                md: "row",
+                xs: "column-reverse",
+              },
+              gap: 2,
+            }}
+          >
+            {showSecondary && (
+              <Button autoFocus onClick={handleClose}>
+                {secondaryLabel}
+              </Button>
+            )}
+            {showPrimary && (
+              <Button variant="contained" onClick={onPrimaryClick} autoFocus>
+                {primaryLabel}
+              </Button>
+            )}
+          </DialogActions>
+        </Stack>
       </Dialog>
     </>
   );
