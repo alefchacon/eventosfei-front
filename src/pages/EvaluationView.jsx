@@ -10,11 +10,11 @@ import { GetEvidences } from "../api/EvidenceService";
 
 import { useNotices } from "../providers/NoticeProvider";
 
-export default function EvaluationView({ evaluation }) {
+export default function EvaluationView({ evaluation, idAviso }) {
   //
   const [evidences, setEvidencies] = useState([]);
 
-  const { removeNoticeEvent } = useNotices();
+  const { markAsRead } = useNotices();
 
   useEffect(() => {
     const fetchEvidence = async () => {
@@ -22,9 +22,8 @@ export default function EvaluationView({ evaluation }) {
       setEvidencies(response.data.data);
     };
 
+    markAsRead(idAviso);
     fetchEvidence();
-
-    removeNoticeEvent(evaluation.idEvento);
   }, []);
 
   function wrapCell(content = "sin contenido") {

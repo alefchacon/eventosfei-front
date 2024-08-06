@@ -10,43 +10,19 @@ import { Container } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import moment from "moment";
-import { useDialog } from "../providers/DialogProvider.jsx";
 import DialogTypes from "../providers/DialogTypes";
 
 import { Link } from "react-router-dom";
 
 function CustomCardActions({ isEvaluated, reservation, adminView = true }) {
-  const { showDialog } = useDialog();
   return (
     <>
       {adminView ? (
-        <Button
-          size="medium"
-          onClick={() =>
-            showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
-            )
-          }
-          disabled={isEvaluated}
-        >
+        <Button size="medium" disabled={isEvaluated}>
           Responder
         </Button>
       ) : (
-        <Button
-          size="medium"
-          onClick={() =>
-            showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
-            )
-          }
-          disabled={isEvaluated}
-        >
+        <Button size="medium" disabled={isEvaluated}>
           Ver respuesta
         </Button>
       )}
@@ -63,7 +39,7 @@ function Organizer({ user }) {
   );
 }
 
-export default function ReservationCard({
+export default function CardReservation({
   item = {
     space: {
       name: "space name",
@@ -77,16 +53,6 @@ export default function ReservationCard({
   showActions = false,
   elevated = true,
 }) {
-  const [isEvaluated, setIsEvaluated] = useState(false);
-
-  function handle() {
-    console.log();
-    //parentHandle(props)
-  }
-  const handleClick = () => {
-    console.info("You clicked the Chip.");
-  };
-
   const getColor = () => {
     if (adminView) {
       return item.notifyAdministrator ? "success" : "default";
@@ -123,32 +89,19 @@ export default function ReservationCard({
           <Typography variant="h6" component="div" gutterBottom>
             {item.space.name}{" "}
           </Typography>
-
-          {item.status && showActions && (
-            <Chip
-              onClick={handleClick}
-              color={getColor()}
-              label={item.status.name}
-            />
-          )}
         </Stack>
-        <Typography variant="body1" color={"text.secondary"}>
+        <Typography variant="body2" color={"text.secondary"}>
           {moment(item.start).format("dddd, MMMM Do YYYY")}
         </Typography>
-        <Typography gutterBottom color={"text.secondary"}>{`${moment(
-          item.start
-        ).format("HH:mm")} - ${moment(item.end).format("HH:mm")}`}</Typography>
+        <Typography
+          gutterBottom
+          variant="body2"
+          color={"text.secondary"}
+        >{`${moment(item.start).format("HH:mm")} - ${moment(item.end).format(
+          "HH:mm"
+        )}`}</Typography>
+        <Organizer user={item.user}></Organizer>
       </CardContent>
-      {showActions && (
-        <CardActions
-          sx={{ display: "flex", justifyContent: "flex-end", padding: 0 }}
-        >
-          <CustomCardActions
-            adminView={adminView}
-            reservation={item}
-          ></CustomCardActions>
-        </CardActions>
-      )}
     </Card>
   );
 }

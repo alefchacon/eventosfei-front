@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
-import ReservationCard from "./ReservationCard";
+import CardReservation from "./CardReservation";
 
 export default function CheckboxList({
   valueName = "",
@@ -121,11 +121,11 @@ export default function CheckboxList({
                     ) : (
                       <div></div>
                     )}
-                    <ReservationCard
+                    <CardReservation
                       elevated={false}
                       item={item}
                       adminView={false}
-                    ></ReservationCard>
+                    ></CardReservation>
                   </Stack>
                 </ListItemButton>
               </ListItem>

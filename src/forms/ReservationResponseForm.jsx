@@ -3,15 +3,22 @@ import { Typography, Stack } from "@mui/material";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import { useFormik } from "formik";
 import moment from "moment";
 
 import LoadingButton from "../components/LoadingButton.jsx";
-import ToggleButton from "../components/ToggleButton.jsx";
+import ToggleButton from "@mui/material/ToggleButton";
+import { responseSchema } from "../validation/modelSchemas/responseSchema.js";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+
+import FormActions from "./FormActions.jsx";
 
 import {
-  RespondToReservation,
+  UpdateReservation,
   AddReservation,
 } from "../api/ReservationService.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
@@ -43,7 +50,7 @@ export default function ReservationResponse({
         idEstado: values.statusId,
       };
 
-      const response = await RespondToReservation(request);
+      const response = await UpdateReservation(request);
       showSnackbar(response.data.message);
     } catch (error) {
       showSnackbar(error.message);
@@ -52,16 +59,20 @@ export default function ReservationResponse({
 
   const {
     values,
+    errors,
+    touched,
     handleBlur,
     handleChange,
     handleSubmit,
     isSubmitting,
     setFieldValue,
+    setFieldTouched,
   } = useFormik({
     initialValues: {
-      statusId: 4,
-      response: "",
+      idEstado: "",
+      notes: "",
     },
+    validationSchema: responseSchema,
     onSubmit: submitResponse,
   });
 
@@ -76,6 +87,7 @@ export default function ReservationResponse({
         <Stack
           direction={{ xs: "column-reverse", md: "column" }}
           height={"100%"}
+          padding={0}
         >
           <div>
             {reservation !== null && (
@@ -98,11 +110,34 @@ export default function ReservationResponse({
             <Stack direction={"column"} spacing={2} paddingTop={2}>
               <Divider></Divider>
 
-              <ToggleButton
-                options={reservationStatus}
-                value={values.statusId}
-                onChange={handleStatusIdChange}
-              ></ToggleButton>
+              <FormControl error={Boolean(errors.idEstado) && touched.idEstado}>
+                <FormLabel>Estado de la notificación</FormLabel>
+                <ToggleButtonGroup
+                  id="idEstado"
+                  onChange={(e, newIdEstado) =>
+                    setFieldValue("idEstado", newIdEstado)
+                  }
+                  onBlur={() => setFieldTouched("idEstado", true)}
+                  name="idEstado"
+                  color="primary"
+                  exclusive
+                  aria-label="Platform"
+                  sx={{
+                    display: "flex",
+                  }}
+                  value={values.idEstado}
+                >
+                  <ToggleButton value={4} sx={{ flexGrow: 1 }}>
+                    {"Rechazada"}
+                  </ToggleButton>
+                  <ToggleButton value={2} sx={{ flexGrow: 1 }}>
+                    {"Aceptada"}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <Typography variant="caption" color={"error"} paddingLeft={2}>
+                  {touched.idEstado && errors.idEstado}
+                </Typography>
+              </FormControl>
 
               <TextField
                 id="response"
@@ -122,20 +157,6 @@ export default function ReservationResponse({
               ></TextField>
             </Stack>
           </div>
-
-          <Stack
-            direction={"row"}
-            spacing={3}
-            justifyContent={{ xs: "space-between", md: "end" }}
-          >
-            <Button autoFocus onClick={onCancel} disabled={isSubmitting}>
-              {"Cancelar"}
-            </Button>
-            <LoadingButton
-              label="Responder"
-              isLoading={isSubmitting}
-            ></LoadingButton>
-          </Stack>
         </Stack>
       </form>
     </>

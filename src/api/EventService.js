@@ -4,7 +4,8 @@ import {
   urlEventById, 
   urlEventsByMonth, 
   urlUserEvents, 
-  urlNewEvents 
+  urlNewEvents, 
+  urlResponses
 } from "./urls.js";
 import { client } from "./Client.js";
 import moment from "moment";
@@ -24,9 +25,9 @@ export const GetEventsByMonth = async (date) => {
 };
 
 export const GetEvents = async (filters = [""]) => {
-  let url = urlEvents
+  let url = urlEvents.concat("?")
   filters.forEach(filter => {
-    url = url.concat("&", filter)
+    url = url.concat(filter, "&")
   })
   const response = await client.get(url);
   return response;
@@ -42,19 +43,36 @@ export const GetEventById = async (id) => {
   return response;
 };
 
-export const RespondToEvent = async (notification, id) => {
+export const Respond = async (notification, id) => {
   const data = {
-    respuesta: notification.response,
+    id: id,
+    observaciones: notification.response,
     idEstado: notification.idEstado,
+    vistoStaff: notification.vistoStaff,
+    vistoOrganizador: notification.vistoOrganizador,
   };
-  const response = await client.put(urlEventById(id), data);
+  console.log(data);
+  const response = await client.put(urlResponses.concat(id), data);
   return response;
 };
+
 
 export const GetNotifications = async () => {
   const response = await client.get(urlNotifications);
   return response;
 };
+
+export const UpdateEvent = async (notificationResponse, idAviso) => {
+  const body = {
+    model: {
+      id: notificationResponse.id,
+      idEstado: notificationResponse.idEstado,
+      observaciones: notificationResponse.notes, 
+    },
+    idAviso: idAviso
+  }
+  return await client.put(urlEvents.concat(`/${notificationResponse.id}`), body);
+} 
 
 export const GetNewEvents = async (filters = [""]) => {
   let url = urlNewEvents

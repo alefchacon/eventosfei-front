@@ -25,9 +25,6 @@ export const LogIn = async (credentials) => {
 
   const response = await axios.post("http://localhost:8000/api/login",requestData);
   
-  const token = response.data.token;
-  client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
   /*
   localStorage.setItem("user", JSON.stringify(response.data.user));
   console.log(JSON.parse(localStorage.getItem("user")))
@@ -36,11 +33,7 @@ export const LogIn = async (credentials) => {
 };
   
 export const LogOut = async () => {
-  const token = client.defaults.headers.common['Authorization'];
   const response = await client.post("http://localhost:8000/api/logout")
-  if (response.status === 200 ) {
-    delete client.defaults.headers.common['Authorization'];
-  }
   return response;
 }
 

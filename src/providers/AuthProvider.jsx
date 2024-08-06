@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogIn, LogOut } from "../api/UserService";
 import { idRol } from "../validation/enums/idRol";
+import { client } from "../api/Client";
 
 const AuthContext = createContext();
 
@@ -13,17 +14,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
-  const [isCoordinator, setIsCoordinator] = useState(false);
-  const [isAdministrator, setIsAdministrator] = useState(false);
-  const [isOrganizer, setIsOrganizer] = useState(false);
+
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(user.rol.id === idRol.ADMINISTRADOR_ESPACIOS);
-    setIsOrganizer(user.rol.id === idRol.ORGANIZADOR);
-    setIsAdministrator(user.rol.id === idRol.ADMINISTRADOR_ESPACIOS);
-    setIsCoordinator(user.rol.id === idRol.COORDINADOR);
+    client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }, []);
 
   const logIn = async (credentials) => {
@@ -38,13 +34,10 @@ export function AuthProvider({ children }) {
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
 
-      setIsOrganizer(user.rol.id === idRol.ORGANIZADOR);
-      setIsAdministrator(user.rol.id === idRol.ADMINISTRADOR_ESPACIOS);
-      setIsCoordinator(user.rol.id === idRol.COORDINADOR);
-
       const token = response.data.token;
       localStorage.setItem("site", token);
       setToken(token);
+      client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       navigate("/calendario");
     } catch (error) {
@@ -53,11 +46,12 @@ export function AuthProvider({ children }) {
   };
 
   const logOut = async () => {
-    LogOut();
     setUser(null);
+    client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    LogOut();
     localStorage.removeItem("site");
     setToken("");
-
+    delete client.defaults.headers.common["Authorization"];
     navigate("/");
   };
 
