@@ -51,7 +51,7 @@ export default function Event({ setTitle, notice }) {
 
   const { isLoading, setIsLoading } = useIsLoading();
 
-  let { eventId } = useParams();
+  let { idEvento, idAviso } = useParams();
 
   const { removeNotices } = useNotices();
 
@@ -60,7 +60,7 @@ export default function Event({ setTitle, notice }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await GetEventById(eventId);
+        const response = await GetEventById(idEvento);
 
         if (!response.status === 200) {
           throw new Error("Network response was not ok");
@@ -235,7 +235,6 @@ export default function Event({ setTitle, notice }) {
     setIsLoading(true);
 
     const publicity = (await GetPublicity(FEIEvent.id)).data.data;
-    console.log(publicity.length);
     setPublicity(publicity);
     setFetchedPublicity(true);
 
@@ -247,8 +246,7 @@ export default function Event({ setTitle, notice }) {
   function showEvaluation(FEIEvent) {
     const isOrganizer = user.id === FEIEvent.user.id;
 
-    const canShow =
-      (isOrganizer || isCoordinator) && FEIEvent.idEstado === estado.ACEPTADO;
+    const canShow = isOrganizer || isCoordinator;
 
     if (!canShow) {
       return;
@@ -256,7 +254,11 @@ export default function Event({ setTitle, notice }) {
 
     if (FEIEvent.hasEvaluation && canShow) {
       return (
-        <EvaluationView label={"Evaluación"} evaluation={FEIEvent.evaluation} />
+        <EvaluationView
+          label={"Evaluación"}
+          evaluation={FEIEvent.evaluation}
+          idAviso={idAviso}
+        />
       );
     }
 
@@ -271,7 +273,7 @@ export default function Event({ setTitle, notice }) {
         <Typography variant="h5">Respuesta</Typography>
 
         <InfoItem label={"Estado"} value={FEIEvent.status.name}></InfoItem>
-        <InfoItem label={"Observaciones"} value={FEIEvent.response}></InfoItem>
+        <InfoItem label={"Observaciones"} value={FEIEvent.notes}></InfoItem>
       </>
     );
   }
@@ -284,10 +286,10 @@ export default function Event({ setTitle, notice }) {
     }
 
     if (
-      FEIEvent.response === stringConstants.EMPTY_COLUM &&
+      FEIEvent.notes === stringConstants.EMPTY_COLUM &&
       FEIEvent.status.id === estado.NUEVO
     ) {
-      FEIEvent.response =
+      FEIEvent.notes =
         "El evento aún no ha sido revisado por la Coordinación de Eventos";
     }
 
@@ -299,8 +301,8 @@ export default function Event({ setTitle, notice }) {
       <Stack label="Responder">
         <Typography variant="h5">Responder notificación</Typography>
         <NotificationResponse
-          idEvento={eventId}
           notification={FEIEvent}
+          idAviso={idAviso}
           type="event"
         ></NotificationResponse>
       </Stack>
@@ -309,16 +311,6 @@ export default function Event({ setTitle, notice }) {
 
   return (
     <>
-      <ResponsiveDialog
-        open={showResponseModal}
-        onClose={() => setShowResponseModal(!showResponseModal)}
-        title="Responder notificación"
-        responsive
-        isForm={true}
-      >
-        <NotificationResponse idEvento={eventId}></NotificationResponse>
-      </ResponsiveDialog>
-
       {isCoordinator && (
         <Stack direction={"row"} padding={1} gap={2}>
           <Button variant="outlined" onClick={getReport}>

@@ -7,9 +7,14 @@ import { responseSchema } from "../validation/modelSchemas/responseSchema.js";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
-import { RespondToEvent } from "../api/EventService.js";
+import { UpdateEvent } from "../api/EventService.js";
+import { UpdateReservation } from "../api/ReservationService.js";
 
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
+
+import FormActions from "../forms/FormActions.jsx";
+
+import { useNotices } from "../providers/NoticeProvider.jsx";
 
 import {
   Stack,
@@ -27,21 +32,34 @@ import LoadingButton from "./LoadingButton.jsx";
 import "../App.css";
 
 export default function NotificationResponse({
-  idEvento,
+  children,
+  idAviso,
+  type,
+  onClose = null,
   // Esta sería o un Evento, o una Reservación/Solicitud de espacio
-  notification = { id: 0 },
-  type = "event",
+  notification,
 }) {
   const { showSnackbar } = useSnackbar();
+  const { decreaseNotices } = useNotices();
 
   const submitResponse = async (values) => {
+    console.log(notification);
     try {
-      const response = await RespondToEvent(values, idEvento);
+      values.id = notification.id;
+      const response = await chooseSubmitType();
       showSnackbar(response.data.message);
+      decreaseNotices(idAviso);
     } catch (e) {
-      showSnackbar("Algo salió mal");
+      showSnackbar(e.message);
     }
   };
+
+  async function chooseSubmitType() {
+    if (type === "event") {
+      return await UpdateEvent(values, idAviso);
+    }
+    return await UpdateReservation(values, idAviso);
+  }
 
   const {
     values,
@@ -56,7 +74,7 @@ export default function NotificationResponse({
   } = useFormik({
     initialValues: {
       idEstado: "",
-      response: "",
+      notes: "",
     },
     validationSchema: responseSchema,
     onSubmit: submitResponse,
@@ -64,62 +82,58 @@ export default function NotificationResponse({
 
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
-      <Stack gap={3}>
-        <FormControl error={Boolean(errors.idEstado) && touched.idEstado}>
-          <FormLabel>Estado de la notificación</FormLabel>
-          <ToggleButtonGroup
-            id="idEstado"
-            onChange={(e, newIdEstado) =>
-              setFieldValue("idEstado", newIdEstado)
+      <Stack gap={0} direction={{ xs: "column-reverse", md: "column" }}>
+        <Stack gap={3} padding={2} id="form-content">
+          {children}
+          <FormControl error={Boolean(errors.idEstado) && touched.idEstado}>
+            <FormLabel>Estado de la notificación</FormLabel>
+            <ToggleButtonGroup
+              id="idEstado"
+              onChange={(e, newIdEstado) =>
+                setFieldValue("idEstado", newIdEstado)
+              }
+              onBlur={() => setFieldTouched("idEstado", true)}
+              name="idEstado"
+              color="primary"
+              exclusive
+              aria-label="Platform"
+              sx={{
+                display: "flex",
+              }}
+              value={values.idEstado}
+            >
+              <ToggleButton value={4} sx={{ flexGrow: 1 }}>
+                {"Rechazada"}
+              </ToggleButton>
+              <ToggleButton value={2} sx={{ flexGrow: 1 }}>
+                {"Aceptada"}
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Typography variant="caption" color={"error"} paddingLeft={2}>
+              {touched.idEstado && errors.idEstado}
+            </Typography>
+          </FormControl>
+
+          <TextField
+            id="notes"
+            name="notes"
+            variant="outlined"
+            label="Observaciones"
+            fullWidth
+            multiline
+            rows={5}
+            onChange={handleChange}
+            disabled={isSubmitting}
+            value={values.response}
+            onBlur={handleBlur}
+            error={Boolean(errors.notes) && touched.notes}
+            helperText={
+              touched.notes && Boolean(errors.notes) ? errors.notes : " "
             }
-            onBlur={() => setFieldTouched("idEstado", true)}
-            name="idEstado"
-            color="primary"
-            exclusive
-            aria-label="Platform"
-            sx={{
-              display: "flex",
-            }}
-            value={values.idEstado}
-          >
-            <ToggleButton value={4} sx={{ flexGrow: 1 }}>
-              {"Rechazada"}
-            </ToggleButton>
-            <ToggleButton value={2} sx={{ flexGrow: 1 }}>
-              {"Aceptada"}
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <Typography variant="caption" color={"error"} paddingLeft={2}>
-            {touched.idEstado && errors.idEstado}
-          </Typography>
-        </FormControl>
-
-        <TextField
-          id="response"
-          name="response"
-          variant="outlined"
-          label="Observaciones"
-          fullWidth
-          multiline
-          rows={5}
-          onChange={handleChange}
-          disabled={isSubmitting}
-          value={values.response}
-          onBlur={handleBlur}
-          error={Boolean(errors.response) && touched.response}
-          helperText={
-            touched.response && Boolean(errors.response) ? errors.response : " "
-          }
-        ></TextField>
-
-        <Stack direction={"row"} paddingRight={2} justifyContent={"end"}>
-          <div></div>
-          <LoadingButton
-            label="Responder"
-            isLoading={isSubmitting}
-            endIcon={<SendIcon />}
-          ></LoadingButton>
+          ></TextField>
         </Stack>
+
+        <FormActions onSubmit={isSubmitting} onClose={onClose}></FormActions>
       </Stack>
     </form>
   );

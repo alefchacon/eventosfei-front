@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import Card from "../components/Card.jsx";
-import ReservationCard from "../components/ReservationCard.jsx";
+import CardReservation from "../components/CardReservation.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
 import {
@@ -289,7 +289,7 @@ export default function ReservationList(
       )}
       <Stack spacing={{ md: 1 }} margin={{ md: 1 }}>
         {queriedEvents.map((item) => (
-          <ReservationCard item={item} adminView={idUsuario === 0} />
+          <CardReservation item={item} adminView={idUsuario === 0} />
         ))}
       </Stack>
       {!isLoading && (

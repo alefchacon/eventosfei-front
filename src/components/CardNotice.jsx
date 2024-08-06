@@ -14,11 +14,23 @@ import { useDialog } from "../providers/DialogProvider.jsx";
 import DialogTypes from "../providers/DialogTypes";
 import CircleIcon from "@mui/icons-material/Circle";
 
+import ReservationResponse from "../forms/ReservationResponseForm.jsx";
+
+import ResponsiveDialog from "./Dialog.jsx";
+
 import { estado } from "../validation/enums/estado.js";
 
-import Divider from "@mui/material/Divider";
+import { useAuth } from "../providers/AuthProvider.jsx";
 
-const bull = (
+import Divider from "@mui/material/Divider";
+import { idRol } from "../validation/enums/idRol.js";
+
+import NotificationResponse from "./NotificationResponseRedux.jsx";
+import FormActions from "../forms/FormActions.jsx";
+
+import { useNavigate } from "react-router-dom";
+
+const dot = (
   <Box
     component="span"
     sx={{
@@ -33,112 +45,131 @@ const bull = (
   </Box>
 );
 
-function CustomCardActions({ isEvaluated, reservation, adminView = true }) {
-  const { showDialog } = useDialog();
-  return (
-    <>
-      {adminView ? (
-        <Button
-          size="medium"
-          onClick={() =>
-            showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
-            )
-          }
-          disabled={isEvaluated}
-        >
-          Responder
-        </Button>
-      ) : (
-        <Button
-          size="medium"
-          onClick={() =>
-            showDialog(
-              "Responder reservación",
-              DialogTypes.reservationResponse,
-              console.log(""),
-              reservation
-            )
-          }
-          disabled={isEvaluated}
-        >
-          Ver respuesta
-        </Button>
-      )}
-    </>
-  );
-}
-
 export default function CardNotice({
   item = {},
+  type = "event",
   isStaff = false,
   event = true,
   children,
   onClick,
 }) {
-  const eventMessages = {
-    1: "Nueva notificación",
-    2: "Su evento ha sido programado",
-    3: "Evento evaluado",
-    4: "Su evento fue rechazado",
+  const [showModal, setShowModal] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const reservationOrganizerMessageTemplate =
+    "Su solicitud de reservación fue ";
+  const eventOrganizerMessageTemplate = "Su evento fue ";
+
+  const getEventRelatedMessage = (idEstado) => {
+    switch (idEstado) {
+      case 2:
+        return eventOrganizerMessageTemplate.concat("aceptado");
+      case 3:
+        return "Evento evaluado";
+      case 4:
+        return eventOrganizerMessageTemplate.concat("rechazado");
+      default:
+        return "Nueva notificación";
+    }
   };
-  const reservationMessages = {
-    1: "Nueva reservación",
-    2: "Su reservación fue aceptada",
-    3: "Evento evaluado",
-    4: "Su reservación fue rechazada",
+  const getReservationRelatedMessage = (idEstado) => {
+    switch (idEstado) {
+      case 2:
+        return reservationOrganizerMessageTemplate.concat("aceptada");
+      case 4:
+        return reservationOrganizerMessageTemplate.concat("rechazada");
+      default:
+        return "Nueva solicitud de reservación";
+    }
   };
 
   function getNoticeMessage(event = false) {
-    if (!event) {
-      return reservationMessages[item.reservation.idEstado];
+    if (item.idEvento) {
+      return getEventRelatedMessage(item.idEstado);
     }
-    return eventMessages[item.event.idEstado];
+    return getReservationRelatedMessage(item.idEstado);
   }
 
-  const newNoticeBullet = () => {
+  const getRedDot = () => {
+    const isStaff = user.rol.id > idRol.ORGANIZADOR;
     if (isStaff) {
-      return item.notifyStaff !== 0 ? bull : "";
+      return !item.read && dot;
     } else {
-      return item.notifyUser !== 0 ? bull : "";
+      return !item.read && dot;
     }
   };
 
-  return (
-    <Card
-      sx={{
-        minWidth: "30%",
-        maxHeight: 250,
-      }}
-      elevation={1}
-    >
-      <CardActionArea onClick={() => onClick(item)}>
-        <CardContent sx={{ mb: 0, padding: "1em 1em 0 1em" }}>
-          <Stack
-            padding={0}
-            display={"flex"}
-            justifyContent={"space-between"}
-            direction={"column"}
-          >
-            <Typography
-              variant="subtitle1"
-              color={"text.secondary"}
-              gutterBottom
-              alignItems={"center"}
-              alignContent={"center"}
-              justifyItems={"center"}
-            >
-              {newNoticeBullet()} {getNoticeMessage(event)}
-            </Typography>
+  const handleCardActionAreaClick = () => {
+    if (type === "event") {
+      navigate(`/eventos/${item.event.id}/${item.id}`);
+    }
+    if (type === "reservation") {
+      setShowModal(true);
+    }
+  };
 
+  const toggleModal = (e) => {
+    setShowModal(!showModal);
+  };
+
+  return (
+    <>
+      <ResponsiveDialog
+        showPrimary={false}
+        showSecondary={false}
+        onClose={toggleModal}
+        responsive
+        open={showModal}
+        isForm={true}
+      >
+        <Stack padding={0}>
+          <NotificationResponse
+            idAviso={item.id}
+            onClose={toggleModal}
+            type="reservation"
+            notification={item.reservation}
+          >
             {children}
-          </Stack>
-        </CardContent>
-      </CardActionArea>
-      <Divider></Divider>
-    </Card>
+          </NotificationResponse>
+        </Stack>
+      </ResponsiveDialog>
+
+      <Card
+        sx={{
+          minWidth: "30%",
+        }}
+        elevation={1}
+      >
+        <CardActionArea onClick={handleCardActionAreaClick}>
+          <CardContent>
+            <Stack
+              padding={0}
+              display={"flex"}
+              justifyContent={"space-between"}
+              direction={"column"}
+            >
+              <Typography
+                variant="subtitle1"
+                color={"text.secondary"}
+                gutterBottom
+                alignItems={"center"}
+                alignContent={"center"}
+                justifyItems={"center"}
+              >
+                {getRedDot()} {getNoticeMessage(event)}
+              </Typography>
+
+              {children}
+            </Stack>
+          </CardContent>
+        </CardActionArea>
+        <CardActions sx={{ justifyContent: "end" }}>
+          <Button size="small" onClick={() => setShowModal(true)}>
+            Responder
+          </Button>
+        </CardActions>
+      </Card>
+    </>
   );
 }

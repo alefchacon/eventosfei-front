@@ -1,5 +1,5 @@
 import { client } from "./Client";
-import { urlReservedSpaces, urlReservations, urlAvailableReservations, urlNewReservations, urlUpdateReservation, urlReservationsMarkAsRead } from "./urls";
+import { urlReservedSpaces, urlReservations, urlAvailableReservations, urlNewReservations, urlUpdateReservation, urlReservationsMarkAsRead, urlReservations2 } from "./urls";
 import moment from "moment";
 
 export const GetReservationsByMonth = async (date) => {
@@ -47,17 +47,16 @@ export const AddReservation = async (reservation) => {
   return response;
 };
 
-export const RespondToReservation = async (reservation) => {
-  const request = {
-    id: reservation.id,
-    respuesta: reservation.response,
-    idEstado: reservation.idEstado,
-  };
-  const response = await client.put(
-    urlUpdateReservation(request.id).concat("?respuesta=true"), 
-    request
-  );
-  return response;
+export const UpdateReservation = async (notificationResponse, idAviso) => {
+  const body = {
+    model: {
+      id: notificationResponse.id,
+      idEstado: notificationResponse.idEstado,
+      respuesta: notificationResponse.notes, 
+    },
+    idAviso: idAviso
+  }
+  return await client.put(urlReservations2.concat(`/${notificationResponse.id}`), body);
 };
 
 export const MarkAsUserRead = async (reservations = []) => {

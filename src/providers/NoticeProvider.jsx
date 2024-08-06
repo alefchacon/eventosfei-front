@@ -1,7 +1,7 @@
 import { useEffect, createContext, useContext, useState } from "react";
 import { useIsLoading } from "./LoadingProvider";
 import { useLocation } from "react-router-dom";
-import { GetNotices, MarkAsUserRead } from "../api/NoticeService";
+import { GetNotices, UpdateNotice } from "../api/NoticeService";
 import { idRol } from "../validation/enums/idRol";
 
 import { useAuth } from "./AuthProvider";
@@ -28,27 +28,19 @@ export function NoticeProvider({ children }) {
   const { isCoordinator, isAdministrator, isOrganizer, user } = useAuth();
 
   const getNotices = async (page = 1) => {
+    if (!user) {
+      return;
+    }
+
     setIsLoading(true);
 
-    setIsStaff(user.id > idRol.COORDINADOR);
+    setIsStaff(user.rol.id > idRol.COORDINADOR);
 
     let filters = [];
-    if (user.rol.id === idRol.ORGANIZADOR) {
-      filters.push(`idUsuario=${user.id}`);
-    }
-    if (user.rol.id === idRol.ADMINISTRADOR_ESPACIOS) {
-      filters.push(`vista=admin`);
-    }
-    if (user.rol.id === idRol.COORDINADOR) {
-      filters.push(`vista=coord`);
-    }
-    filters.push(`page=${page}`);
-
-    console.log(filters);
 
     const response = await GetNotices(filters);
 
-    console.log(response.data.data);
+    //console.log(response.data.data);
 
     const noticeData = response.data.data;
     setNotices(noticeData.data);
@@ -64,23 +56,41 @@ export function NoticeProvider({ children }) {
   }, [location]);
 
   const removeNotice = () => {
-    setNoticeAmount((prev) => prev - 1);
+    setNoticeAmount((prev) => {
+      prev - 1;
+    });
   };
 
   const removeNotices = async (notices = []) => {
-    console.log(isStaff);
+    //console.log(isStaff);
+    /*
     const response = await MarkAsUserRead(notices, isStaff);
     if (noticeAmount >= response.noticesUpdated) {
       setNoticeAmount((prev) => prev - response.noticesUpdated);
-    }
-    console.log(response);
+    }*/
+    //console.log(response);
   };
 
-  const removeNoticeEvent = async (idEvento = 0) => {
-    const filteredNotice = notices.filter(
-      (notice) => notice.idEvento === idEvento
-    );
-    await MarkAsUserRead(filteredNotice, isStaff);
+  const findNotice = (idAviso) => {
+    return notices.filter((n) => n.id == idAviso)[0];
+  };
+
+  const decreaseNotices = async (idAviso = 0) => {
+    if (findNotice(idAviso).read) {
+      return;
+    }
+
+    setNoticeAmount((prev) => prev - 1);
+  };
+
+  const markAsRead = async (idAviso = 0) => {
+    const notice = findNotice(idAviso);
+
+    if (notice.read) {
+      return;
+    }
+
+    const response = await UpdateNotice(idAviso);
   };
 
   return (
@@ -88,9 +98,10 @@ export function NoticeProvider({ children }) {
       value={{
         noticeAmount,
         removeNotice,
-        removeNoticeEvent,
+        decreaseNotices,
         getNotices,
         removeNotices,
+        markAsRead,
         isStaff,
       }}
     >

@@ -42,6 +42,7 @@ import { useAuth } from "./providers/AuthProvider.jsx";
 
 import Sidebar from "./components/Sidebar.jsx";
 import Topbar from "./components/Topbar.jsx";
+import { idRol } from "./validation/enums/idRol.js";
 
 const drawerWidth = 240;
 
@@ -59,6 +60,10 @@ function App(props) {
   const { isLoading, setIsLoading } = useIsLoading();
 
   const { user, token, logIn, logOut } = useAuth();
+  const [isStaff, setIsStaff] = useState(
+    user ? user.rol.id > idRol.ORGANIZADOR : false
+  );
+
   const [isAuthenticated, setIsAuthenticated] = React.useState(user !== null);
 
   const handleFEIEventSelection = (FEIEvent) => {
@@ -139,7 +144,7 @@ function App(props) {
 
         <Stack className="content" padding={{ xs: 0, md: 3 }}>
           <Routes>
-            <Route path="/avisos" element={<Notices />}>
+            <Route path="/avisos" element={<Notices isStaff={isStaff} />}>
               {" "}
             </Route>
             <Route
@@ -195,7 +200,7 @@ function App(props) {
               {" "}
             </Route>
             <Route
-              path="/eventos/:eventId"
+              path="/eventos/:idEvento/:idAviso?"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
                   <Event

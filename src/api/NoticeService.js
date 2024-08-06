@@ -2,20 +2,14 @@ import { urlNotices, urlNoticesMarkAsUserRead } from "./urls";
 import { client } from "./Client";
 
 export const GetNotices = async (filters = []) => {
-  let url = urlNotices
-  filters.forEach(filter => {
-    url = url.concat(filter,"&")
-  })
-  return await client.get(url);
+  console.log(client.defaults.headers.common["Authorization"])
+  return await client.get(urlNotices);
 }
 
-export const MarkAsUserRead = async (notices, forStaff) => {
+export const UpdateNotice = async (idAviso=0) => {
   const body = {
-    "notices": notices,
+    "id": idAviso,
+    "visto": 1,
   }
-  let url = urlNoticesMarkAsUserRead;
-  if (forStaff){
-    url = url.concat("?tipo=staff")
-  }
-  return await client.post(url, body);
+  return await client.put(urlNotices, body);
 }

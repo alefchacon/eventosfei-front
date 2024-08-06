@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import ReservationCard from "../components/ReservationCard.jsx";
+import CardReservation from "../components/CardReservation.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
 import { GetReservations } from "../api/ReservationService.js";
@@ -58,7 +58,7 @@ export default function ReservationList(
     <>
       <Stack spacing={2} margin={5}>
         {items.map((item) => (
-          <ReservationCard reservation={item} key={item.id}></ReservationCard>
+          <CardReservation reservation={item} key={item.id}></CardReservation>
         ))}
       </Stack>
     </>

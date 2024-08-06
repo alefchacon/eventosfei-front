@@ -13,7 +13,7 @@ import useWindowSize from "../hooks/useWindowSize";
 
 export default function ResponsiveDialog({
   children,
-  title = "Título",
+  title = "",
   showPrimary = true,
   showSecondary = true,
   primaryLabel = "Enviar",
@@ -23,6 +23,7 @@ export default function ResponsiveDialog({
   responsive = false,
   open = false,
   oneTimeOnly = false,
+  isForm = false,
 }) {
   const [dismissed, setDismissed] = useState(false);
   const theme = useTheme();
@@ -37,6 +38,15 @@ export default function ResponsiveDialog({
     }
   };
 
+  const getXSFlexDirection = () => {
+    if (isForm) {
+      return "row";
+    }
+    return "column-reverse";
+  };
+
+  const isFullscreenForm = () => fullScreen && isForm;
+
   return (
     <>
       <Dialog
@@ -45,27 +55,33 @@ export default function ResponsiveDialog({
         aria-labelledby="responsive-dialog-title"
         fullWidth
       >
-        <DialogTitle id="responsive-dialog-title">{title}</DialogTitle>
+        {title && (
+          <DialogTitle id="responsive-dialog-title">{title}</DialogTitle>
+        )}
 
-        <Stack>
+        <Stack
+          direction={isFullscreenForm() ? "column-reverse" : "column"}
+          padding={"0px 0 20px 0"}
+        >
           {children}
           <DialogActions
             sx={{
               display: "flex",
               flexDirection: {
                 md: "row",
-                xs: "column-reverse",
+                xs: getXSFlexDirection(),
               },
+              justifyContent: isFullscreenForm() ? "space-between" : "end",
               gap: 2,
             }}
           >
             {showSecondary && (
-              <Button autoFocus onClick={handleClose}>
+              <Button size="small" onClick={handleClose}>
                 {secondaryLabel}
               </Button>
             )}
             {showPrimary && (
-              <Button variant="contained" onClick={onPrimaryClick} autoFocus>
+              <Button size="small" variant="contained" onClick={onPrimaryClick}>
                 {primaryLabel}
               </Button>
             )}

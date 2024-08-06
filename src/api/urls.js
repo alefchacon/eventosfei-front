@@ -5,15 +5,18 @@ export const urlVerifyToken = "/api/token/verify/";
 
 export const urlNotifications = "/api/eventos?idEstado[eq]=1&estado=true";
 export const urlUserEvents = (idUsuario, page, filter) => `/api/eventos?estado=true&idUsuario[eq]=${idUsuario}${filter}&page=${page}`;
-export const urlEvents = "/api/eventos?estado=true"
+export const urlEvents = "/api/eventos"
 export const urlEventsByMonth = "/api/eventos/mes"
 export const urlNewEvents = "/api/eventos?idEstado[eq]=1&estado=true";
 export const urlEventById = (id) => `/api/eventos/${id}`
+
+export const urlResponses = `/api/avisos/`;
 
 export const urlEvaluations = "/api/evaluaciones/";
 export const urlStatus = "/api/estados/";
 export const urlReservedSpaces = "/api/espacios/reservaciones/";
 export const urlReservations = "/api/solicitud?";
+export const urlReservations2 = "/api/solicitud";
 export const urlReservationsMarkAsRead = "/api/solicitud/marcarLeidasUsuario";
 export const urlUpdateReservation = (id) => `/api/solicitud/${id}`;
 export const urlNewReservations = "/api/solicitud?idEstado[eq]=1";

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 import Card from "../components/Card.jsx";
 import CardNotice from "../components/CardNotice.jsx";
-import ReservationCard from "../components/ReservationCard.jsx";
+import CardReservation from "../components/CardReservation.jsx";
 import { Stack } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
@@ -58,7 +58,7 @@ export default function NoticeList(
     <>
       <Stack spacing={{ md: 1 }} margin={{ md: 1 }} direction={"column"}>
         {notices.map((item, index) =>
-          item.event !== null ? (
+          item.idEvento ? (
             <CardNotice
               key={index}
               item={item}
@@ -69,10 +69,11 @@ export default function NoticeList(
             </CardNotice>
           ) : (
             <CardNotice key={index} event={false} item={item} isStaff={isStaff}>
-              <ReservationCard
+              <CardReservation
                 elevated={false}
                 item={item.reservation}
-              ></ReservationCard>
+                adminView={isStaff}
+              ></CardReservation>
             </CardNotice>
           )
         )}

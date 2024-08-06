@@ -67,7 +67,7 @@ export default function Eventos(
   const handleGetEvents = async (extraFilters = []) => {
     setIsLoading(true);
 
-    let filters = [`page=${currentPage}`, `${currentFilter}=true`];
+    let filters = [`?`, `page=${currentPage}`, `${currentFilter}=true`];
     console.log(currentPage);
     for (const filter of extraFilters) {
       filters.push(filter);
