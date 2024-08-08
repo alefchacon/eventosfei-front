@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import Card from "../components/Card.jsx";
+import Card from "../components/CardEvent.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNewEvents } from "../api/EventService.js";
 import Button from "@mui/material/Button";
@@ -10,7 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import TextField from "@mui/material/TextField";
-import Tabs from "../components/Tabs.jsx";
+import Tabs from "../components/CustomTabs.jsx";
 
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";

@@ -61,7 +61,7 @@ export default function ResponsiveDialog({
 
         <Stack
           direction={isFullscreenForm() ? "column-reverse" : "column"}
-          padding={"0px 0 20px 0"}
+          padding={3}
         >
           {children}
           <DialogActions

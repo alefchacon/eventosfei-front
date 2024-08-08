@@ -12,19 +12,19 @@ import { LoadingProvider } from "./providers/LoadingProvider.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <LoadingProvider>
-          <NoticeProvider>
-            <SnackbarProvider>
+      <SnackbarProvider>
+        <AuthProvider>
+          <LoadingProvider>
+            <NoticeProvider>
               <DialogProvider>
                 <main>
                   <App />
                 </main>
               </DialogProvider>
-            </SnackbarProvider>
-          </NoticeProvider>
-        </LoadingProvider>
-      </AuthProvider>
+            </NoticeProvider>
+          </LoadingProvider>
+        </AuthProvider>
+      </SnackbarProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

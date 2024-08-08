@@ -25,7 +25,7 @@ import EventResponseMobile from "../components/EventResponseMobile.jsx";
 import NotificationResponse from "../components/NotificationResponseRedux.jsx";
 import DialogContentText from "@mui/material/DialogContentText";
 
-import BasicTabs from "../components/Tabs.jsx";
+import CustomTabs from "../components/CustomTabs.jsx";
 
 import { GetEventById } from "../api/EventService.js";
 import EvaluationView from "./EvaluationView.jsx";
@@ -37,7 +37,7 @@ import { idRol } from "../validation/enums/idRol.js";
 import { estado } from "../validation/enums/estado.js";
 import { stringConstants } from "../validation/enums/stringConstants.js";
 
-import ResponsiveDialog from "../components/Dialog.jsx";
+import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
 
 import InfoItem from "../components/InfoItem.jsx";
 
@@ -54,8 +54,6 @@ export default function Event({ setTitle, notice }) {
   let { idEvento, idAviso } = useParams();
 
   const { removeNotices } = useNotices();
-
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -241,18 +239,20 @@ export default function Event({ setTitle, notice }) {
     setIsLoading(false);
   }
 
-  const isCoordinator = user.rol.id === idRol.COORDINADOR;
+  const { user } = useAuth();
+  const isStaff = user.rol.id > idRol.ORGANIZADOR;
 
   function showEvaluation(FEIEvent) {
-    const isOrganizer = user.id === FEIEvent.user.id;
+    const ownsEvent = user.id === FEIEvent.user.id;
 
-    const canShow = isOrganizer || isCoordinator;
+    const userCanSee =
+      (ownsEvent || isStaff) && FEIEvent.idEstado === estado.ACEPTADO;
 
-    if (!canShow) {
+    if (!userCanSee) {
       return;
     }
 
-    if (FEIEvent.hasEvaluation && canShow) {
+    if (FEIEvent.hasEvaluation && userCanSee) {
       return (
         <EvaluationView
           label={"Evaluación"}
@@ -262,7 +262,7 @@ export default function Event({ setTitle, notice }) {
       );
     }
 
-    if (isOrganizer) {
+    if (ownsEvent) {
       return <Evaluation FEIEvent={FEIEvent} label={"Evaluación"}></Evaluation>;
     }
   }
@@ -279,7 +279,7 @@ export default function Event({ setTitle, notice }) {
   }
 
   function showResponse(FEIEvent) {
-    const canShow = user.id === FEIEvent.user.id || isCoordinator;
+    const canShow = user.id === FEIEvent.user.id || isStaff;
 
     if (!canShow) {
       return;
@@ -287,14 +287,11 @@ export default function Event({ setTitle, notice }) {
 
     if (
       FEIEvent.notes === stringConstants.EMPTY_COLUM &&
-      FEIEvent.status.id === estado.NUEVO
+      FEIEvent.status.id === estado.NUEVO &&
+      !isStaff
     ) {
       FEIEvent.notes =
         "El evento aún no ha sido revisado por la Coordinación de Eventos";
-    }
-
-    if (!isCoordinator) {
-      return <SimpleResponseTab label={"Respuesta"} />;
     }
 
     return (
@@ -311,7 +308,7 @@ export default function Event({ setTitle, notice }) {
 
   return (
     <>
-      {isCoordinator && (
+      {isStaff && (
         <Stack direction={"row"} padding={1} gap={2}>
           <Button variant="outlined" onClick={getReport}>
             Generar reporte
@@ -320,7 +317,7 @@ export default function Event({ setTitle, notice }) {
       )}
 
       {FEIEvent && (
-        <BasicTabs>
+        <CustomTabs>
           {showEvaluation(FEIEvent)}
           {showResponse(FEIEvent)}
 
@@ -474,7 +471,7 @@ export default function Event({ setTitle, notice }) {
             <Typography variant="h5">Comentarios adicionales</Typography>
             <InfoItem label={""} value={FEIEvent.additional}></InfoItem>
           </Stack>
-        </BasicTabs>
+        </CustomTabs>
       )}
     </>
   );

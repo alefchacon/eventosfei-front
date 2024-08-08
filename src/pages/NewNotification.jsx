@@ -26,7 +26,7 @@ import ConditionalInput from "../components/ConditionalInput.jsx";
 
 import DotMobileStepper from "../components/MobileStepper.jsx";
 
-import ResponsiveDialog from "../components/Dialog.jsx";
+import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
 import DialogContentText from "@mui/material/DialogContentText";
 import CheckboxList from "../components/CheckboxList.jsx";
 import RadioList from "../components/RadioList.jsx";

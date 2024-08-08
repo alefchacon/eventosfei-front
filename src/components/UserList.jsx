@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import Card from "./Card.jsx";
+import Card from "./CardEvent.jsx";
 import CardUser from "./CardUser.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";

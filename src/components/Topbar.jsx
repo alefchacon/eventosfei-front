@@ -15,15 +15,15 @@ import { useIsLoading } from "../providers/LoadingProvider";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../providers/AuthProvider";
+
 export default function Topbar({
   noticeAmount = 0,
-  user = {
-    names: "name",
-    email: "email",
-  },
+
   onLogOutClick,
   onMenuIconClick,
 }) {
+  const { user } = useAuth();
   const { isLoading } = useIsLoading();
   const navigate = useNavigate();
 

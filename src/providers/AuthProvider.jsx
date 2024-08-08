@@ -46,9 +46,10 @@ export function AuthProvider({ children }) {
   };
 
   const logOut = async () => {
-    setUser(null);
-    client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     LogOut();
+    setUser(null);
+    localStorage.removeItem("user");
+    client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     localStorage.removeItem("site");
     setToken("");
     delete client.defaults.headers.common["Authorization"];

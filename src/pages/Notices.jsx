@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import Card from "../components/Card.jsx";
+import Card from "../components/CardEvent.jsx";
 import CardNotice from "../components/CardNotice.jsx";
 import CardReservation from "../components/CardReservation.jsx";
 import { Stack } from "@mui/material";
@@ -47,13 +47,12 @@ export default function Notices(
   useEffect(() => {}, [currentPage]);
 
   const fetchData = async (page = currentPage) => {
-    //debugger;
-
-    const response = await getNotices(page);
-
-    setCurrentPage(response.current_page);
-    setTotalPages(response.total_pages ?? response.last_page);
-    setNotices(response.data);
+    //debugger;;
+    const pagedNotices = await getNotices(page);
+    console.log(getNotices);
+    setCurrentPage(pagedNotices.meta.current_page);
+    setTotalPages(pagedNotices.meta.total_pages ?? pagedNotices.meta.last_page);
+    setNotices(pagedNotices.data);
   };
 
   const removeNotice = async (notice) => {
@@ -62,7 +61,7 @@ export default function Notices(
 
   return (
     <>
-      <Stack spacing={{ md: 1 }} margin={{ md: 1 }} direction={"column"}>
+      <Stack spacing={1} direction={"column"}>
         {notices.map((item, index) =>
           item.idEvento ? (
             <CardNotice
@@ -90,6 +89,7 @@ export default function Notices(
           )
         )}
       </Stack>
+      <br />
       {!isLoading && (
         <Stack
           spacing={0}

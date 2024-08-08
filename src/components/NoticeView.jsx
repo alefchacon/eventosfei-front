@@ -25,7 +25,7 @@ import EventResponseMobile from "../components/EventResponseMobile.jsx";
 import NotificationResponse from "../components/NotificationResponseRedux.jsx";
 import DialogContentText from "@mui/material/DialogContentText";
 
-import BasicTabs from "../components/Tabs.jsx";
+import CustomTabs from "../components/Tabs.jsx";
 
 import { GetEventById } from "../api/EventService.js";
 import EvaluationView from "./EvaluationView.jsx";

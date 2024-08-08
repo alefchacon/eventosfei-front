@@ -141,7 +141,7 @@ function SpaceRadio({
   );
 }
 
-export default function Reservation({ onCancel, onSubmit }) {
+export default function Reservation({ onCancel, onSubmit, idUsuario = 0 }) {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(moment());
   const [start, setStart] = useState(moment());
@@ -219,7 +219,7 @@ export default function Reservation({ onCancel, onSubmit }) {
         end: end.date(date.format("YYYY-MM-DD")),
         idEspacio: space.id,
         // CAMBIAR
-        idUsuario: 1,
+        idUsuario: idUsuario,
       };
 
       const response = await AddReservation(reservation);

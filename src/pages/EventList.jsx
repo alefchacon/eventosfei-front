@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import Card from "../components/Card.jsx";
+import Card from "../components/CardEvent.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
 import Typography from "@mui/material/Typography";
@@ -21,6 +21,7 @@ import emotionStyledBase from "@emotion/styled/base";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useWindowSize from "../hooks/useWindowSize.jsx";
+import Tooltip from "@mui/material/Tooltip";
 import Fab from "@mui/material/Fab";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
 
@@ -29,6 +30,12 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import moment from "moment";
 import "moment/locale/es";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import CustomFab from "../components/CustomFab.jsx";
+
+import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
+
+import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
 
 import { jsPDF } from "jspdf";
 
@@ -271,21 +278,41 @@ export default function Eventos(
     doc.output("dataurlnewwindow");
   };
 
-  return (
-    <Stack>
+  const filters = (
+    <>
       <Stack
-        direction={{ lg: "row", sm: "column" }}
+        direction={{ md: "row", xs: "column" }}
         padding={2}
         spacing={3}
         display={"flex"}
       >
-        <Stack direction={"row"} flexGrow={2}>
+        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
+          <DatePicker
+            label={"Buscar por mes"}
+            views={["month", "year"]}
+            onYearChange={handleDateChange}
+          />
+        </LocalizationProvider>
+        <FormControl>
+          <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            label="Ordenar por"
+            value={currentFilter}
+            onChange={handleFilterChange}
+          >
+            <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
+            <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Stack direction={"row"}>
           <TextField
-            fullWidth
+            fullWidth={{ md: "false", xs: "true" }}
             onChange={handleSearchQueryChange}
             value={searchQuery}
-            placeholder="Buscar eventos"
-            sx={{ bgcolor: "white" }}
+            placeholder="Buscar por título u organizador"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -309,42 +336,44 @@ export default function Eventos(
             variant="contained"
             aria-label="search"
             edge="end"
+            disableElevation
             onClick={handleEventSearch}
           >
             <SearchIcon />
           </Button>
         </Stack>
+        <Tooltip title="Limpiar filtros">
+          <Button variant="outlined" onClick={handleClearSearchQuery}>
+            <FilterAltOffIcon />
+          </Button>
+        </Tooltip>
+      </Stack>
+    </>
+  );
 
-        {/*
+  const [showModal, setShowModal] = useState(false);
+  const toggleModal = () => setShowModal(!showModal);
 
-        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
-          <DatePicker
-            label={"Buscar por mes"}
-            views={["month", "year"]}
-            onYearChange={handleDateChange}
-          />
-        </LocalizationProvider>
-        <FormControl>
-          <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            label="Ordenar por"
-            value={currentFilter}
-            onChange={handleFilterChange}
-          >
-            <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
-            <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
-          </Select>
-        </FormControl>
-        <Button variant="outlined" onClick={handleClearSearchQuery}>
-          Limpiar filtros
+  return (
+    <Stack>
+      <Stack display={showIfBig}>{filters}</Stack>
+      <Stack display={showIfSmall} padding={2}>
+        <Button variant="outlined" onClick={toggleModal}>
+          Filtros
         </Button>
-          */}
       </Stack>
 
+      <ResponsiveDialog
+        open={showModal}
+        onClose={toggleModal}
+        showPrimary={false}
+        secondaryLabel="Regresar"
+      >
+        {filters}
+      </ResponsiveDialog>
+
       <Stack
-        direction={{ lg: "row", sm: "column" }}
+        direction={{ lg: "row", xs: "column" }}
         padding={2}
         spacing={3}
         display={"flex"}
@@ -353,23 +382,8 @@ export default function Eventos(
         <Button variant="outlined" onClick={getReport}>
           Descargar reporte
         </Button>
-        {isMobile ? (
-          <Fab
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              padding: 4,
-              margin: 5,
-            }}
-            color="primary"
-            variant="circular"
-          >
-            +
-          </Fab>
-        ) : (
-          <Button variant="contained">Nueva notificación</Button>
-        )}
+
+        <CustomFab></CustomFab>
       </Stack>
 
       <Stack spacing={{ md: 2 }} margin={{ md: 1 }}>
@@ -383,21 +397,18 @@ export default function Eventos(
         ))}
       </Stack>
       {!isLoading && (
-        <Stack
-          spacing={2}
-          paddingTop={3}
-          paddingBottom={15}
-          display={"flex"}
-          alignItems={"center"}
-        >
-          <Pagination
-            count={queriedPagination.total_pages}
-            onChange={handlePageChange}
-            color="primary"
-            size="large"
-            page={currentPage}
-          />
-        </Stack>
+        <Pagination
+          count={queriedPagination.total_pages}
+          onChange={handlePageChange}
+          color="primary"
+          size="large"
+          page={currentPage}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            padding: 3,
+          }}
+        />
       )}
     </Stack>
   );
