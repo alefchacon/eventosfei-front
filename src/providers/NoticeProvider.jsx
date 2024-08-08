@@ -1,10 +1,15 @@
 import { useEffect, createContext, useContext, useState } from "react";
 import { useIsLoading } from "./LoadingProvider";
 import { useLocation } from "react-router-dom";
-import { GetNotices, UpdateNotice } from "../api/NoticeService";
+import {
+  GetNoticeAmount,
+  GetNotices,
+  UpdateNotice,
+} from "../api/NoticeService";
 import { idRol } from "../validation/enums/idRol";
 
 import { useAuth } from "./AuthProvider";
+import { useSnackbar } from "./SnackbarProvider";
 
 const NoticesContext = createContext(null);
 
@@ -13,7 +18,7 @@ export function useNotices() {
 }
 
 export function NoticeProvider({ children }) {
-  const [notices, setNotices] = useState([]);
+  const [pagedNotices, setPagedNotices] = useState([]);
 
   const [noticeAmount, setNoticeAmount] = useState(0);
 
@@ -24,35 +29,54 @@ export function NoticeProvider({ children }) {
   const [isStaff, setIsStaff] = useState();
 
   const { isLoading, setIsLoading } = useIsLoading();
+  const { showSnackbar } = useSnackbar();
 
-  const { isCoordinator, isAdministrator, isOrganizer, user } = useAuth();
+  const { user, token } = useAuth();
 
-  const getNotices = async (page = 1) => {
-    if (!user) {
+  const getNoticeAmount = async (page = 1) => {
+    console.log(token);
+    if (!user || !token) {
       return;
     }
 
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    setIsStaff(user.rol.id > idRol.COORDINADOR);
+      setIsStaff(user.rol.id > idRol.COORDINADOR);
+      const response = await GetNoticeAmount();
+      const newNoticeAmount = response.data.noticeAmount;
+      setNoticeAmount(newNoticeAmount);
 
-    let filters = [];
+      setIsLoading(false);
+    } catch (error) {
+      showSnackbar(error.message);
+    }
 
-    const response = await GetNotices(filters);
-
-    //console.log(response.data.data);
-
-    const noticeData = response.data.data;
-    setNotices(noticeData.data);
-    const newNoticeAmount = response.data.noticeAmount;
-    setNoticeAmount(newNoticeAmount);
-
-    setIsLoading(false);
-    return noticeData;
+    //return noticeData;
   };
 
+  const getNotices = async (page = 1) => {
+    try {
+      setIsLoading(true);
+
+      const response = await GetNotices(page);
+
+      console.log(response.data);
+
+      setPagedNotices(response.data);
+
+      setIsLoading(false);
+
+      return response.data;
+    } catch (error) {
+      showSnackbar(error.message);
+    }
+  };
+
+  //const get
+
   useEffect(() => {
-    getNotices(1);
+    getNoticeAmount(1);
   }, [location]);
 
   const removeNotice = () => {
@@ -72,7 +96,7 @@ export function NoticeProvider({ children }) {
   };
 
   const findNotice = (idAviso) => {
-    return notices.filter((n) => n.id == idAviso)[0];
+    return pagedNotices.data.filter((n) => n.id == idAviso)[0];
   };
 
   const decreaseNotices = async (idAviso = 0) => {
@@ -84,6 +108,7 @@ export function NoticeProvider({ children }) {
   };
 
   const markAsRead = async (idAviso = 0) => {
+    console.log(pagedNotices);
     const notice = findNotice(idAviso);
 
     if (notice.read) {
@@ -96,10 +121,12 @@ export function NoticeProvider({ children }) {
   return (
     <NoticesContext.Provider
       value={{
+        getNoticeAmount,
+        getNotices,
+        notices: pagedNotices,
         noticeAmount,
         removeNotice,
         decreaseNotices,
-        getNotices,
         removeNotices,
         markAsRead,
         isStaff,

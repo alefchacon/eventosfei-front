@@ -21,7 +21,9 @@ function CustomTabPanel({ children, value, index, onSelect }) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
     >
-      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
+      {value === index && (
+        <Box sx={{ padding: { md: 2, xs: 0 } }}>{children}</Box>
+      )}
     </div>
   );
 }
@@ -44,7 +46,7 @@ function a11yProps(index) {
   };
 }
 
-export default function BasicTabs({ children, onSelect }) {
+export default function CustomTabs({ children, onSelect }) {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {

@@ -23,7 +23,7 @@ const bull = (
 );
 
 export default function EventCard(
-  { props, parentHandle, padding = 2, isProfile, elevated = true },
+  { props, isProfile, elevated = true },
   { key }
 ) {
   const [isEvaluated, setIsEvaluated] = useState(false);
@@ -39,10 +39,6 @@ export default function EventCard(
     space = { name: "espacio" },
   } = props;
 
-  function handle() {
-    console.log(id);
-    //parentHandle(props)
-  }
   const handleClick = () => {
     console.info("You clicked the Chip.");
   };
@@ -60,19 +56,17 @@ export default function EventCard(
       }}
       elevation={elevated ? 1 : 0}
     >
-      <CardContent sx={{ padding: padding }}>
+      <CardContent sx={{ padding: 2 }}>
         <Stack
           sx={{ display: "flex", justifyContent: "space-between" }}
           direction={"row"}
         >
           <Typography variant="h6" component="div">
-            <Link to={`/eventos/${id}`} onClick={handle}>
-              {" "}
-              {name}{" "}
-            </Link>
+            <Link to={`/eventos/${id}`}> {name} </Link>
           </Typography>
           <Chip label={status.name} onClick={handleClick} />
         </Stack>
+        <br />
         {!isProfile && (
           <Typography color="text.primary">
             Organizador:

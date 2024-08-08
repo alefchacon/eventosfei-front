@@ -16,7 +16,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 
 import ReservationResponse from "../forms/ReservationResponseForm.jsx";
 
-import ResponsiveDialog from "./Dialog.jsx";
+import ResponsiveDialog from "./ResponsiveDialog.jsx";
 
 import { estado } from "../validation/enums/estado.js";
 
@@ -100,7 +100,7 @@ export default function CardNotice({
     }
   };
 
-  const handleCardActionAreaClick = () => {
+  const handlePrimaryClick = () => {
     if (type === "event") {
       navigate(`/eventos/${item.event.id}/${item.id}`);
     }
@@ -141,32 +141,31 @@ export default function CardNotice({
         }}
         elevation={1}
       >
-        <CardActionArea onClick={handleCardActionAreaClick}>
-          <CardContent>
-            <Stack
-              padding={0}
-              display={"flex"}
-              justifyContent={"space-between"}
-              direction={"column"}
+        <CardContent>
+          <Stack
+            padding={0}
+            display={"flex"}
+            justifyContent={"space-between"}
+            direction={"column"}
+          >
+            <Typography
+              variant="subtitle1"
+              color={"text.secondary"}
+              gutterBottom
+              alignItems={"center"}
+              alignContent={"center"}
+              justifyItems={"center"}
             >
-              <Typography
-                variant="subtitle1"
-                color={"text.secondary"}
-                gutterBottom
-                alignItems={"center"}
-                alignContent={"center"}
-                justifyItems={"center"}
-              >
-                {getRedDot()} {getNoticeMessage(event)}
-              </Typography>
+              {!item.read && dot} {item.type.name}
+            </Typography>
 
-              {children}
-            </Stack>
-          </CardContent>
-        </CardActionArea>
+            {children}
+          </Stack>
+        </CardContent>
+
         <CardActions sx={{ justifyContent: "end" }}>
-          <Button size="small" onClick={() => setShowModal(true)}>
-            Responder
+          <Button size="small" onClick={handlePrimaryClick}>
+            {item.idEstado === estado.NUEVO ? "Responder" : "Ver respuesta"}
           </Button>
         </CardActions>
       </Card>

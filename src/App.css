@@ -170,7 +170,6 @@ main{
 }
 
 
-
 @media (max-width:600px) {
   .button-new-notification .MuiButton-root{
     display: none !important;

@@ -50,7 +50,12 @@ export default function FormActions({
         gap: 2,
       }}
     >
-      {onClose && <Button onClick={onClose}>{secondaryLabel}</Button>}
+      {onClose ? (
+        <Button onClick={onClose}>{secondaryLabel}</Button>
+      ) : (
+        <div></div>
+      )}
+
       {showPrimary && (
         <LoadingButton
           variant="contained"

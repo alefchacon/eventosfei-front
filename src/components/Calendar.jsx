@@ -42,9 +42,11 @@ import CalendarEventList from "./CalendarEventList";
 
 import { modalidad } from "../validation/enums/modalidad.js";
 
-import ResponsiveDialog from "./Dialog.jsx";
+import ResponsiveDialog from "./ResponsiveDialog.jsx";
 
 import useWindowSize from "../hooks/useWindowSize.jsx";
+
+import CustomFab from "./CustomFab.jsx";
 
 moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
@@ -97,33 +99,9 @@ const CustomToolbar = (props) => {
             <Button variant="outlined" onClick={() => handleNavigate("TODAY")}>
               Hoy
             </Button>
-            <Link className="a" to={"/notificaciones"}>
-              <Button
-                sx={{
-                  backgroundColor: "var(--main-green)",
-                  display: { md: "block", xs: "none" },
-                }}
-                variant="contained"
-              >
-                Nueva Notificación
-              </Button>
-            </Link>
           </Stack>
-          <Stack
-            position={"absolute"}
-            bottom={0}
-            right={0}
-            padding={5}
-            sx={{
-              display: { md: "none", xs: "block" },
-            }}
-          >
-            <Fab color="primary" variant="extended" aria-label="add">
-              <Link className="a" to={"/notificaciones"}>
-                <AddIcon /> Notificar evento
-              </Link>
-            </Fab>
-          </Stack>
+
+          <CustomFab></CustomFab>
         </>
       ) : (
         <Stack alignItems={"center"} direction={"row"}>
@@ -225,10 +203,6 @@ export default function MyCalendar({
       }
     }
 
-    console.log(start);
-    console.log(end);
-    console.log(eventsInDateRange);
-    console.log(events);
     setSelectedDate(start);
     setSelectedEvents(eventsInDateRange);
 

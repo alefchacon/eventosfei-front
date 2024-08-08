@@ -216,7 +216,7 @@ function App(props) {
               path="/reservar"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <Reservation></Reservation>
+                  <Reservation idUsuario={user ? user.id : null}></Reservation>
                 </RouteGuard>
               }
             >

@@ -9,7 +9,7 @@ axios.defaults.withCredentials = true;
 const client = axios.create({
   baseURL: backendUrl,
   headers: {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   }
 });
 

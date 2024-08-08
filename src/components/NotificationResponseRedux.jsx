@@ -24,12 +24,9 @@ import {
   ToggleButton,
 } from "@mui/material";
 
-import SendIcon from "@mui/icons-material/Send";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-import LoadingButton from "./LoadingButton.jsx";
-
 import "../App.css";
+import { estado } from "../validation/enums/estado.js";
+import { stringConstants } from "../validation/enums/stringConstants.js";
 
 export default function NotificationResponse({
   children,
@@ -40,15 +37,15 @@ export default function NotificationResponse({
   notification,
 }) {
   const { showSnackbar } = useSnackbar();
-  const { decreaseNotices } = useNotices();
+  const { decreaseNotices, markAsRead } = useNotices();
 
   const submitResponse = async (values) => {
-    console.log(notification);
     try {
       values.id = notification.id;
       const response = await chooseSubmitType();
       showSnackbar(response.data.message);
-      decreaseNotices(idAviso);
+      markAsRead(idAviso);
+      //decreaseNotices(idAviso);
     } catch (e) {
       showSnackbar(e.message);
     }
@@ -80,14 +77,29 @@ export default function NotificationResponse({
     onSubmit: submitResponse,
   });
 
+  const [canRespond, setCanRespond] = useState(
+    notification.idEstado === estado.NUEVO
+  );
+
+  useEffect(() => {
+    function markAsReadWhenOpened() {
+      if (!canRespond) {
+        markAsRead(idAviso);
+      }
+    }
+
+    markAsReadWhenOpened();
+  }, []);
+
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
       <Stack gap={0} direction={{ xs: "column-reverse", md: "column" }}>
-        <Stack gap={3} padding={2} id="form-content">
+        <Stack gap={3} padding={0} id="form-content">
           {children}
           <FormControl error={Boolean(errors.idEstado) && touched.idEstado}>
             <FormLabel>Estado de la notificación</FormLabel>
             <ToggleButtonGroup
+              disabled={!canRespond}
               id="idEstado"
               onChange={(e, newIdEstado) =>
                 setFieldValue("idEstado", newIdEstado)
@@ -100,7 +112,7 @@ export default function NotificationResponse({
               sx={{
                 display: "flex",
               }}
-              value={values.idEstado}
+              value={canRespond ? values.idEstado : notification.status.id}
             >
               <ToggleButton value={4} sx={{ flexGrow: 1 }}>
                 {"Rechazada"}
@@ -114,26 +126,40 @@ export default function NotificationResponse({
             </Typography>
           </FormControl>
 
-          <TextField
-            id="notes"
-            name="notes"
-            variant="outlined"
-            label="Observaciones"
-            fullWidth
-            multiline
-            rows={5}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            value={values.response}
-            onBlur={handleBlur}
-            error={Boolean(errors.notes) && touched.notes}
-            helperText={
-              touched.notes && Boolean(errors.notes) ? errors.notes : " "
-            }
-          ></TextField>
+          <FormControl>
+            <FormLabel>Observaciones</FormLabel>
+            <TextField
+              disabled={!canRespond}
+              id="notes"
+              name="notes"
+              variant="outlined"
+              fullWidth
+              multiline
+              rows={5}
+              onChange={handleChange}
+              value={
+                notification.notes &&
+                notification.notes !== stringConstants.EMPTY_COLUM
+                  ? notification.notes
+                  : values.notes
+              }
+              onBlur={handleBlur}
+              error={Boolean(errors.notes) && touched.notes}
+              helperText={
+                touched.notes && Boolean(errors.notes) ? errors.notes : " "
+              }
+              sx={{
+                color: "red !important",
+              }}
+            ></TextField>
+          </FormControl>
         </Stack>
 
-        <FormActions onSubmit={isSubmitting} onClose={onClose}></FormActions>
+        <FormActions
+          onSubmit={isSubmitting}
+          onClose={onClose}
+          showPrimary={canRespond}
+        ></FormActions>
       </Stack>
     </form>
   );
