@@ -1,14 +1,13 @@
 import React, {
-  Fragment,
-  useMemo,
   useState,
   useEffect,
+  useRef,
   Children,
   cloneElement,
 } from "react";
 import PropTypes from "prop-types";
 import { Stack, Button, Typography, Fab, IconButton } from "@mui/material";
-
+import html2pdf from "html2pdf.js";
 import { Link, useNavigate } from "react-router-dom";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -30,7 +29,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import moment from "moment";
 import "moment/locale/es";
 
-import * as dates from "./dates";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../App.css";
 
@@ -43,8 +41,6 @@ import CalendarEventList from "./CalendarEventList";
 import { modalidad } from "../validation/enums/modalidad.js";
 
 import ResponsiveDialog from "./ResponsiveDialog.jsx";
-
-import useWindowSize from "../hooks/useWindowSize.jsx";
 
 import CustomFab from "./CustomFab.jsx";
 
@@ -122,7 +118,8 @@ const CustomToolbar = (props) => {
   );
 };
 
-export default function MyCalendar({
+export default function EventCalendar({
+  setTitle,
   localizer = mLocalizer,
   showDemoLink = true,
   ...props
@@ -135,8 +132,11 @@ export default function MyCalendar({
   const { isLoading, setIsLoading } = useIsLoading();
   const navigate = useNavigate();
   const [showEventModal, setShowEventModal] = useState(false);
-  const { width } = useWindowSize();
   const [view, setView] = useState(Views.MONTH);
+
+  useEffect(() => {
+    setTitle("Calendario");
+  }, []);
 
   const components = {
     toolbar: (props) => CustomToolbar({ ...props }, view, setView),
@@ -150,7 +150,8 @@ export default function MyCalendar({
       onTouchEnd: () =>
         onSelectSlot({
           action: "click",
-          date: value,
+          start: value,
+          end: value,
           userIsMobile: true,
         }),
       style: {
@@ -162,9 +163,10 @@ export default function MyCalendar({
     let { start, end } = slotInfo;
 
     if (slotInfo.userIsMobile) {
-      start = slotInfo.date;
-      end = new Date(slotInfo.date);
-      end.setDate(end.getDate() + 1);
+      start = moment(start);
+      end = moment(start).add(1, "days");
+      //end.setDate(end.getDate() + 1);
+      console.log("fuck");
     }
 
     const eventsInDateRange = events.filter(
@@ -202,6 +204,8 @@ export default function MyCalendar({
         event.currentReservation = dateReservations[0];
       }
     }
+
+    console.log(eventsInDateRange);
 
     setSelectedDate(start);
     setSelectedEvents(eventsInDateRange);
@@ -313,7 +317,11 @@ export default function MyCalendar({
             onView={(e) => console.log(e)}
             view={view}
             onNavigate={handleNavigation}
-            onSelectEvent={(e) => navigate(`/eventos/${e.id}`)}
+            onSelectEvent={(FEIEvent) => {
+              console.log(FEIEvent);
+              FEIEvent.userIsMobile = true;
+              filterEventsInDateRange(FEIEvent);
+            }}
             defaultDate={moment()}
             formats={formats}
             events={events}
@@ -334,7 +342,7 @@ export default function MyCalendar({
     </>
   );
 }
-MyCalendar.propTypes = {
+EventCalendar.propTypes = {
   localizer: PropTypes.instanceOf(DateLocalizer),
   showDemoLink: PropTypes.bool,
 };

@@ -22,19 +22,19 @@ import Drawer from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import Calendar from "./components/Calendar.jsx";
+import EventCalendar from "./components/Calendar.jsx";
 import RouteGuard from "./pages/RouteGuard.jsx";
 
 import LogInPage from "./pages/LogIn.jsx";
 import ProfilePage from "./pages/Profile.jsx";
 import Users from "./pages/Users.jsx";
-import Reservation from "./forms/ReservationForm.jsx";
+import ReservationForm from "./forms/ReservationForm.jsx";
 
 import { useNotices } from "./providers/NoticeProvider.jsx";
 
 import Event from "./pages/Event.jsx";
 import NewNotification from "./pages/NewNotification.jsx";
-import TestForm from "./pages/TestForm.jsx";
+import ReportView from "./pages/ReportView.jsx";
 
 import { useIsLoading } from "./providers/LoadingProvider.jsx";
 
@@ -44,20 +44,15 @@ import Sidebar from "./components/Sidebar.jsx";
 import Topbar from "./components/Topbar.jsx";
 import { idRol } from "./validation/enums/idRol.js";
 
-const drawerWidth = 240;
-
 function App(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [currentSection, setCurrentSection] = React.useState("Calendario");
   const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const { noticeAmount, decreaseNotices } = useNotices();
 
-  const { isLoading, setIsLoading } = useIsLoading();
+  const [title, setTitle] = useState("Calendario");
 
   const { user, token, logIn, logOut } = useAuth();
   const [isStaff, setIsStaff] = useState(
@@ -99,39 +94,11 @@ function App(props) {
     >
       <CssBaseline />
 
-      <Box
-        component="nav"
-        sx={{
-          width: { sm: drawerWidth },
-          flexShrink: { sm: 0 },
-          bgcolor: "red",
-        }}
-        aria-label="mailbox folders"
-        display={"flex"}
-        height={"100%"}
-      >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-        >
-          {sideBar}
-        </Drawer>
-        <Stack display={{ xs: "none", sm: "flex" }} flex="1 1 auto">
-          {sideBar}
-        </Stack>
-      </Box>
+      <Sidebar
+        setIsClosing={setIsClosing}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      ></Sidebar>
 
       <Stack direction={"column"} width={"100%"}>
         <Topbar
@@ -140,6 +107,7 @@ function App(props) {
           onLogOutClick={logOut}
           isAuthenticated={isAuthenticated}
           user={user}
+          title={title}
         ></Topbar>
 
         <Stack className="content" padding={{ xs: 0, md: 3 }}>
@@ -155,6 +123,7 @@ function App(props) {
                     notifications={false}
                     setSelectedFEIEvent={handleFEIEventSelection}
                     idUsuario={0}
+                    setTitle={setTitle}
                   />
                 </RouteGuard>
               }
@@ -176,7 +145,7 @@ function App(props) {
               path="/calendario"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <Calendar />
+                  <EventCalendar setTitle={setTitle} />
                 </RouteGuard>
               }
             >
@@ -190,23 +159,20 @@ function App(props) {
               path="/Notificaciones"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <NewNotification></NewNotification>
+                  <NewNotification
+                    idUsuario={user ? user.id : 0}
+                    setTitle={setTitle}
+                  ></NewNotification>
                 </RouteGuard>
               }
             >
-              {" "}
-            </Route>
-            <Route path="/Evaluaciones" element={<Evaluation />}>
               {" "}
             </Route>
             <Route
               path="/eventos/:idEvento/:idAviso?"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <Event
-                    FEIEvent={selectedFEIEvent}
-                    setTitle={setCurrentSection}
-                  />
+                  <Event FEIEvent={selectedFEIEvent} setTitle={setTitle} />
                 </RouteGuard>
               }
             >
@@ -216,7 +182,10 @@ function App(props) {
               path="/reservar"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <Reservation idUsuario={user ? user.id : null}></Reservation>
+                  <ReservationForm
+                    idUsuario={user ? user.id : null}
+                    setTitle={setTitle}
+                  ></ReservationForm>
                 </RouteGuard>
               }
             >
@@ -236,7 +205,7 @@ function App(props) {
               path="/usuario"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <ProfilePage user={user}></ProfilePage>
+                  <ProfilePage user={user} setTitle={setTitle}></ProfilePage>
                 </RouteGuard>
               }
             >
@@ -246,7 +215,7 @@ function App(props) {
               path="/test"
               element={
                 <RouteGuard isAuthenticated={isAuthenticated}>
-                  <TestForm />
+                  <ReportView />
                 </RouteGuard>
               }
             >

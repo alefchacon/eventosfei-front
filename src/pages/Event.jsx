@@ -246,7 +246,9 @@ export default function Event({ setTitle, notice }) {
     const ownsEvent = user.id === FEIEvent.user.id;
 
     const userCanSee =
-      (ownsEvent || isStaff) && FEIEvent.idEstado === estado.ACEPTADO;
+      (ownsEvent || isStaff) &&
+      (FEIEvent.idEstado === estado.ACEPTADO ||
+        FEIEvent.idEstado === estado.EVALUADO);
 
     if (!userCanSee) {
       return;
@@ -265,17 +267,6 @@ export default function Event({ setTitle, notice }) {
     if (ownsEvent) {
       return <Evaluation FEIEvent={FEIEvent} label={"Evaluación"}></Evaluation>;
     }
-  }
-
-  function SimpleResponseTab() {
-    return (
-      <>
-        <Typography variant="h5">Respuesta</Typography>
-
-        <InfoItem label={"Estado"} value={FEIEvent.status.name}></InfoItem>
-        <InfoItem label={"Observaciones"} value={FEIEvent.notes}></InfoItem>
-      </>
-    );
   }
 
   function showResponse(FEIEvent) {

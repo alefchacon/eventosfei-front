@@ -10,6 +10,7 @@ import { Container } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import moment from "moment";
+import { useAuth } from "../providers/AuthProvider";
 
 import { Link } from "react-router-dom";
 
@@ -22,7 +23,7 @@ const bull = (
   </Box>
 );
 
-export default function EventCard(
+export default function CardEvent(
   { props, isProfile, elevated = true },
   { key }
 ) {

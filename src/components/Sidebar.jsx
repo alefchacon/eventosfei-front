@@ -40,95 +40,157 @@ import LinearProgress from "@mui/material/LinearProgress";
 
 import { idRol } from "../validation/enums/idRol";
 
-const nonAuthOptions = (
-  <>
-    <Link to="/calendario" id="Calendario" className="sidebar-link">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <CalendarMonthIcon className="sidebar-link" />
-          </ListItemIcon>
-          <ListItemText primary="Calendario" />
-        </ListItemButton>
-      </ListItem>
-    </Link>
-    <Link to="/eventos" id="Eventos" className="sidebar-link">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <FestivalIcon className="sidebar-link" />
-          </ListItemIcon>
-          <ListItemText primary="Eventos" />
-        </ListItemButton>
-      </ListItem>
-    </Link>
-  </>
-);
-
-const authOptions = (
-  <>
-    <Link to="/Notificaciones" id="Notificaciones" className="sidebar-link">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <NotificationsActiveIcon className="sidebar-link" />
-          </ListItemIcon>
-          <ListItemText primary="Notificaciones" />
-        </ListItemButton>
-      </ListItem>
-    </Link>
-
-    <Link to="/reservar" id="Espacios" className="sidebar-link">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <PeopleIcon className="sidebar-link" />
-          </ListItemIcon>
-          <ListItemText primary="Reservaciones" />
-        </ListItemButton>
-      </ListItem>
-    </Link>
-  </>
-);
-
-const coordinatorOptions = (
-  <>
-    <Link to="/usuarios" id="Eventos" className="sidebar-link">
-      <ListItem disablePadding>
-        <ListItemButton>
-          <ListItemIcon>
-            <PeopleIcon className="sidebar-link" />
-          </ListItemIcon>
-          <ListItemText primary="Usuarios" />
-        </ListItemButton>
-      </ListItem>
-    </Link>
-  </>
-);
-
 export default function Sidebar({
   user = {
     rol: {
       id: 0,
     },
   },
+  mobileOpen = false,
+  setMobileOpen,
+  setIsClosing,
 }) {
+  const handleDrawerTransitionEnd = () => {
+    setIsClosing(false);
+  };
+
+  const handleDrawerClose = () => {
+    setIsClosing(true);
+    setMobileOpen(false);
+  };
+
+  function ClosingListItem({ children }) {
+    return (
+      <ListItem disablePadding onClick={handleDrawerClose}>
+        {children}
+      </ListItem>
+    );
+  }
+
+  const nonAuthOptions = (
+    <>
+      <Link to="/calendario" id="Calendario" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <CalendarMonthIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Calendario" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
+      <Link to="/eventos" id="Eventos" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <FestivalIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Eventos" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
+    </>
+  );
+
+  const authOptions = (
+    <>
+      <Link to="/Notificaciones" id="Notificaciones" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <NotificationsActiveIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Notificaciones" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
+
+      <Link to="/reservar" id="Espacios" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <PeopleIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Reservaciones" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
+    </>
+  );
+
+  const coordinatorOptions = (
+    <>
+      <Link to="/usuarios" id="Eventos" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <PeopleIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Usuarios" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
+    </>
+  );
+
+  function SidebarContent() {
+    return (
+      <>
+        <Stack bgcolor={"#18529d"} flex={"1 1 auto"} color={"white"}>
+          <Toolbar />
+          <Typography variant="h4" sx={{ padding: "10px" }} align="center">
+            SAEFEI
+          </Typography>
+          <Divider />
+          <List sx={{ height: "100%" }}>
+            {nonAuthOptions}
+            {user !== null && authOptions}
+            <Divider />
+            {user !== null
+              ? user.rol.id === idRol.COORDINADOR && coordinatorOptions
+              : false}
+          </List>
+          <Divider />
+        </Stack>
+      </>
+    );
+  }
+
+  const drawerWidth = 240;
+
   return (
-    <Stack bgcolor={"#18529d"} flex={"1 1 auto"} color={"white"}>
-      <Toolbar />
-      <Typography variant="h4" sx={{ padding: "10px" }} align="center">
-        SAEFEI
-      </Typography>
-      <Divider />
-      <List sx={{ height: "100%" }}>
-        {nonAuthOptions}
-        {user !== null && authOptions}
-        <Divider />
-        {user !== null
-          ? user.rol.id === idRol.COORDINADOR && coordinatorOptions
-          : false}
-      </List>
-      <Divider />
-    </Stack>
+    <Box
+      component="nav"
+      sx={{
+        width: { sm: drawerWidth },
+        flexShrink: { sm: 0 },
+        bgcolor: "red",
+      }}
+      aria-label="mailbox folders"
+      display={"flex"}
+      height={"100%"}
+    >
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onTransitionEnd={handleDrawerTransitionEnd}
+        onClose={handleDrawerClose}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+          },
+        }}
+      >
+        {<SidebarContent />}
+      </Drawer>
+      <Stack display={{ xs: "none", sm: "flex" }} flex="1 1 auto">
+        {<SidebarContent />}
+      </Stack>
+    </Box>
   );
 }

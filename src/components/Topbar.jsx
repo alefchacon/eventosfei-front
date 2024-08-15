@@ -19,7 +19,7 @@ import { useAuth } from "../providers/AuthProvider";
 
 export default function Topbar({
   noticeAmount = 0,
-
+  title = "Calendario",
   onLogOutClick,
   onMenuIconClick,
 }) {
@@ -105,7 +105,7 @@ export default function Topbar({
               </IconButton>
 
               <Typography variant="h6" noWrap component="div">
-                hey man
+                {title}
               </Typography>
             </Stack>
 
