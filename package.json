@@ -21,6 +21,7 @@
     "axios": "^1.6.8",
     "formik": "^2.4.5",
     "formik-mui": "^5.0.0-alpha.0",
+    "html2pdf.js": "^0.10.2",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "moment": "^2.30.1",

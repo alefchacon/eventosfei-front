@@ -66,34 +66,21 @@ export default function Users() {
           display={"flex"}
           justifyContent={"end"}
         >
-          {false && (
-            <>
-              <Button
-                variant="contained"
-                onClick={() =>
-                  showDialog(
-                    "Importar usuario",
-                    DialogTypes.multiUserForm,
-                    () => handleStoreUser
-                  )
-                }
-              >
-                Importar usuarios
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() =>
-                  showDialog(
-                    "Registrar usuario",
-                    DialogTypes.userForm,
-                    () => handleStoreUser
-                  )
-                }
-              >
-                Registrar usuario
-              </Button>
-            </>
-          )}
+          <>
+            <Button
+              variant="contained"
+              onClick={() =>
+                showDialog(
+                  "Registrar usuario",
+                  DialogTypes.userForm,
+                  () => handleStoreUser
+                )
+              }
+            >
+              Registrar usuario
+            </Button>
+          </>
+
           <Stack
             position={"absolute"}
             bottom={0}

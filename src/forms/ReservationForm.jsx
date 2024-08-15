@@ -141,7 +141,12 @@ function SpaceRadio({
   );
 }
 
-export default function Reservation({ onCancel, onSubmit, idUsuario = 0 }) {
+export default function ReservationForm({
+  onCancel,
+  onSubmit,
+  idUsuario = 0,
+  setTitle,
+}) {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(moment());
   const [start, setStart] = useState(moment());
@@ -151,6 +156,8 @@ export default function Reservation({ onCancel, onSubmit, idUsuario = 0 }) {
   const [space, setSpace] = useState();
 
   //const {isLoading, setIsLoading} = useIsLoading();
+
+  setTitle("Reservar");
 
   const { showSnackbar } = useSnackbar();
 
@@ -318,7 +325,7 @@ export default function Reservation({ onCancel, onSubmit, idUsuario = 0 }) {
           paddingLeft={0}
           color={"text.secondary"}
         >
-          Espacios de la FEI
+          Seleccione el espacio que desea reservar:
         </Typography>
         <Stack
           flex={"1 1 auto"}

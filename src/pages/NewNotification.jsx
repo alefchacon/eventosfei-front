@@ -49,6 +49,8 @@ import { eventSchema } from "../validation/modelSchemas/eventSchema.js";
 
 import DialogContent from "@mui/material/DialogContent";
 
+import { estado } from "../validation/enums/estado.js";
+
 function BooleanRadio({
   label = "Pregunta",
   name = "name",
@@ -97,7 +99,7 @@ function CustomTabPanel(props) {
   );
 }
 
-function NewNotification() {
+function NewNotification({ idUsuario, setTitle }) {
   const numSteps = 7;
   const [programasEducativos, setProgramasEducativos] = useState([]);
   const [reservations, setReservations] = useState([]);
@@ -116,6 +118,8 @@ function NewNotification() {
   const [showComputerCenterRequirements, setShowComputerCenterRequirements] =
     useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  setTitle("Notificar");
 
   const noReservationMessage =
     "Para notificar un evento presencial o híbrido, primero debe contar con reservaciones de espacios aprobadas por administración, de lo contrario sólo podrá notificar eventos virtuales.";
@@ -188,8 +192,8 @@ function NewNotification() {
   }, []);
 
   const handleSubmitEvent = async () => {
-    console.log("submitting");
     try {
+      console.log("fuck!!!");
       await StoreEvent(values);
       setShowSuccessModal(true);
     } catch (error) {
@@ -289,8 +293,8 @@ function NewNotification() {
 
       adicional: "",
 
-      idUsuario: 1,
-      idEstado: 1,
+      idUsuario: idUsuario,
+      idEstado: estado.NUEVO,
     },
 
     validateOnChange: false,

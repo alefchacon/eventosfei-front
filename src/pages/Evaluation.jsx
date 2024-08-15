@@ -19,10 +19,13 @@ import { useFormik } from "formik";
 import { evaluationSchema } from "../validation/modelSchemas/evaluationSchema.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
+import DotMobileStepper from "../components/MobileStepper.jsx";
+
 import AddEvaluation from "../api/EvaluationService.js";
-import { AddEvidence } from "../api/EvidenceService.js";
 
 import LoadingButton from "../components/LoadingButton.jsx";
+
+import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
 import Typography from "@mui/material/Typography";
 
@@ -37,7 +40,7 @@ function CustomTabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      <Box sx={{ p: 0 }}>
+      <Box sx={{ paddingBottom: 7 }}>
         <div>{children}</div>
       </Box>
     </div>
@@ -58,9 +61,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
   const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
-    //setFEIEvent(FEIEvent);
-    //setIsEvaluated(FEIEvent && FEIEvent.evaluation !== null);
-
     const updateOrientation = () => {
       setShowProgressHorizontal(window.innerWidth < 900);
     };
@@ -117,22 +117,11 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
       const response = await AddEvaluation(values, evidences);
 
       FEIEvent.evaluation = values;
-      //setFEIEvent(FEIEvent);
-      //setIsEvaluated(true);
+      FEIEvent.hasEvaluation = true;
 
-      //showSnackbar(response.data.message);
+      showSnackbar(response.data.message);
     } catch (error) {
-      console.log(error);
-      //showSnackbar(error);
-    }
-  };
-
-  const submitEvidences = async (idEvaluacion, evidences) => {
-    for (let i = 0; i < evidences.length; i++) {
-      const response = await AddEvidence(idEvaluacion, evidences[i]);
-      if (response.status !== 201) {
-        break;
-      }
+      showSnackbar(error.message);
     }
   };
 
@@ -165,15 +154,15 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
 
   return (
     <>
-      <Stack direction={{ md: "row", xs: "column" }} className="fuck">
-        <Box
-          noValidate
-          autoComplete="off"
-          width={"100%"}
-          padding={0}
-          margin={0}
-        >
-          <form autoComplete="off" onSubmit={handleSubmit}>
+      <form autoComplete="off" onSubmit={handleSubmit}>
+        <Stack direction={{ md: "row", xs: "column" }} className="fuck">
+          <Box
+            noValidate
+            autoComplete="off"
+            width={"100%"}
+            padding={0}
+            margin={0}
+          >
             <CustomTabPanel value={value} index={4}>
               <div className="form-page">
                 <Typography variant="h5">
@@ -484,7 +473,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
             <Stack
               direction={"row"}
               padding={3}
-              display={"flex"}
+              display={showIfBig}
               justifyContent={"flex-end"}
               alignItems={"center"}
               spacing={2}
@@ -509,24 +498,24 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                 ></LoadingButton>
               )}
             </Stack>
-          </form>
-        </Box>
+          </Box>
 
-        {!showProgressHorizontal && (
-          <Progress
-            isDisabled={isSubmitting}
-            value={value}
-            changePage={handleChangePage}
-          ></Progress>
+          {!showProgressHorizontal && (
+            <Progress
+              isDisabled={isSubmitting}
+              value={value}
+              changePage={handleChangePage}
+            ></Progress>
+          )}
+        </Stack>
+        {showProgressHorizontal && (
+          <DotMobileStepper
+            steps={5}
+            onChange={handleChangePage}
+            isSubmitting={isSubmitting}
+          />
         )}
-      </Stack>
-      {showProgressHorizontal && (
-        <ProgressHorizontal
-          isDisabled={isSubmitting}
-          value={value}
-          changePage={handleChangePage}
-        ></ProgressHorizontal>
-      )}
+      </form>
     </>
   );
 }

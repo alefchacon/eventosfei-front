@@ -32,6 +32,9 @@ import moment from "moment";
 import "moment/locale/es";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import CustomFab from "../components/CustomFab.jsx";
+import html2pdf from "html2pdf.js";
+
+import ReportView from "./ReportView.jsx";
 
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
@@ -50,7 +53,7 @@ import {
 } from "react-router-dom";
 
 export default function Eventos(
-  { notifications, handleGet, idUsuario = 1 },
+  { notifications, handleGet, idUsuario = 0, setTitle },
   { setSelectedFEIEvent }
 ) {
   const [queriedEvents, setQueriedEvents] = useState([]);
@@ -62,9 +65,10 @@ export default function Eventos(
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [date, setDate] = useState(moment());
+  const [date, setDate] = useState(null);
   const { width } = useWindowSize();
   const isMobile = width < 600;
+  const reportRef = useRef(null);
 
   const { isLoading, setIsLoading } = useIsLoading();
 
@@ -75,20 +79,28 @@ export default function Eventos(
     setIsLoading(true);
 
     let filters = [`?`, `page=${currentPage}`, `${currentFilter}=true`];
-    console.log(currentPage);
     for (const filter of extraFilters) {
       filters.push(filter);
+    }
+    if (date) {
+      filters.push(`inicio=${date.format("YYYY-MM")}`);
     }
     if (idUsuario > 0) {
       filters.push(`idUsuario[eq]=${idUsuario}`);
     }
-    console.log(filters);
     const response = await GetEvents(filters);
 
+    console.log(response.data);
+    setQueriedEvents(response.data.data);
+    setQueriedPagination(response.data.meta);
     setIsLoading(false);
 
-    return response.data.data;
+    //return response.data.data;
   };
+
+  useEffect(() => {
+    handleGetEvents();
+  }, [date]);
 
   const handle = (FEIEvent) => {
     console.log(FEIEvent);
@@ -99,25 +111,14 @@ export default function Eventos(
     const newFilter = event.target.value;
     setCurrentFilter(newFilter);
 
-    const events = await handleGetEvents();
+    await handleGetEvents();
 
-    setQueriedEvents(events);
     setCurrentPage(1);
-  };
-
-  const handleDateChange = async (date) => {
-    setDate(date);
-    const extraFilter = `inicio=${date.format("YYYY-MM")}`;
-    const events = await handleGetEvents([extraFilter]);
-    setQueriedEvents(events);
-    setQueriedPagination(events);
   };
 
   const handleEventSearch = async () => {
     const extraFilter = `nombre=${searchQuery}`;
-    const events = await handleGetEvents([extraFilter]);
-    setQueriedEvents(events);
-    setQueriedPagination(events);
+    await handleGetEvents([extraFilter]);
   };
 
   const handleSearchQueryChange = async (e) => {
@@ -129,6 +130,7 @@ export default function Eventos(
     setQueriedEvents(defaultEvents);
     setQueriedPagination(defaultPagination);
     setCurrentPage(1);
+    setDate(null);
   };
 
   useEffect(() => {
@@ -164,7 +166,9 @@ export default function Eventos(
         console.error("Error fetching data:", error);
       }
     };
-
+    if (idUsuario === 0) {
+      setTitle("Eventos");
+    }
     fetchData();
   }, []); // Empty dependency array means this effect runs once on mount
 
@@ -174,8 +178,7 @@ export default function Eventos(
 
   useEffect(() => {
     async function fetchEvents() {
-      const events = await handleGetEvents();
-      setQueriedEvents(events);
+      await handleGetEvents();
       window.scrollTo(0, 0);
     }
     fetchEvents();
@@ -278,19 +281,38 @@ export default function Eventos(
     doc.output("dataurlnewwindow");
   };
 
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  const convertToPdf = () => {
+    const report = <ReportView reportRef={reportRef} events={queriedEvents} />;
+    console.log(report);
+    const content = reportRef.current;
+    html2pdf().set(options).from(report).save();
+  };
+
+  const options = {
+    filename: "my-document.pdf",
+    margin: 1,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+  };
+
   const filters = (
-    <>
+    <Stack bgcolor={""}>
       <Stack
         direction={{ md: "row", xs: "column" }}
         padding={2}
         spacing={3}
         display={"flex"}
+        className="fuck"
       >
         <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
           <DatePicker
             label={"Buscar por mes"}
             views={["month", "year"]}
-            onYearChange={handleDateChange}
+            onYearChange={(date) => setDate(date)}
+            value={date}
           />
         </LocalizationProvider>
         <FormControl>
@@ -301,15 +323,16 @@ export default function Eventos(
             label="Ordenar por"
             value={currentFilter}
             onChange={handleFilterChange}
+            fullWidth
           >
             <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
             <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
           </Select>
         </FormControl>
 
-        <Stack direction={"row"}>
+        <Stack direction={"row"} flexGrow={1}>
           <TextField
-            fullWidth={{ md: "false", xs: "true" }}
+            fullWidth={{ md: "true", xs: "true" }}
             onChange={handleSearchQueryChange}
             value={searchQuery}
             placeholder="Buscar por título u organizador"
@@ -348,20 +371,24 @@ export default function Eventos(
           </Button>
         </Tooltip>
       </Stack>
-    </>
+    </Stack>
   );
 
   const [showModal, setShowModal] = useState(false);
   const toggleModal = () => setShowModal(!showModal);
 
+  const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
+
   return (
     <Stack>
+      {generatingPDF && (
+        <ReportView
+          reportRef={reportRef}
+          events={queriedEvents}
+          onFinishReport={toggleReportGeneration}
+        />
+      )}
       <Stack display={showIfBig}>{filters}</Stack>
-      <Stack display={showIfSmall} padding={2}>
-        <Button variant="outlined" onClick={toggleModal}>
-          Filtros
-        </Button>
-      </Stack>
 
       <ResponsiveDialog
         open={showModal}
@@ -373,16 +400,22 @@ export default function Eventos(
       </ResponsiveDialog>
 
       <Stack
-        direction={{ lg: "row", xs: "column" }}
+        direction={"row"}
         padding={2}
         spacing={3}
         display={"flex"}
         justifyContent={"end"}
       >
-        <Button variant="outlined" onClick={getReport}>
+        <Button variant="outlined" onClick={toggleReportGeneration}>
           Descargar reporte
         </Button>
-
+        <Button
+          variant="outlined"
+          onClick={toggleModal}
+          sx={{ display: showIfSmall }}
+        >
+          Filtros
+        </Button>
         <CustomFab></CustomFab>
       </Stack>
 

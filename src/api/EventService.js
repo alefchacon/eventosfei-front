@@ -96,13 +96,6 @@ export const StoreEvent = async (values) => {
   newValues.programas = JSON.stringify(newValues.programas);
   newValues.reservaciones = JSON.stringify(newValues.reservaciones);  
 
-  /*
-  Object.entries(newValues).map(([key, value])=> {
-    if (!value){
-
-      delete newValues[key]
-    }
-  })*/
 
   console.log(newValues)
 

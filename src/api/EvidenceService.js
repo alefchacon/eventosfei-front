@@ -1,13 +1,11 @@
 import { urlEvidences } from "./urls"
 import { client } from "./Client";
 
-export const AddEvidence = async (idEvaluacion, evidence) => {
-  console.log(evidence)
-  const formData = new FormData();
-  formData.append('Evidencia[archivo]', evidence);
-  formData.append('Evidencia[idEvaluacion]', idEvaluacion);
-
-  const response = await client.post(urlEvidences, formData);
+export const GetEvidencesFor = async (idEvaluaciones = [9,10]) => {
+  const body = {
+    "idEvaluaciones": idEvaluaciones
+  }
+  const response = await client.post(urlEvidences, body);
   return response;
 }
 

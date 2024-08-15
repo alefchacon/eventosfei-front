@@ -13,8 +13,10 @@ import {
 import { modalidad } from "../validation/enums/modalidad.js";
 
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
-function parseDate(date) {
+function parseDate(momentDate) {
+  const date = new Date(moment(momentDate).format("YYYY-MM-DD"));
   return `${date.toLocaleString("es-MX", {
     weekday: "long",
   })}, ${date.getDate()} de ${date.toLocaleString("es-MX", {

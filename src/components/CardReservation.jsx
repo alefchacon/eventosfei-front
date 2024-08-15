@@ -100,7 +100,7 @@ export default function CardReservation({
         >{`${moment(item.start).format("HH:mm")} - ${moment(item.end).format(
           "HH:mm"
         )}`}</Typography>
-        <Organizer user={item.user}></Organizer>
+        {item.user && <Organizer user={item.user}></Organizer>}
       </CardContent>
     </Card>
   );

@@ -22,7 +22,7 @@ function CustomTabPanel({ children, value, index, onSelect }) {
       aria-labelledby={`simple-tab-${index}`}
     >
       {value === index && (
-        <Box sx={{ padding: { md: 2, xs: 0 } }}>{children}</Box>
+        <Box sx={{ padding: { md: 2, xs: 2 } }}>{children}</Box>
       )}
     </div>
   );

@@ -14,9 +14,11 @@ import CustomTabs from "../components/CustomTabs";
 import { GetUserEvents } from "../api/EventService";
 import { GetProfile } from "../api/UserService";
 
-export default function Profile({ user }) {
+export default function Profile({ user, setTitle }) {
   const [value, setValue] = useState(0);
   const [idUsuario, setIdUsuario] = useState(1);
+
+  setTitle("Usuario");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -39,7 +41,7 @@ export default function Profile({ user }) {
           <Eventos
             notifications={false}
             handleGet={GetUserEvents}
-            idUsuario={1}
+            idUsuario={user.id}
           ></Eventos>
         </Stack>
         <Stack label="Reservaciones">asdf</Stack>
