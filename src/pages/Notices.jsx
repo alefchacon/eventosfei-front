@@ -46,10 +46,11 @@ export default function Notices(
 
   useEffect(() => {}, [currentPage]);
 
-  const fetchData = async (page = currentPage) => {
+  const fetchData = async (page = 1) => {
     //debugger;;
     const pagedNotices = await getNotices(page);
-    console.log(getNotices);
+
+    console.log(pagedNotices);
     setCurrentPage(pagedNotices.meta.current_page);
     setTotalPages(pagedNotices.meta.total_pages ?? pagedNotices.meta.last_page);
     setNotices(pagedNotices.data);

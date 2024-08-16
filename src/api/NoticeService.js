@@ -1,8 +1,8 @@
 import { urlNotices, urlNoticesMarkAsUserRead } from "./urls";
 import { client } from "./Client";
 
-export const GetNotices = async (filters = []) => {
-  return await client.get(urlNotices);
+export const GetNotices = async (page) => {
+  return await client.get(urlNotices.concat(`page=${page}`));
 }
 export const GetNoticeAmount = async () => {
   return await client.get(urlNotices.concat("?soloCantidad=true"));

@@ -26,8 +26,8 @@ import { useIsLoading } from "../providers/LoadingProvider";
 
 //const event = events[0];
 
-function createData(name, calories) {
-  return { name, calories };
+function createData(name, value) {
+  return { name, value };
 }
 
 const getRows = (event) => {
@@ -74,47 +74,14 @@ export default function ReportView({
   onFinishReport,
   dateString = "dateString",
 }) {
-  //
-  //const reportRef = useRef(null);
-  const [evidences, setEvidencies] = useState([]);
-  const [fetched, setFetched] = useState(false);
-
-  const { setIsLoading } = useIsLoading();
-
   useEffect(() => {
-    async function fetchEvidences() {
-      const idEvaluaciones = events.map((event) => event["idEvaluacion"]);
-      const evidences = (
-        await GetEvidencesFor(idEvaluaciones.filter((id) => id))
-      ).data;
-      setEvidencies(evidences);
-      setFetched(true);
-    }
-    console.log(events);
-    setIsLoading(true);
-    if (!fetched) {
-      fetchEvidences();
-    }
-    setIsLoading(false);
+    convertToPdf();
   }, []);
-
-  useEffect(() => {
-    if (fetched) {
-      convertToPdf();
-    }
-  }, [fetched]);
 
   function EventReport({ event }) {
     const rows = getRows(event);
     return (
       <>
-        {evidences[10]?.map((evidence, index) => {
-          <img
-            key={index}
-            src={`data:${evidence.type};base64,${evidence.file}`}
-            alt="Base64 Image"
-          />;
-        })}
         <CardEvent props={event}></CardEvent>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -139,18 +106,17 @@ export default function ReportView({
         <Typography variant="h5" sx={{ pageBreakBefore: "always" }}>
           Evidencias
         </Typography>
-        {Object.entries(evidences).length > 0 &&
-          evidences[event.idEvaluacion]?.map((evidence, index) => (
-            <>
-              <Typography variant="h6">Evidencia {index + 1}</Typography>
-              <br />
-              <img
-                src={`data:${evidence.type};base64,${evidence.file}`}
-                alt="Base64 Image"
-              />
-              <div style={{ pageBreakAfter: "always" }}></div>
-            </>
-          ))}
+        {event.evidences?.map((evidence, index) => (
+          <>
+            <Typography variant="h6">Evidencia {index + 1}</Typography>
+            <br />
+            <img
+              src={`data:${evidence.type};base64,${evidence.file}`}
+              alt="Base64 Image"
+            />
+            <div style={{ pageBreakAfter: "always" }}></div>
+          </>
+        ))}
       </>
     );
   }
@@ -163,23 +129,16 @@ export default function ReportView({
     jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
   };
 
-  const convertToPdf = () => {
+  const convertToPdf = async () => {
     const content = reportRef.current.innerHTML;
-    setGeneratingPDF(true);
-    //reportRef.current.style.display = "block";
-
     html2pdf()
       .set(options)
       .from(content)
       .save()
       .then(() => {
         onFinishReport();
-        //reportRef.current.style.display = "none";
-        //setGeneratingPDF(false);
       });
   };
-
-  const [generatingPDF, setGeneratingPDF] = useState(false);
 
   return (
     <Stack>

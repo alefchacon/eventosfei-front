@@ -3,8 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import Card from "../components/CardEvent.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
-import Typography from "@mui/material/Typography";
-import { Container } from "@mui/material";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";
 import Pagination from "@mui/material/Pagination";
@@ -15,15 +13,11 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import Grid from "@mui/material/Grid";
 import ClearIcon from "@mui/icons-material/Clear";
-import emotionStyledBase from "@emotion/styled/base";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useWindowSize from "../hooks/useWindowSize.jsx";
 import Tooltip from "@mui/material/Tooltip";
-import Fab from "@mui/material/Fab";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
+import { useSnackbar } from "../providers/SnackbarProvider.jsx";
 
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -33,25 +27,12 @@ import "moment/dist/locale/es-mx";
 
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import CustomFab from "../components/CustomFab.jsx";
-import html2pdf from "html2pdf.js";
 
-import ReportView from "./ReportView.jsx";
+import ReportGenerator from "./ReportView.jsx";
 
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
 import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
-import { jsPDF } from "jspdf";
-
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
-import GetFullDateString from "../util/GetFullDateString.js";
 
 export default function Eventos(
   { notifications, handleGet, idUsuario = 0, setTitle },
@@ -61,11 +42,12 @@ export default function Eventos(
   const [defaultEvents, setDefaultEvents] = useState([]);
   const [queriedPagination, setQueriedPagination] = useState(1);
   const [defaultPagination, setDefaultPagination] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [currentFilter, setCurrentFilter] = useState("porFechaEnvio");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  const [ready, setReady] = useState(false);
 
   moment.locale("es-mx");
   const [date, setDate] = useState(null);
@@ -74,13 +56,16 @@ export default function Eventos(
   const reportRef = useRef(null);
 
   const { isLoading, setIsLoading } = useIsLoading();
+  const { showSnackbar } = useSnackbar();
 
-  const handleGetEvents = async (extraFilters = []) => {
+  const fetchEvents = async (fullFetch = false) => {
     setIsLoading(true);
 
-    let filters = [`?`, `page=${currentPage}`, `${currentFilter}=true`];
-    for (const filter of extraFilters) {
-      filters.push(filter);
+    let filters = [`page=${currentPage}`, `${currentFilter}=true`];
+
+    if (fullFetch) {
+      filters.push(`todo=true`);
+      filters.push(`evidencias=true`);
     }
     if (date) {
       filters.push(`inicio=${date.format("YYYY-MM")}`);
@@ -88,41 +73,33 @@ export default function Eventos(
     if (idUsuario > 0) {
       filters.push(`idUsuario[eq]=${idUsuario}`);
     }
+    if (searchQuery) {
+      filters.push(`nombre=${searchQuery}`);
+    }
     const response = await GetEvents(filters);
 
-    console.log(response.data);
-    setQueriedEvents(response.data.data);
-    setQueriedPagination(response.data.meta);
     setIsLoading(false);
 
-    //return response.data.data;
-  };
-
-  useEffect(() => {
-    handleGetEvents();
-  }, [date]);
-
-  const handle = (FEIEvent) => {
-    console.log(FEIEvent);
-    setSelectedFEIEvent(FEIEvent);
+    return response;
   };
 
   const handleFilterChange = async (event) => {
     const newFilter = event.target.value;
     setCurrentFilter(newFilter);
 
-    await handleGetEvents();
+    getEventsOnFilterChange();
 
     setCurrentPage(1);
   };
 
-  const handleEventSearch = async () => {
-    const extraFilter = `nombre=${searchQuery}`;
-    await handleGetEvents([extraFilter]);
-  };
-
   const handleSearchQueryChange = async (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const getEventsOnFilterChange = async () => {
+    const response = await fetchEvents();
+    setQueriedEvents(response.data.data);
+    setQueriedPagination(response.data.meta);
   };
 
   const handleClearSearchQuery = (e) => {
@@ -130,167 +107,150 @@ export default function Eventos(
     setQueriedEvents(defaultEvents);
     setQueriedPagination(defaultPagination);
     setCurrentPage(1);
+    setCurrentFilter("");
     setDate(null);
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setIsLoading(true);
-
-        let response = [];
-
-        let initialFilters = [`page=${currentPage}`, `${currentFilter}=true`];
-        console.log(initialFilters);
-
-        if (idUsuario > 0) {
-          initialFilters.push(`idUsuario[eq]=${idUsuario}`);
-        }
-
-        response = await GetEvents(initialFilters);
-
-        if (!response.status === 200) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = response.data;
-        const events = data.data;
-        setQueriedEvents(events);
-        setDefaultEvents(events);
-        setQueriedPagination(data.meta);
-        setDefaultPagination(data.meta);
-
-        setLoading(false);
-        //setItems(response)
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      const response = await fetchEvents();
+      setQueriedEvents(response.data.data);
+      setQueriedPagination(response.data.meta);
+      setDefaultPagination(response.data.meta);
+      setDefaultEvents(response.data.data);
+      setReady(true);
     };
     if (idUsuario === 0) {
       setTitle("Eventos");
     }
     fetchData();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   const handlePageChange = async (event, newPage) => {
     setCurrentPage(newPage);
   };
 
   useEffect(() => {
-    async function fetchEvents() {
-      await handleGetEvents();
-      window.scrollTo(0, 0);
+    if (!ready) {
+      return;
     }
-    fetchEvents();
-  }, [currentPage, currentFilter]);
+    getEventsOnFilterChange();
+  }, [currentPage, currentFilter, date]);
 
   const [generatingPDF, setGeneratingPDF] = useState(false);
 
-  const convertToPdf = () => {
-    const report = <ReportView reportRef={reportRef} events={queriedEvents} />;
-    console.log(report);
-    const content = reportRef.current;
-    html2pdf().set(options).from(report).save();
-  };
-
-  const options = {
-    filename: "my-document.pdf",
-    margin: 1,
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, avoidPageSplit: true },
-    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    pagebreak: { avoid: ["img", "td"] },
+  const handleEnter = (e) => {
+    switch (e.key) {
+      case "Enter":
+        getEventsOnFilterChange();
+        break;
+      case "Escape":
+        setSearchQuery("");
+        break;
+      default:
+        break;
+    }
   };
 
   const filters = (
-    <Stack bgcolor={""}>
-      <Stack
-        direction={{ md: "row", xs: "column" }}
-        padding={2}
-        spacing={3}
-        display={"flex"}
-        className="fuck"
-      >
-        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
-          <DatePicker
-            label={"Buscar por mes"}
-            views={["month", "year"]}
-            onYearChange={(date) => setDate(date)}
-            value={date}
-          />
-        </LocalizationProvider>
-        <FormControl>
-          <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            label="Ordenar por"
-            value={currentFilter}
-            onChange={handleFilterChange}
-            fullWidth
-          >
-            <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
-            <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
-          </Select>
-        </FormControl>
-
-        <Stack direction={"row"} flexGrow={1}>
-          <TextField
-            fullWidth={{ md: "true", xs: "true" }}
-            onChange={handleSearchQueryChange}
-            value={searchQuery}
-            placeholder="Buscar por título u organizador"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  {searchQuery !== "" ? (
-                    <IconButton
-                      aria-label="search"
-                      edge="end"
-                      onClick={handleClearSearchQuery}
-                    >
-                      {false ? <ClearIcon /> : ""}
-                      <ClearIcon />
-                    </IconButton>
-                  ) : (
-                    ""
-                  )}
-                </InputAdornment>
-              ),
-            }}
-          ></TextField>
-          <Button
-            variant="contained"
-            aria-label="search"
-            edge="end"
-            disableElevation
-            onClick={handleEventSearch}
-          >
-            <SearchIcon />
-          </Button>
-        </Stack>
-        <Tooltip title="Limpiar filtros">
-          <Button variant="outlined" onClick={handleClearSearchQuery}>
-            <FilterAltOffIcon />
-          </Button>
-        </Tooltip>
+    <Stack
+      direction={{ md: "row", xs: "column" }}
+      padding={2}
+      spacing={3}
+      display={"flex"}
+      className="fuck"
+    >
+      <Stack id={"text-field"} direction={"row"} flexGrow={2}>
+        <TextField
+          onKeyDown={handleEnter}
+          fullWidth
+          onChange={handleSearchQueryChange}
+          value={searchQuery}
+          placeholder="Buscar por título u organizador"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                {searchQuery !== "" ? (
+                  <IconButton
+                    aria-label="search"
+                    edge="end"
+                    onClick={handleClearSearchQuery}
+                  >
+                    {false ? <ClearIcon /> : ""}
+                    <ClearIcon />
+                  </IconButton>
+                ) : (
+                  ""
+                )}
+              </InputAdornment>
+            ),
+          }}
+        ></TextField>
+        <Button
+          variant="contained"
+          aria-label="search"
+          edge="end"
+          disableElevation
+          onClick={fetchEvents}
+        >
+          <SearchIcon />
+        </Button>
       </Stack>
+      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
+        <DatePicker
+          sx={{ flexGrow1: 1 }}
+          label={"Buscar por mes"}
+          views={["month", "year"]}
+          onYearChange={(date) => setDate(date)}
+          value={date}
+        />
+      </LocalizationProvider>
+      <FormControl sx={{ flexGrow: 2, minWidth: "13rem" }}>
+        <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="Ordenar por"
+          value={currentFilter}
+          onChange={handleFilterChange}
+          fullWidth
+        >
+          <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
+          <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
+        </Select>
+      </FormControl>
+
+      <Tooltip title="Limpiar filtros">
+        <Button variant="outlined" onClick={handleClearSearchQuery}>
+          <FilterAltOffIcon />
+        </Button>
+      </Tooltip>
     </Stack>
   );
 
   const [showModal, setShowModal] = useState(false);
   const toggleModal = () => setShowModal(!showModal);
+  const [reportEvents, setReportEvents] = useState({});
+
+  const generateReport = async () => {
+    showSnackbar("Obteniendo evidencias y generando el reporte...", "asdf");
+    const response = await fetchEvents(true);
+    setReportEvents(response.data.data);
+    toggleReportGeneration();
+  };
 
   const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
 
   return (
     <Stack>
       {generatingPDF && (
-        <ReportView
+        <ReportGenerator
           reportRef={reportRef}
-          events={queriedEvents}
-          onFinishReport={toggleReportGeneration}
-          dateString={date.format("MMMM YYYY")}
+          events={reportEvents}
+          onFinishReport={() => setGeneratingPDF(false)}
+          dateString={
+            date ? date.format("MMMM YYYY") : moment().format("MMMM YYYY")
+          }
         />
       )}
       <Stack display={showIfBig}>{filters}</Stack>
@@ -311,7 +271,7 @@ export default function Eventos(
         display={"flex"}
         justifyContent={"end"}
       >
-        <Button variant="outlined" onClick={toggleReportGeneration}>
+        <Button variant="outlined" onClick={generateReport}>
           Descargar reporte
         </Button>
         <Button
@@ -326,17 +286,12 @@ export default function Eventos(
 
       <Stack spacing={{ md: 2 }} margin={{ md: 1 }}>
         {queriedEvents.map((item) => (
-          <Card
-            props={item}
-            key={item.id}
-            parentHandle={handle}
-            isProfile={idUsuario !== 0}
-          ></Card>
+          <Card props={item} key={item.id} isProfile={idUsuario !== 0}></Card>
         ))}
       </Stack>
       {!isLoading && (
         <Pagination
-          count={queriedPagination.total_pages}
+          count={queriedPagination.total_pages ?? queriedPagination.last_page}
           onChange={handlePageChange}
           color="primary"
           size="large"
