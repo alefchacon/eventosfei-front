@@ -12,6 +12,8 @@ import Stack from "@mui/material/Stack";
 import moment from "moment";
 import { useAuth } from "../providers/AuthProvider";
 
+import { estado } from "../validation/enums/estado";
+
 import { Link } from "react-router-dom";
 
 const bull = (
@@ -33,6 +35,7 @@ export default function CardEvent(
     id = 0,
     name = "nombre del evento",
     status = { name: "estado" },
+    idEstado = 0,
     user = { id: 0, names: "asdf", paternalName: "asdf" },
     program = "Programa educativo",
     start = "31 de diciembre del 9999 - 23:59 hrs",
@@ -66,7 +69,7 @@ export default function CardEvent(
           <Typography variant="h6" component="div">
             <Link to={`/eventos/${id}`}> {name} </Link>
           </Typography>
-          <Chip label={status.name} onClick={handleClick} />
+          <Chip label={estado.fromValue(idEstado)} onClick={handleClick} />
         </Stack>
         <br />
         {!isProfile && (

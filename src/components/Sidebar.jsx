@@ -130,8 +130,6 @@ export default function Sidebar({
     </>
   );
 
-  console.log(user);
-
   function SidebarContent() {
     return (
       <>
