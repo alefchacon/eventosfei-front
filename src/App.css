@@ -209,3 +209,30 @@ main{
 ul{
   margin: 0;
 }
+
+@media print {
+  table, div   {
+      break-inside: avoid;
+  }
+}
+
+thead { display: table-header-group; }
+tfoot { display: table-row-group;}
+img {
+  page-break-after: auto!important;
+  page-break-inside: avoid;
+  
+  max-width: 100%;
+  height: auto;  /* Maintain aspect ratio */
+  max-height: 100%;
+  display: block;
+  margin: auto;
+}
+
+.card-event{
+}
+
+.break-after{
+  page-break-after: always!important;
+
+}

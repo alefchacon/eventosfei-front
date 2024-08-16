@@ -29,8 +29,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import moment from "moment";
-import "moment/dist/locale/es-mx";
-
+import "moment/locale/es";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import CustomFab from "../components/CustomFab.jsx";
 import html2pdf from "html2pdf.js";
@@ -40,6 +39,7 @@ import ReportView from "./ReportView.jsx";
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
 import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
+
 import { jsPDF } from "jspdf";
 
 import {
@@ -51,9 +51,8 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import GetFullDateString from "../util/GetFullDateString.js";
 
-export default function Eventos(
+export default function Reports(
   { notifications, handleGet, idUsuario = 0, setTitle },
   { setSelectedFEIEvent }
 ) {
@@ -66,14 +65,15 @@ export default function Eventos(
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-
-  moment.locale("es-mx");
   const [date, setDate] = useState(null);
   const { width } = useWindowSize();
   const isMobile = width < 600;
   const reportRef = useRef(null);
 
   const { isLoading, setIsLoading } = useIsLoading();
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleGetEvents = async (extraFilters = []) => {
     setIsLoading(true);
@@ -92,10 +92,7 @@ export default function Eventos(
 
     console.log(response.data);
     setQueriedEvents(response.data.data);
-    setQueriedPagination(response.data.meta);
     setIsLoading(false);
-
-    //return response.data.data;
   };
 
   useEffect(() => {
@@ -105,32 +102,6 @@ export default function Eventos(
   const handle = (FEIEvent) => {
     console.log(FEIEvent);
     setSelectedFEIEvent(FEIEvent);
-  };
-
-  const handleFilterChange = async (event) => {
-    const newFilter = event.target.value;
-    setCurrentFilter(newFilter);
-
-    await handleGetEvents();
-
-    setCurrentPage(1);
-  };
-
-  const handleEventSearch = async () => {
-    const extraFilter = `nombre=${searchQuery}`;
-    await handleGetEvents([extraFilter]);
-  };
-
-  const handleSearchQueryChange = async (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleClearSearchQuery = (e) => {
-    setSearchQuery("");
-    setQueriedEvents(defaultEvents);
-    setQueriedPagination(defaultPagination);
-    setCurrentPage(1);
-    setDate(null);
   };
 
   useEffect(() => {
@@ -157,8 +128,6 @@ export default function Eventos(
         const events = data.data;
         setQueriedEvents(events);
         setDefaultEvents(events);
-        setQueriedPagination(data.meta);
-        setDefaultPagination(data.meta);
 
         setLoading(false);
         //setItems(response)
@@ -166,9 +135,10 @@ export default function Eventos(
         console.error("Error fetching data:", error);
       }
     };
+    /*
     if (idUsuario === 0) {
-      setTitle("Eventos");
-    }
+      setTitle("Reportes");
+    }*/
     fetchData();
   }, []); // Empty dependency array means this effect runs once on mount
 
@@ -197,91 +167,36 @@ export default function Eventos(
     filename: "my-document.pdf",
     margin: 1,
     image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, avoidPageSplit: true },
+    html2canvas: { scale: 2 },
     jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    pagebreak: { avoid: ["img", "td"] },
   };
 
-  const filters = (
-    <Stack bgcolor={""}>
-      <Stack
-        direction={{ md: "row", xs: "column" }}
-        padding={2}
-        spacing={3}
-        display={"flex"}
-        className="fuck"
-      >
-        <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es">
-          <DatePicker
-            label={"Buscar por mes"}
-            views={["month", "year"]}
-            onYearChange={(date) => setDate(date)}
-            value={date}
-          />
-        </LocalizationProvider>
-        <FormControl>
-          <InputLabel id="demo-simple-select-label">Ordenar por</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            label="Ordenar por"
-            value={currentFilter}
-            onChange={handleFilterChange}
-            fullWidth
-          >
-            <MenuItem value={"porFechaEnvio"}>Fecha de notificación</MenuItem>
-            <MenuItem value={"porAlfabetico"}>Orden alfabético</MenuItem>
-          </Select>
-        </FormControl>
+  const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
 
-        <Stack direction={"row"} flexGrow={1}>
-          <TextField
-            fullWidth={{ md: "true", xs: "true" }}
-            onChange={handleSearchQueryChange}
-            value={searchQuery}
-            placeholder="Buscar por título u organizador"
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  {searchQuery !== "" ? (
-                    <IconButton
-                      aria-label="search"
-                      edge="end"
-                      onClick={handleClearSearchQuery}
-                    >
-                      {false ? <ClearIcon /> : ""}
-                      <ClearIcon />
-                    </IconButton>
-                  ) : (
-                    ""
-                  )}
-                </InputAdornment>
-              ),
-            }}
-          ></TextField>
-          <Button
-            variant="contained"
-            aria-label="search"
-            edge="end"
-            disableElevation
-            onClick={handleEventSearch}
-          >
-            <SearchIcon />
-          </Button>
-        </Stack>
-        <Tooltip title="Limpiar filtros">
-          <Button variant="outlined" onClick={handleClearSearchQuery}>
-            <FilterAltOffIcon />
-          </Button>
-        </Tooltip>
-      </Stack>
+  const filters = (
+    <Stack
+      direction={{ md: "row", xs: "column" }}
+      padding={2}
+      spacing={3}
+      display={"flex"}
+      className="fuck"
+    >
+      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="es-MX">
+        <DatePicker
+          label={"Buscar por mes"}
+          views={["month", "year"]}
+          onYearChange={(date) => setDate(date)}
+          value={date}
+        />
+      </LocalizationProvider>
+      <Button variant="outlined" onClick={toggleReportGeneration}>
+        Descargar reporte
+      </Button>
     </Stack>
   );
 
   const [showModal, setShowModal] = useState(false);
   const toggleModal = () => setShowModal(!showModal);
-
-  const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
 
   return (
     <Stack>
@@ -290,7 +205,6 @@ export default function Eventos(
           reportRef={reportRef}
           events={queriedEvents}
           onFinishReport={toggleReportGeneration}
-          dateString={date.format("MMMM YYYY")}
         />
       )}
       <Stack display={showIfBig}>{filters}</Stack>
@@ -304,26 +218,6 @@ export default function Eventos(
         {filters}
       </ResponsiveDialog>
 
-      <Stack
-        direction={"row"}
-        padding={2}
-        spacing={3}
-        display={"flex"}
-        justifyContent={"end"}
-      >
-        <Button variant="outlined" onClick={toggleReportGeneration}>
-          Descargar reporte
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={toggleModal}
-          sx={{ display: showIfSmall }}
-        >
-          Filtros
-        </Button>
-        <CustomFab></CustomFab>
-      </Stack>
-
       <Stack spacing={{ md: 2 }} margin={{ md: 1 }}>
         {queriedEvents.map((item) => (
           <Card
@@ -334,20 +228,6 @@ export default function Eventos(
           ></Card>
         ))}
       </Stack>
-      {!isLoading && (
-        <Pagination
-          count={queriedPagination.total_pages}
-          onChange={handlePageChange}
-          color="primary"
-          size="large"
-          page={currentPage}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            padding: 3,
-          }}
-        />
-      )}
     </Stack>
   );
 }

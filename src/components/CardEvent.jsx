@@ -56,6 +56,7 @@ export default function CardEvent(
         bgcolor: "white",
       }}
       elevation={elevated ? 1 : 0}
+      className="card-event"
     >
       <CardContent sx={{ padding: 2 }}>
         <Stack

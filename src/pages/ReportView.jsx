@@ -68,7 +68,12 @@ const getRows = (event) => {
   ];
 };
 
-export default function ReportView({ reportRef, events, onFinishReport }) {
+export default function ReportView({
+  reportRef,
+  events,
+  onFinishReport,
+  dateString = "dateString",
+}) {
   //
   //const reportRef = useRef(null);
   const [evidences, setEvidencies] = useState([]);
@@ -79,7 +84,9 @@ export default function ReportView({ reportRef, events, onFinishReport }) {
   useEffect(() => {
     async function fetchEvidences() {
       const idEvaluaciones = events.map((event) => event["idEvaluacion"]);
-      const evidences = (await GetEvidencesFor(idEvaluaciones)).data;
+      const evidences = (
+        await GetEvidencesFor(idEvaluaciones.filter((id) => id))
+      ).data;
       setEvidencies(evidences);
       setFetched(true);
     }
@@ -129,13 +136,20 @@ export default function ReportView({ reportRef, events, onFinishReport }) {
             </TableBody>
           </Table>
         </TableContainer>
-        <Typography variant="h5">Evidencias</Typography>
+        <Typography variant="h5" sx={{ pageBreakBefore: "always" }}>
+          Evidencias
+        </Typography>
         {Object.entries(evidences).length > 0 &&
-          evidences[event.idEvaluacion]?.map((evidence) => (
-            <img
-              src={`data:${evidence.type};base64,${evidence.file}`}
-              alt="Base64 Image"
-            />
+          evidences[event.idEvaluacion]?.map((evidence, index) => (
+            <>
+              <Typography variant="h6">Evidencia {index + 1}</Typography>
+              <br />
+              <img
+                src={`data:${evidence.type};base64,${evidence.file}`}
+                alt="Base64 Image"
+              />
+              <div style={{ pageBreakAfter: "always" }}></div>
+            </>
           ))}
       </>
     );
@@ -180,7 +194,7 @@ export default function ReportView({ reportRef, events, onFinishReport }) {
               <Typography variant="h4">Reporte de Eventos</Typography>
 
               <Typography color="text.secondary" variant="h5">
-                dd del mm del yyyy
+                {dateString}
               </Typography>
             </div>
 
@@ -194,12 +208,9 @@ export default function ReportView({ reportRef, events, onFinishReport }) {
               </Typography>
             </Stack>
           </Stack>
-          <Divider></Divider>
           {events.map((event, index) => (
             <Stack key={index}>
               <EventReport event={event} />
-              <br />
-              <Divider />
             </Stack>
           ))}
         </Stack>
