@@ -12,40 +12,27 @@ import {
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
+import CelebrationIcon from "@mui/icons-material/Celebration";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import MailIcon from "@mui/icons-material/Mail";
-import MenuIcon from "@mui/icons-material/Menu";
+import WhereToVoteIcon from "@mui/icons-material/WhereToVote";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import Badge from "@mui/material/Badge";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import FestivalIcon from "@mui/icons-material/Festival";
 import PeopleIcon from "@mui/icons-material/People";
-import LinearProgress from "@mui/material/LinearProgress";
-
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import { idRol } from "../validation/enums/idRol";
 
 export default function Sidebar({
-  user = {
-    rol: {
-      id: 0,
-    },
-  },
+  user,
   mobileOpen = false,
   setMobileOpen,
   setIsClosing,
@@ -83,7 +70,7 @@ export default function Sidebar({
         <ClosingListItem>
           <ListItemButton>
             <ListItemIcon>
-              <FestivalIcon className="sidebar-link" />
+              <CelebrationIcon className="sidebar-link" />
             </ListItemIcon>
             <ListItemText primary="Eventos" />
           </ListItemButton>
@@ -109,7 +96,7 @@ export default function Sidebar({
         <ClosingListItem>
           <ListItemButton>
             <ListItemIcon>
-              <PeopleIcon className="sidebar-link" />
+              <WhereToVoteIcon className="sidebar-link" />
             </ListItemIcon>
             <ListItemText primary="Reservaciones" />
           </ListItemButton>
@@ -130,8 +117,20 @@ export default function Sidebar({
           </ListItemButton>
         </ClosingListItem>
       </Link>
+      <Link to="/reportes" id="Reportes" className="sidebar-link">
+        <ClosingListItem>
+          <ListItemButton>
+            <ListItemIcon>
+              <LeaderboardIcon className="sidebar-link" />
+            </ListItemIcon>
+            <ListItemText primary="Reportes" />
+          </ListItemButton>
+        </ClosingListItem>
+      </Link>
     </>
   );
+
+  console.log(user);
 
   function SidebarContent() {
     return (
@@ -144,11 +143,9 @@ export default function Sidebar({
           <Divider />
           <List sx={{ height: "100%" }}>
             {nonAuthOptions}
-            {user !== null && authOptions}
+            {user && authOptions}
             <Divider />
-            {user !== null
-              ? user.rol.id === idRol.COORDINADOR && coordinatorOptions
-              : false}
+            {user?.rol.id === idRol.COORDINADOR && coordinatorOptions}
           </List>
           <Divider />
         </Stack>

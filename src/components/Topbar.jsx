@@ -14,6 +14,7 @@ import { ListItemButton } from "@mui/material";
 import { useIsLoading } from "../providers/LoadingProvider";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 import { useAuth } from "../providers/AuthProvider";
 
@@ -40,6 +41,39 @@ export default function Topbar({
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isMenuOpen = Boolean(anchorEl);
+
+  const UserButton = (
+    <Stack direction={"row"} alignItems={"center"}>
+      <IconButton
+        size="large"
+        aria-label="show 17 new notifications"
+        color="inherit"
+        onClick={() => navigate("/avisos")}
+      >
+        <Badge badgeContent={noticeAmount} color="error">
+          <NotificationsIcon />
+        </Badge>
+      </IconButton>
+
+      <ListItemButton
+        size="large"
+        edge="end"
+        aria-label="account of current user"
+        aria-haspopup="true"
+        onClick={handleProfileMenuOpen}
+        color="inherit"
+      >
+        <AccountCircle />
+        <Stack spacing={-0.7} alignItems={"start"}>
+          <Typography variant="caption">{user?.names}</Typography>
+          <Typography variant="caption" color={"text.secondary"}>
+            {user?.email}
+          </Typography>
+        </Stack>
+      </ListItemButton>
+    </Stack>
+  );
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -109,36 +143,16 @@ export default function Topbar({
               </Typography>
             </Stack>
 
-            {user !== null && (
-              <Stack direction={"row"} alignItems={"center"}>
-                <IconButton
-                  size="large"
-                  aria-label="show 17 new notifications"
-                  color="inherit"
-                  onClick={() => navigate("/avisos")}
-                >
-                  <Badge badgeContent={noticeAmount} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-
-                <ListItemButton
-                  size="large"
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                  <Stack spacing={-0.7} alignItems={"start"}>
-                    <Typography variant="caption">{user.names}</Typography>
-                    <Typography variant="caption" color={"text.secondary"}>
-                      {user.email}
-                    </Typography>
-                  </Stack>
-                </ListItemButton>
-              </Stack>
+            {user ? (
+              UserButton
+            ) : (
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={() => navigate("/")}
+              >
+                Entrar
+              </Button>
             )}
           </Stack>
         </Toolbar>

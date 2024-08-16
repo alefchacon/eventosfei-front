@@ -59,7 +59,7 @@ function App(props) {
     user ? user.rol.id > idRol.ORGANIZADOR : false
   );
 
-  const [isAuthenticated, setIsAuthenticated] = React.useState(user !== null);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(Boolean(user));
 
   const handleFEIEventSelection = (FEIEvent) => {
     setSelectedFEIEvent(FEIEvent);
@@ -81,8 +81,6 @@ function App(props) {
     }
   };
 
-  const sideBar = <Sidebar user={user} />;
-
   return (
     <Box
       className="app"
@@ -93,12 +91,12 @@ function App(props) {
       flexDirection={"row"}
     >
       <CssBaseline />
-
       <Sidebar
+        user={user}
         setIsClosing={setIsClosing}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
-      ></Sidebar>
+      />
 
       <Stack direction={"column"} width={"100%"}>
         <Topbar
