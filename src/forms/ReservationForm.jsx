@@ -157,8 +157,6 @@ export default function ReservationForm({
 
   //const {isLoading, setIsLoading} = useIsLoading();
 
-  setTitle("Reservar");
-
   const { showSnackbar } = useSnackbar();
 
   const handleOpenDatePicker = () => {
@@ -212,6 +210,10 @@ export default function ReservationForm({
     setIsLoading(true);
     fetchData(date);
   }, [date]);
+
+  useEffect(() => {
+    setTitle("Reservar");
+  }, []);
 
   const submitReservation = async (values, actions) => {
     try {

@@ -33,9 +33,10 @@ import ReportGenerator from "./ReportView.jsx";
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
 import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
+import { idRol } from "../validation/enums/idRol.js";
 
 export default function Eventos(
-  { notifications, handleGet, idUsuario = 0, setTitle },
+  { notifications, handleGet, idUsuario = 0, setTitle, user },
   { setSelectedFEIEvent }
 ) {
   const [queriedEvents, setQueriedEvents] = useState([]);
@@ -271,9 +272,11 @@ export default function Eventos(
         display={"flex"}
         justifyContent={"end"}
       >
-        <Button variant="outlined" onClick={generateReport}>
-          Descargar reporte
-        </Button>
+        {user?.rol.id === idRol.COORDINADOR && (
+          <Button variant="outlined" onClick={generateReport}>
+            Descargar reporte
+          </Button>
+        )}
         <Button
           variant="outlined"
           onClick={toggleModal}
