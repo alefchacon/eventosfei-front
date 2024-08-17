@@ -240,10 +240,10 @@ export default function Event({ setTitle, notice }) {
   }
 
   const { user } = useAuth();
-  const isStaff = user.rol.id > idRol.ORGANIZADOR;
+  const isStaff = user?.rol.id > idRol.ORGANIZADOR;
 
   function showEvaluation(FEIEvent) {
-    const ownsEvent = user.id === FEIEvent.user.id;
+    const ownsEvent = user?.id === FEIEvent.user.id;
 
     const userCanSee =
       (ownsEvent || isStaff) &&
@@ -270,7 +270,7 @@ export default function Event({ setTitle, notice }) {
   }
 
   function showResponse(FEIEvent) {
-    const canShow = user.id === FEIEvent.user.id || isStaff;
+    const canShow = user?.id === FEIEvent.user.id || isStaff;
 
     if (!canShow) {
       return;

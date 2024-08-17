@@ -61,18 +61,14 @@ function App(props) {
 
   const [isAuthenticated, setIsAuthenticated] = React.useState(Boolean(user));
 
+  useEffect(() => {
+    setIsAuthenticated(Boolean(user));
+    console.log(Boolean(user));
+  }, []);
+
   const handleFEIEventSelection = (FEIEvent) => {
     setSelectedFEIEvent(FEIEvent);
     //setCurrentSection(FEIEvent.name);
-  };
-
-  const handleDrawerClose = () => {
-    setIsClosing(true);
-    setMobileOpen(false);
-  };
-
-  const handleDrawerTransitionEnd = () => {
-    setIsClosing(false);
   };
 
   const handleDrawerToggle = () => {
@@ -116,14 +112,13 @@ function App(props) {
             <Route
               path="/eventos"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
-                  <EventList
-                    notifications={false}
-                    setSelectedFEIEvent={handleFEIEventSelection}
-                    idUsuario={0}
-                    setTitle={setTitle}
-                  />
-                </RouteGuard>
+                <EventList
+                  user={user}
+                  notifications={false}
+                  setSelectedFEIEvent={handleFEIEventSelection}
+                  idUsuario={0}
+                  setTitle={setTitle}
+                />
               }
             >
               {" "}
@@ -141,11 +136,7 @@ function App(props) {
             </Route>
             <Route
               path="/calendario"
-              element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
-                  <EventCalendar setTitle={setTitle} />
-                </RouteGuard>
-              }
+              element={<EventCalendar setTitle={setTitle} />}
             >
               {" "}
             </Route>
@@ -169,9 +160,7 @@ function App(props) {
             <Route
               path="/eventos/:idEvento/:idAviso?"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
-                  <Event FEIEvent={selectedFEIEvent} setTitle={setTitle} />
-                </RouteGuard>
+                <Event FEIEvent={selectedFEIEvent} setTitle={setTitle} />
               }
             >
               {" "}
