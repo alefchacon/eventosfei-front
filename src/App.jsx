@@ -36,7 +36,7 @@ import Event from "./pages/Event.jsx";
 import NewNotification from "./pages/NewNotification.jsx";
 import ReportView from "./pages/ReportView.jsx";
 
-import { useIsLoading } from "./providers/LoadingProvider.jsx";
+import { useAxiosInterceptors } from "./api/Client.js";
 
 import { useAuth } from "./providers/AuthProvider.jsx";
 
@@ -45,6 +45,8 @@ import Topbar from "./components/Topbar.jsx";
 import { idRol } from "./validation/enums/idRol.js";
 
 function App(props) {
+  useAxiosInterceptors();
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [currentSection, setCurrentSection] = React.useState("Calendario");

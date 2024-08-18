@@ -55,14 +55,12 @@ export default function NoticeList(
   const { width } = useWindowSize();
   const isMobile = width < 600;
 
-  const { isLoading, setIsLoading } = useIsLoading();
+  const { isLoading } = useIsLoading();
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleGetEvents = async (extraFilters = []) => {
-    setIsLoading(true);
-
     let filters = [`page=${currentPage}`, `${currentFilter}=true`];
     for (const filter of extraFilters) {
       filters.push(filter);
@@ -71,8 +69,6 @@ export default function NoticeList(
       filters.push(`idUsuario[eq]=${idUsuario}`);
     }
     const response = await GetNewEvents(filters);
-
-    setIsLoading(false);
 
     return response.data.data;
   };
@@ -121,8 +117,6 @@ export default function NoticeList(
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-
         let response = [];
 
         let initialFilters = [`page=${currentPage}`, `${currentFilter}=true`];
@@ -146,7 +140,6 @@ export default function NoticeList(
         setQueriedPagination(data.meta);
         setDefaultPagination(data.meta);
 
-        setLoading(false);
         //setItems(response)
       } catch (error) {
         console.error("Error fetching data:", error);

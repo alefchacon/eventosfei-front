@@ -1,4 +1,4 @@
-import { client } from "./Client";
+import { client } from "./Client.js";
 import { urlReservedSpaces, urlReservations, urlAvailableReservations, urlNewReservations, urlUpdateReservation, urlReservationsMarkAsRead, urlReservations2 } from "./urls";
 import moment from "moment";
 

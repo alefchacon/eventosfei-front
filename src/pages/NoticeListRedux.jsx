@@ -18,11 +18,11 @@ export default function NoticeList(
 
   const [notices, setNotices] = useState([]);
   const [idUsuario, setIdUsuario] = useState(1);
-  const { isLoading, setIsLoading } = useIsLoading();
+
+  const { isLoading } = useIsLoading();
+
   useEffect(() => {
-    setIsLoading(true);
     fetchData();
-    setIsLoading(false);
   }, []);
 
   const { getNotices, removeNotices, isStaff } = useNotices();

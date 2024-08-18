@@ -1,5 +1,5 @@
 import { urlEvaluations } from "./urls"
-import { client } from "./Client";
+import { client } from "./Client.js";
 import messages from "../validation/messages";
 
 export default async function AddEvaluation(evaluation, evidences){

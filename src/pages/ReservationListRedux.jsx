@@ -4,10 +4,7 @@ import Card from "../components/Card.jsx";
 import CardReservation from "../components/CardReservation.jsx";
 import { Stack } from "@mui/material";
 import { GetEvents, GetNotifications } from "../api/EventService.js";
-import {
-  GetNewReservation,
-  GetReservations2,
-} from "../api/ReservationService.js";
+import { GetReservations2 } from "../api/ReservationService.js";
 import Typography from "@mui/material/Typography";
 import { Container } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -20,11 +17,7 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import Grid from "@mui/material/Grid";
 import ClearIcon from "@mui/icons-material/Clear";
-import emotionStyledBase from "@emotion/styled/base";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useWindowSize from "../hooks/useWindowSize.jsx";
 import Fab from "@mui/material/Fab";
 import { useIsLoading } from "../providers/LoadingProvider.jsx";
@@ -36,8 +29,6 @@ import moment from "moment";
 import "moment/locale/es";
 
 import { useNotices } from "../providers/NoticeProvider.jsx";
-
-import { useNavigate, useLocation } from "react-router-dom";
 
 import { MarkAsUserRead } from "../api/ReservationService.js";
 
@@ -59,19 +50,13 @@ export default function ReservationList(
   const [currentFilter, setCurrentFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
   const [date, setDate] = useState(moment());
   const { width } = useWindowSize();
   const isMobile = width < 600;
 
-  const { isLoading, setIsLoading } = useIsLoading();
-
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { isLoading } = useIsLoading();
 
   const handleGetEvents = async (extraFilters = []) => {
-    setIsLoading(true);
-
     let filters = [`page=${currentPage}`];
     for (const filter of extraFilters) {
       filters.push(filter);
@@ -83,8 +68,6 @@ export default function ReservationList(
       filters.push(`porAvisosAdministrador=true`);
     }
     const response = await GetReservations2(filters);
-
-    setIsLoading(false);
 
     return response.data.data;
   };
@@ -132,8 +115,6 @@ export default function ReservationList(
   const { removeUserNotices } = useNotices();
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-
       let response = [];
 
       let initialFilters = [`page=${currentPage}`];

@@ -32,8 +32,6 @@ import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../App.css";
 
-import { useIsLoading } from "../providers/LoadingProvider.jsx";
-
 import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
@@ -129,8 +127,6 @@ export default function EventCalendar({
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
-  const { isLoading, setIsLoading } = useIsLoading();
-  const navigate = useNavigate();
   const [showEventModal, setShowEventModal] = useState(false);
   const [view, setView] = useState(Views.MONTH);
 
@@ -214,7 +210,6 @@ export default function EventCalendar({
   };
 
   const getEvents = async () => {
-    setIsLoading(true);
     const response = await GetEventsByMonth(date);
 
     const responseEvents = response.data.data;
@@ -232,7 +227,6 @@ export default function EventCalendar({
     }
 
     setEvents(eventsByReservation);
-    setIsLoading(false);
   };
 
   const handleNavigation = async (newDate, view, action) => {

@@ -24,11 +24,9 @@ export default function Notices(
 
   const [notices, setNotices] = useState([]);
   const [idUsuario, setIdUsuario] = useState(1);
-  const { isLoading, setIsLoading } = useIsLoading();
+  const { isLoading } = useIsLoading();
   useEffect(() => {
-    setIsLoading(true);
     fetchData();
-    setIsLoading(false);
   }, []);
 
   const { getNotices } = useNotices();
@@ -51,7 +49,7 @@ export default function Notices(
     const pagedNotices = await getNotices(page);
 
     console.log(pagedNotices);
-    setCurrentPage(pagedNotices.meta.current_page);
+    setCurrentPage(pagedNotices?.meta.current_page);
     setTotalPages(pagedNotices.meta.total_pages ?? pagedNotices.meta.last_page);
     setNotices(pagedNotices.data);
   };

@@ -28,28 +28,26 @@ export function NoticeProvider({ children }) {
   const [idUsuario, setIdUsuario] = useState(1);
   const [isStaff, setIsStaff] = useState();
 
-  const { isLoading, setIsLoading } = useIsLoading();
   const { showSnackbar } = useSnackbar();
 
   const { user, token } = useAuth();
 
   const getNoticeAmount = async (page = 1) => {
     console.log(token);
+
+    //debugger;
+
     if (!user || !token) {
       return;
     }
 
     try {
-      setIsLoading(true);
-
       setIsStaff(user.rol.id > idRol.COORDINADOR);
       const response = await GetNoticeAmount();
       const newNoticeAmount = response.data.noticeAmount;
       setNoticeAmount(newNoticeAmount);
-
-      setIsLoading(false);
     } catch (error) {
-      showSnackbar(error.message);
+      //showSnackbar(error.message);
     }
 
     //return noticeData;
@@ -57,19 +55,15 @@ export function NoticeProvider({ children }) {
 
   const getNotices = async (page = 1) => {
     try {
-      setIsLoading(true);
-
       const response = await GetNotices(page);
 
       console.log(response.data);
 
       setPagedNotices(response.data);
 
-      setIsLoading(false);
-
       return response.data;
     } catch (error) {
-      showSnackbar(error.message);
+      //showSnackbar(error.message);
     }
   };
 

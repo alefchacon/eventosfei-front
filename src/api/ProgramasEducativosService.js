@@ -1,4 +1,4 @@
-import { client } from "./Client";
+import { client } from "./Client.js";
 import { urlProgramasEducativos } from "./urls";
 
 export const GetProgramasEducativos = async () => {

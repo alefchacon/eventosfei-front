@@ -17,13 +17,8 @@ import { Typography, Button, Stack, ListItem, List } from "@mui/material";
 
 import FileItem from "../components/FileItem.jsx";
 
-import SendIcon from "@mui/icons-material/Send";
-import { useIsLoading } from "../providers/LoadingProvider.jsx";
-
 import Evaluation from "../pages/Evaluation";
-import EventResponseMobile from "../components/EventResponseMobile.jsx";
 import NotificationResponse from "../components/NotificationResponseRedux.jsx";
-import DialogContentText from "@mui/material/DialogContentText";
 
 import CustomTabs from "../components/CustomTabs.jsx";
 
@@ -48,8 +43,6 @@ export default function Event({ setTitle, notice }) {
   const [fetchedCronogram, setFetchedCronogram] = useState(false);
   const [fetchedPublicity, setFetchedPublicity] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
-
-  const { isLoading, setIsLoading } = useIsLoading();
 
   let { idEvento, idAviso } = useParams();
 
@@ -217,26 +210,18 @@ export default function Event({ setTitle, notice }) {
       return;
     }
 
-    setIsLoading(true);
-
     const cronogram = (await GetCronogram(FEIEvent.id)).data.data[0];
     setCronogram(cronogram);
     setFetchedCronogram(true);
-
-    setIsLoading(false);
   }
   async function fetchPublicity() {
     if (fetchedPublicity) {
       return;
     }
 
-    setIsLoading(true);
-
     const publicity = (await GetPublicity(FEIEvent.id)).data.data;
     setPublicity(publicity);
     setFetchedPublicity(true);
-
-    setIsLoading(false);
   }
 
   const { user } = useAuth();

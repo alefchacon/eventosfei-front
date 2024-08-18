@@ -7,7 +7,7 @@ import {
   urlNewEvents, 
   urlResponses
 } from "./urls.js";
-import { client } from "./Client.js";
+import { client } from "./Client";
 import moment from "moment";
 
 const filters = {

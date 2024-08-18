@@ -1,5 +1,5 @@
 import { urlEvidences } from "./urls"
-import { client } from "./Client";
+import { client } from "./Client.js";
 
 export const GetEvidencesFor = async (idEvaluaciones = [9,10]) => {
   const body = {
