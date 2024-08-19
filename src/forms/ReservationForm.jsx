@@ -151,11 +151,10 @@ export default function ReservationForm({
   const [date, setDate] = useState(moment());
   const [start, setStart] = useState(moment());
   const [end, setEnd] = useState(moment().add(1, "hours"));
-  const [isLoading, setIsLoading] = useState(true);
   const [reservations, setReservations] = useState([]);
   const [space, setSpace] = useState();
 
-  //const {isLoading, setIsLoading} = useIsLoading();
+  const { isLoading } = useIsLoading();
 
   const { showSnackbar } = useSnackbar();
 
@@ -200,19 +199,18 @@ export default function ReservationForm({
       const availableSpace = await getFirstAvailableSpace(responseReservations);
       setSpace(availableSpace);
       setReservations(responseReservations);
-      setIsLoading(false);
     };
 
     const getFirstAvailableSpace = (spaces) => {
       return spaces[0];
     };
 
-    setIsLoading(true);
     fetchData(date);
   }, [date]);
 
   useEffect(() => {
     setTitle("Reservar");
+    console.log(space);
   }, []);
 
   const submitReservation = async (values, actions) => {
@@ -340,7 +338,7 @@ export default function ReservationForm({
             {!isLoading && (
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
-                value={space.id}
+                value={space?.id}
                 name="radio-buttons-group"
                 sx={{
                   width: "100%",

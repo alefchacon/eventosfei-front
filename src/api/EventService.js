@@ -7,7 +7,7 @@ import {
   urlNewEvents, 
   urlResponses
 } from "./urls.js";
-import { client } from "./Client.js";
+import { client } from "./Client";
 import moment from "moment";
 
 const filters = {
@@ -51,7 +51,6 @@ export const Respond = async (notification, id) => {
     vistoStaff: notification.vistoStaff,
     vistoOrganizador: notification.vistoOrganizador,
   };
-  console.log(data);
   const response = await client.put(urlResponses.concat(id), data);
   return response;
 };
@@ -79,7 +78,6 @@ export const GetNewEvents = async (filters = [""]) => {
   filters.forEach(filter => {
     url = url.concat("&", filter)
   })
-  console.log(url)
   const response = await client.get(url);
   return response;
 }
@@ -96,8 +94,6 @@ export const StoreEvent = async (values) => {
   newValues.programas = JSON.stringify(newValues.programas);
   newValues.reservaciones = JSON.stringify(newValues.reservaciones);  
 
-
-  console.log(newValues)
 
   /*
   Transformar datos a FormData, para poder enviar 
@@ -129,8 +125,6 @@ export const StoreEvent = async (values) => {
     },
   });
   
-  console.log(response);
-  //console.log(await client.post(urlEvents, newValues));
 }
 
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -152,6 +146,5 @@ Aquí se parsean esos datos, dependiendo de si el catalogo maneja id o name varc
 
 */ 
 function parseStringCatalog(catalog){
-  console.log(catalog)
   return catalog.map(item => item["name"]).join(";")
 }

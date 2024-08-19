@@ -28,7 +28,7 @@ import "moment/dist/locale/es-mx";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import CustomFab from "../components/CustomFab.jsx";
 
-import ReportGenerator from "./ReportView.jsx";
+import ReportView from "./ReportView.jsx";
 
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
@@ -40,28 +40,23 @@ export default function Eventos(
   { setSelectedFEIEvent }
 ) {
   const [queriedEvents, setQueriedEvents] = useState([]);
-  const [defaultEvents, setDefaultEvents] = useState([]);
   const [queriedPagination, setQueriedPagination] = useState(1);
-  const [defaultPagination, setDefaultPagination] = useState(1);
-  const [currentFilter, setCurrentFilter] = useState("porFechaEnvio");
+  const [currentFilter, setCurrentFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [disableDownload, setDisableDownload] = useState(true);
 
   const [ready, setReady] = useState(false);
 
+  const textFieldRef = useRef(null);
+
   moment.locale("es-mx");
   const [date, setDate] = useState(null);
-  const { width } = useWindowSize();
-  const isMobile = width < 600;
-  const reportRef = useRef(null);
 
-  const { isLoading, setIsLoading } = useIsLoading();
+  const { isLoading } = useIsLoading();
   const { showSnackbar } = useSnackbar();
 
-  const fetchEvents = async (fullFetch = false) => {
-    setIsLoading(true);
-
+  const getFilteredEvents = async (fullFetch = false) => {
     let filters = [`page=${currentPage}`, `${currentFilter}=true`];
 
     if (fullFetch) {
@@ -77,9 +72,10 @@ export default function Eventos(
     if (searchQuery) {
       filters.push(`nombre=${searchQuery}`);
     }
-    const response = await GetEvents(filters);
 
-    setIsLoading(false);
+    console.log(filters);
+
+    const response = await GetEvents(filters);
 
     return response;
   };
@@ -87,44 +83,35 @@ export default function Eventos(
   const handleFilterChange = async (event) => {
     const newFilter = event.target.value;
     setCurrentFilter(newFilter);
-
-    getEventsOnFilterChange();
-
     setCurrentPage(1);
   };
 
-  const handleSearchQueryChange = async (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   const getEventsOnFilterChange = async () => {
-    const response = await fetchEvents();
+    setReady(false);
+    const filtered =
+      Boolean(currentFilter) || Boolean(searchQuery) || Boolean(date);
+    setDisableDownload(!filtered);
+    const response = await getFilteredEvents();
     setQueriedEvents(response.data.data);
     setQueriedPagination(response.data.meta);
+    setReady(true);
   };
 
   const handleClearSearchQuery = (e) => {
     setSearchQuery("");
-    setQueriedEvents(defaultEvents);
-    setQueriedPagination(defaultPagination);
+    textFieldRef.current.value = "";
+
     setCurrentPage(1);
     setCurrentFilter("");
     setDate(null);
+    setDisableDownload(true);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetchEvents();
-      setQueriedEvents(response.data.data);
-      setQueriedPagination(response.data.meta);
-      setDefaultPagination(response.data.meta);
-      setDefaultEvents(response.data.data);
-      setReady(true);
-    };
     if (idUsuario === 0) {
       setTitle("Eventos");
     }
-    fetchData();
+    getEventsOnFilterChange();
   }, []);
 
   const handlePageChange = async (event, newPage) => {
@@ -135,15 +122,20 @@ export default function Eventos(
     if (!ready) {
       return;
     }
+    console.log("now");
     getEventsOnFilterChange();
-  }, [currentPage, currentFilter, date]);
+  }, [currentPage, currentFilter, date, searchQuery]);
 
   const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  const handleSearchQueryChange = () => {
+    setSearchQuery(textFieldRef.current.value);
+  };
 
   const handleEnter = (e) => {
     switch (e.key) {
       case "Enter":
-        getEventsOnFilterChange();
+        handleSearchQueryChange();
         break;
       case "Escape":
         setSearchQuery("");
@@ -164,9 +156,8 @@ export default function Eventos(
       <Stack id={"text-field"} direction={"row"} flexGrow={2}>
         <TextField
           onKeyDown={handleEnter}
+          inputRef={textFieldRef}
           fullWidth
-          onChange={handleSearchQueryChange}
-          value={searchQuery}
           placeholder="Buscar por título u organizador"
           InputProps={{
             endAdornment: (
@@ -192,7 +183,7 @@ export default function Eventos(
           aria-label="search"
           edge="end"
           disableElevation
-          onClick={fetchEvents}
+          onClick={handleSearchQueryChange}
         >
           <SearchIcon />
         </Button>
@@ -235,20 +226,22 @@ export default function Eventos(
 
   const generateReport = async () => {
     showSnackbar("Obteniendo evidencias y generando el reporte...", "asdf");
-    const response = await fetchEvents(true);
+    const response = await getFilteredEvents(true);
     setReportEvents(response.data.data);
     toggleReportGeneration();
   };
 
   const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
 
+  const reportRef = useRef(null);
   return (
     <Stack>
       {generatingPDF && (
-        <ReportGenerator
+        <ReportView
           reportRef={reportRef}
           events={reportEvents}
           onFinishReport={() => setGeneratingPDF(false)}
+          date={date}
           dateString={
             date ? date.format("MMMM YYYY") : moment().format("MMMM YYYY")
           }
@@ -273,9 +266,17 @@ export default function Eventos(
         justifyContent={"end"}
       >
         {user?.rol.id === idRol.COORDINADOR && (
-          <Button variant="outlined" onClick={generateReport}>
-            Descargar reporte
-          </Button>
+          <Tooltip title={"Primero filtre los eventos"}>
+            <div>
+              <Button
+                variant="outlined"
+                onClick={generateReport}
+                disabled={disableDownload}
+              >
+                Descargar reporte
+              </Button>
+            </div>
+          </Tooltip>
         )}
         <Button
           variant="outlined"

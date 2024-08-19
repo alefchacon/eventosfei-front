@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
-import RadioGroup from "../components/RadioGroup.jsx";
 import UploadArea from "../components/UploadArea.jsx";
 import Rating from "@mui/material/Rating";
 import Progress from "../components/Progress.jsx";
-import ProgressHorizontal from "../components/ProgressHorizontal.jsx";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import ItemUpload from "../components/ItemUpload.jsx";
-import TextArea from "../components/TextArea.jsx";
 import Stack from "@mui/material/Stack";
-import CustomToggleButton from "../components/ToggleButton.jsx";
-import Toolbar from "@mui/material/Toolbar";
-import Divider from "@mui/material/Divider";
-import CardActionArea from "@mui/material/CardActionArea";
-import { styled } from "@mui/material/styles";
 import { useFormik } from "formik";
 import { evaluationSchema } from "../validation/modelSchemas/evaluationSchema.js";
 import { useSnackbar } from "../providers/SnackbarProvider.jsx";
@@ -58,8 +49,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
 
   const [showProgressHorizontal, setShowProgressHorizontal] = useState(false);
 
-  const { showSnackbar } = useSnackbar();
-
   useEffect(() => {
     const updateOrientation = () => {
       setShowProgressHorizontal(window.innerWidth < 900);
@@ -73,56 +62,38 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
   }, []);
 
   const handleChangePage = (pageIndex) => {
-    console.log(values.ratingCommunication);
     if (pageIndex > -1 && pageIndex < 5) {
       setValue(pageIndex);
     }
   };
 
   const handleRatingAttentionChange = (event, newRatingAttention) => {
-    console.log(newRatingAttention);
     if (newRatingAttention !== null) {
       setFieldValue("ratingAttention", newRatingAttention);
     }
   };
-  const handleRatingCommunicationChange = (newRatingAttention) => {
-    console.log(newRatingAttention);
-    if (newRatingAttention !== null) {
-      setFieldValue("ratingCommunication", newRatingAttention);
-    }
-  };
   const handleRatingComputerCenterChange = (event, newRatingAttention) => {
-    console.log(newRatingAttention);
     if (newRatingAttention !== null) {
       setFieldValue("ratingComputerCenter", newRatingAttention);
     }
   };
   const handleRatingResourcesChange = (event, newRatingAttention) => {
-    console.log(newRatingAttention);
     if (newRatingAttention !== null) {
       setFieldValue("ratingResources", newRatingAttention);
     }
   };
   const handleRatingSpaceChange = (event, newRatingAttention) => {
-    console.log(newRatingAttention);
     if (newRatingAttention !== null) {
       setFieldValue("ratingSpace", newRatingAttention);
     }
   };
 
   const submitEvaluation = async (values, actions) => {
-    try {
-      console.log(values);
-      values.idEvento = FEIEvent.id;
-      const response = await AddEvaluation(values, evidences);
+    values.idEvento = FEIEvent.id;
+    const response = await AddEvaluation(values, evidences);
 
-      FEIEvent.evaluation = values;
-      FEIEvent.hasEvaluation = true;
-
-      showSnackbar(response.data.message);
-    } catch (error) {
-      showSnackbar(error.message);
-    }
+    FEIEvent.evaluation = values;
+    FEIEvent.hasEvaluation = true;
   };
 
   const {
@@ -150,6 +121,8 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
       additional: "",
     },
     onSubmit: submitEvaluation,
+    validateOnChange: false,
+    validationSchema: evaluationSchema,
   });
 
   return (
@@ -196,13 +169,11 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                   <Stack spacing={questionSpacing}>
                     <Typography variant={typographyVariant}>
                       Por favor, explique los factores que contribuyeron a su
-                      calificación anterior:
+                      calificación anterior *:
                     </Typography>
                     <TextField
                       id="ratingAttentionReason"
                       name="ratingAttentionReason"
-                      variant="filled"
-                      label="Razón de la calificación"
                       disabled={isSubmitting}
                       multiline
                       maxRows={3}
@@ -217,6 +188,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                         touched.ratingAttentionReason &&
                         errors.ratingAttentionReason
                       }
+                      inputProps={{ maxLength: 1000 }}
                     ></TextField>
                   </Stack>
 
@@ -228,9 +200,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                     <TextField
                       id="improvementsSupport"
                       name="improvementsSupport"
-                      variant="filled"
                       disabled={isSubmitting}
-                      label="Mejoras"
                       multiline
                       maxRows={3}
                       value={values.improvementsSupport}
@@ -244,6 +214,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                         touched.improvementsSupport &&
                         errors.improvementsSupport
                       }
+                      inputProps={{ maxLength: 1000 }}
                     ></TextField>
                   </Stack>
                 </Stack>
@@ -284,9 +255,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                     <TextField
                       id="problemsSpace"
                       name="problemsSpace"
-                      variant="filled"
                       disabled={isSubmitting}
-                      label="Mejoras"
                       multiline
                       maxRows={3}
                       value={values.problemsSpace}
@@ -296,6 +265,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                         Boolean(errors.problemsSpace) && touched.problemsSpace
                       }
                       helperText={touched.problemsSpace && errors.problemsSpace}
+                      inputProps={{ maxLength: 1000 }}
                     ></TextField>
                   </Stack>
                 </Stack>
@@ -332,13 +302,11 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                 <Stack spacing={2}>
                   <Typography variant="p">
                     Por favor, explique los factores que contribuyeron a su
-                    calificación anterior:
+                    calificación anterior *
                   </Typography>
                   <TextField
                     name="ratingComputerCenterReason"
-                    variant="filled"
                     disabled={isSubmitting}
-                    label="Factores"
                     multiline
                     maxRows={3}
                     value={values.ratingComputerCenterReason}
@@ -352,6 +320,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                       touched.ratingComputerCenterReason &&
                       errors.ratingComputerCenterReason
                     }
+                    inputProps={{ maxLength: 1000 }}
                   ></TextField>
                 </Stack>
 
@@ -380,14 +349,12 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                 <Stack spacing={2}>
                   <Typography variant="p">
                     Por favor, explique los factores que contribuyeron a su
-                    calificación anterior:
+                    calificación anterior *
                   </Typography>
                   <TextField
                     id="ratingResourcesReason"
                     name="ratingResourcesReason"
                     disabled={isSubmitting}
-                    variant="filled"
-                    label="Factores"
                     multiline
                     maxRows={3}
                     value={values.ratingResourcesReason}
@@ -401,6 +368,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                       touched.ratingResourcesReason &&
                       errors.ratingResourcesReason
                     }
+                    inputProps={{ maxLength: 1000 }}
                   ></TextField>
                 </Stack>
 
@@ -411,8 +379,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                   </Typography>
                   <TextField
                     id="improvementsResources"
-                    variant="filled"
-                    label="Mejoras"
                     disabled={isSubmitting}
                     multiline
                     maxRows={3}
@@ -427,6 +393,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                       touched.improvementsResources &&
                       errors.improvementsResources
                     }
+                    inputProps={{ maxLength: 1000 }}
                   ></TextField>
                 </Stack>
               </Stack>
@@ -457,8 +424,6 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                   <TextField
                     disabled={isSubmitting}
                     id="additional"
-                    variant="filled"
-                    label="Comentario adicional"
                     multiline
                     maxRows={3}
                     value={values.additional}
@@ -466,6 +431,7 @@ export default function Form({ idEvento, FEIEvent, onSubmit: setFEIEvent }) {
                     onBlur={handleBlur}
                     error={Boolean(errors.additional) && touched.additional}
                     helperText={touched.additional && errors.additional}
+                    inputProps={{ maxLength: 1000 }}
                   ></TextField>
                 </Stack>
               </div>

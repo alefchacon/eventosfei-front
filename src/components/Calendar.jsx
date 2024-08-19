@@ -32,8 +32,6 @@ import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../App.css";
 
-import { useIsLoading } from "../providers/LoadingProvider.jsx";
-
 import { GetEventsByMonth } from "../api/EventService";
 
 import CalendarEventList from "./CalendarEventList";
@@ -53,8 +51,6 @@ const CustomToolbar = (props) => {
   const { date, onNavigate, view, setView } = props;
 
   const handleNavigate = (action) => {
-    // Call the onNavigate prop with the action type
-    console.log(action);
     onNavigate(action);
   };
 
@@ -68,7 +64,6 @@ const CustomToolbar = (props) => {
                 value={moment(date)}
                 views={["month", "year"]}
                 onAccept={(e) => {
-                  //console.log(e.toDate());
                   handleNavigate(e.toDate());
                 }}
               />
@@ -129,8 +124,6 @@ export default function EventCalendar({
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [openEventSidebar, setOpenEventSidebar] = useState(false);
-  const { isLoading, setIsLoading } = useIsLoading();
-  const navigate = useNavigate();
   const [showEventModal, setShowEventModal] = useState(false);
   const [view, setView] = useState(Views.MONTH);
 
@@ -165,8 +158,6 @@ export default function EventCalendar({
     if (slotInfo.userIsMobile) {
       start = moment(start);
       end = moment(start).add(1, "days");
-      //end.setDate(end.getDate() + 1);
-      console.log("fuck");
     }
 
     const eventsInDateRange = events.filter(
@@ -204,9 +195,6 @@ export default function EventCalendar({
         event.currentReservation = dateReservations[0];
       }
     }
-
-    console.log(eventsInDateRange);
-
     setSelectedDate(start);
     setSelectedEvents(eventsInDateRange);
 
@@ -214,7 +202,6 @@ export default function EventCalendar({
   };
 
   const getEvents = async () => {
-    setIsLoading(true);
     const response = await GetEventsByMonth(date);
 
     const responseEvents = response.data.data;
@@ -232,12 +219,10 @@ export default function EventCalendar({
     }
 
     setEvents(eventsByReservation);
-    setIsLoading(false);
   };
 
   const handleNavigation = async (newDate, view, action) => {
     let date2 = new Date();
-    console.log(action);
     switch (action) {
       case "PREVIOUS":
         date2.setMonth(date.getMonth() - 1);
@@ -318,7 +303,6 @@ export default function EventCalendar({
             view={view}
             onNavigate={handleNavigation}
             onSelectEvent={(FEIEvent) => {
-              console.log(FEIEvent);
               FEIEvent.userIsMobile = true;
               filterEventsInDateRange(FEIEvent);
             }}

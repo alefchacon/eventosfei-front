@@ -4,7 +4,7 @@ import { Snackbar, Button, IconButton } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 
-const LoadingContext = createContext();
+export const LoadingContext = createContext();
 
 export const useIsLoading = () => {
   return useContext(LoadingContext);

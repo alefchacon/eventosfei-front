@@ -1,9 +1,9 @@
-import { client } from "./Client";
+import { client } from "./Client.js";
 import { urlLogin, urlUsers, urlProfile } from "./urls";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-axios.defaults.withCredentials = true;
+
 
 function getRequest(data) {
   return {
@@ -23,12 +23,8 @@ export const LogIn = async (credentials) => {
     password: credentials.password,
   };
 
-  const response = await axios.post("http://localhost:8000/api/login",requestData);
-  
-  /*
-  localStorage.setItem("user", JSON.stringify(response.data.user));
-  console.log(JSON.parse(localStorage.getItem("user")))
-  */
+  const response = await client.post("http://localhost:8000/api/login",requestData);
+
   return response;
 };
   
@@ -53,5 +49,4 @@ export const UpdateUser = async (data) => {
         
 export const GetProfile = async () => {
   const response = await client.get(urlProfile);
-  console.log(response)
 }

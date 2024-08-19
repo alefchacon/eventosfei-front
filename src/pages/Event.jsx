@@ -17,13 +17,8 @@ import { Typography, Button, Stack, ListItem, List } from "@mui/material";
 
 import FileItem from "../components/FileItem.jsx";
 
-import SendIcon from "@mui/icons-material/Send";
-import { useIsLoading } from "../providers/LoadingProvider.jsx";
-
 import Evaluation from "../pages/Evaluation";
-import EventResponseMobile from "../components/EventResponseMobile.jsx";
 import NotificationResponse from "../components/NotificationResponseRedux.jsx";
-import DialogContentText from "@mui/material/DialogContentText";
 
 import CustomTabs from "../components/CustomTabs.jsx";
 
@@ -49,8 +44,6 @@ export default function Event({ setTitle, notice }) {
   const [fetchedPublicity, setFetchedPublicity] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
 
-  const { isLoading, setIsLoading } = useIsLoading();
-
   let { idEvento, idAviso } = useParams();
 
   const { removeNotices } = useNotices();
@@ -66,7 +59,7 @@ export default function Event({ setTitle, notice }) {
 
         console.log(response.data.data);
         setEvent(response.data.data);
-        setTitle(response.data.data.name);
+        setTitle("Evento");
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -217,26 +210,18 @@ export default function Event({ setTitle, notice }) {
       return;
     }
 
-    setIsLoading(true);
-
     const cronogram = (await GetCronogram(FEIEvent.id)).data.data[0];
     setCronogram(cronogram);
     setFetchedCronogram(true);
-
-    setIsLoading(false);
   }
   async function fetchPublicity() {
     if (fetchedPublicity) {
       return;
     }
 
-    setIsLoading(true);
-
     const publicity = (await GetPublicity(FEIEvent.id)).data.data;
     setPublicity(publicity);
     setFetchedPublicity(true);
-
-    setIsLoading(false);
   }
 
   const { user } = useAuth();
@@ -254,7 +239,7 @@ export default function Event({ setTitle, notice }) {
       return;
     }
 
-    if (FEIEvent.hasEvaluation && userCanSee) {
+    if (Boolean(FEIEvent.evaluation) && userCanSee) {
       return (
         <EvaluationView
           label={"Evaluación"}
@@ -299,11 +284,9 @@ export default function Event({ setTitle, notice }) {
 
   return (
     <>
-      {isStaff && (
+      {false && (
         <Stack direction={"row"} padding={1} gap={2}>
-          <Button variant="outlined" onClick={getReport}>
-            Generar reporte
-          </Button>
+          <Button variant="outlined">Generar reporte</Button>
         </Stack>
       )}
 
@@ -331,11 +314,16 @@ export default function Event({ setTitle, notice }) {
               value={FEIEvent.description}
             ></InfoItem>
 
-            <CheckboxList
-              label="Programas educativos"
-              items={FEIEvent.programs}
-              selectable={false}
-            ></CheckboxList>
+            <InfoItem
+              label={"Programas educativos"}
+              value={
+                <ul>
+                  {FEIEvent.programs.map((program, index) => (
+                    <li key={index}>{program.name}</li>
+                  ))}
+                </ul>
+              }
+            ></InfoItem>
 
             <InfoItem
               label={"Audiencia(s)"}
@@ -347,6 +335,7 @@ export default function Event({ setTitle, notice }) {
                 </ul>
               }
             ></InfoItem>
+            <InfoItem label={"Ámbito"} value={FEIEvent.scope}></InfoItem>
 
             <InfoItem
               label={"Temática(s)"}

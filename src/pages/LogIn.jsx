@@ -143,12 +143,6 @@ export default function LogInPage({ onLoginIn }) {
               endIcon={<LoginIcon></LoginIcon>}
               isLoading={isSubmitting}
             ></LoadingButton>
-            <Button fullWidth variant="text">
-              ¿Problemas para ingresar?
-            </Button>
-            <Button fullWidth variant="text">
-              Solicitar acceso
-            </Button>
           </Stack>
         </form>
       </Stack>

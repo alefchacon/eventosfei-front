@@ -4,7 +4,7 @@ import { Snackbar, Button, IconButton } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 import useWindowSize from "../hooks/useWindowSize";
-const SnackbarContext = createContext(null);
+export const SnackbarContext = createContext(null);
 
 export function useSnackbar() {
   return useContext(SnackbarContext);

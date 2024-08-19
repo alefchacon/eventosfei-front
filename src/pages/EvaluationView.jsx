@@ -22,7 +22,9 @@ export default function EvaluationView({ evaluation, idAviso }) {
       setEvidencies(response.data.data);
     };
 
-    markAsRead(idAviso);
+    if (idAviso > 0) {
+      markAsRead(idAviso);
+    }
     fetchEvidence();
   }, []);
 

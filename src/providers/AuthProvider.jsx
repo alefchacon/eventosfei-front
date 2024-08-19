@@ -2,18 +2,23 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogIn, LogOut } from "../api/UserService";
 import { idRol } from "../validation/enums/idRol";
-import { client } from "../api/Client";
+import { client } from "../api/Client.js";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const useAuth = () => {
   return useContext(AuthContext);
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  );
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch (error) {
+      localStorage.removeItem("user");
+      navigate("/");
+    }
+  });
 
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const navigate = useNavigate();
@@ -47,6 +52,10 @@ export function AuthProvider({ children }) {
 
   const logOut = async () => {
     LogOut();
+    clearData();
+  };
+
+  const clearData = () => {
     setUser(null);
     localStorage.removeItem("user");
     client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -63,6 +72,7 @@ export function AuthProvider({ children }) {
         user,
         logIn,
         logOut,
+        clearData,
       }}
     >
       {children}

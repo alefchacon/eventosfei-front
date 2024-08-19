@@ -110,7 +110,7 @@ export default function CheckboxList({
                           edge="start"
                           checked={
                             checked.findIndex(
-                              (_item) => _item.id === item.id
+                              (_item) => _item?.id === item?.id
                             ) !== -1
                           }
                           tabIndex={-1}

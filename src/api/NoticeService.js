@@ -1,5 +1,5 @@
 import { urlNotices, urlNoticesMarkAsUserRead } from "./urls";
-import { client } from "./Client";
+import { client } from "./Client.js";
 
 export const GetNotices = async (page) => {
   return await client.get(urlNotices.concat(`page=${page}`));

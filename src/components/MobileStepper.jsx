@@ -17,15 +17,12 @@ export default function DotMobileStepper({
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    console.log(activeStep + 1);
     onChange(steps - 1 - (activeStep + 1));
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    console.log(activeStep - 1);
     onChange(steps - 1 - (activeStep - 1));
-    //onChange(setps);
   };
 
   return (
