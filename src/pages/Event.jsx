@@ -59,7 +59,7 @@ export default function Event({ setTitle, notice }) {
 
         console.log(response.data.data);
         setEvent(response.data.data);
-        setTitle(response.data.data.name);
+        setTitle("Evento");
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -239,7 +239,7 @@ export default function Event({ setTitle, notice }) {
       return;
     }
 
-    if (FEIEvent.hasEvaluation && userCanSee) {
+    if (Boolean(FEIEvent.evaluation) && userCanSee) {
       return (
         <EvaluationView
           label={"Evaluación"}
@@ -284,11 +284,9 @@ export default function Event({ setTitle, notice }) {
 
   return (
     <>
-      {isStaff && (
+      {false && (
         <Stack direction={"row"} padding={1} gap={2}>
-          <Button variant="outlined" onClick={getReport}>
-            Generar reporte
-          </Button>
+          <Button variant="outlined">Generar reporte</Button>
         </Stack>
       )}
 
@@ -316,11 +314,16 @@ export default function Event({ setTitle, notice }) {
               value={FEIEvent.description}
             ></InfoItem>
 
-            <CheckboxList
-              label="Programas educativos"
-              items={FEIEvent.programs}
-              selectable={false}
-            ></CheckboxList>
+            <InfoItem
+              label={"Programas educativos"}
+              value={
+                <ul>
+                  {FEIEvent.programs.map((program, index) => (
+                    <li key={index}>{program.name}</li>
+                  ))}
+                </ul>
+              }
+            ></InfoItem>
 
             <InfoItem
               label={"Audiencia(s)"}
@@ -332,6 +335,7 @@ export default function Event({ setTitle, notice }) {
                 </ul>
               }
             ></InfoItem>
+            <InfoItem label={"Ámbito"} value={FEIEvent.scope}></InfoItem>
 
             <InfoItem
               label={"Temática(s)"}

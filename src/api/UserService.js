@@ -24,11 +24,7 @@ export const LogIn = async (credentials) => {
   };
 
   const response = await client.post("http://localhost:8000/api/login",requestData);
-  
-  /*
-  localStorage.setItem("user", JSON.stringify(response.data.user));
-  console.log(JSON.parse(localStorage.getItem("user")))
-  */
+
   return response;
 };
   
@@ -53,5 +49,4 @@ export const UpdateUser = async (data) => {
         
 export const GetProfile = async () => {
   const response = await client.get(urlProfile);
-  console.log(response)
 }

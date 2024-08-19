@@ -117,16 +117,6 @@ export default function Sidebar({
           </ListItemButton>
         </ClosingListItem>
       </Link>
-      <Link to="/reportes" id="Reportes" className="sidebar-link">
-        <ClosingListItem>
-          <ListItemButton>
-            <ListItemIcon>
-              <LeaderboardIcon className="sidebar-link" />
-            </ListItemIcon>
-            <ListItemText primary="Reportes" />
-          </ListItemButton>
-        </ClosingListItem>
-      </Link>
     </>
   );
 

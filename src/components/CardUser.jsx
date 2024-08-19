@@ -21,7 +21,6 @@ export default function CardUser({ user, onUpdate }) {
   const { showDialog } = useDialog();
 
   function handle() {
-    console.log();
     //parentHandle(props)
   }
   const handleClick = () => {

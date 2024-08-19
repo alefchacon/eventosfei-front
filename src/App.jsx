@@ -65,12 +65,10 @@ function App(props) {
 
   useEffect(() => {
     setIsAuthenticated(Boolean(user));
-    console.log(Boolean(user));
   }, []);
 
   const handleFEIEventSelection = (FEIEvent) => {
     setSelectedFEIEvent(FEIEvent);
-    //setCurrentSection(FEIEvent.name);
   };
 
   const handleDrawerToggle = () => {

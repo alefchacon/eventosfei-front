@@ -90,6 +90,7 @@ export function NoticeProvider({ children }) {
   };
 
   const findNotice = (idAviso) => {
+    console.log(pagedNotices);
     return pagedNotices.data.filter((n) => n.id == idAviso)[0];
   };
 
@@ -102,14 +103,10 @@ export function NoticeProvider({ children }) {
   };
 
   const markAsRead = async (idAviso = 0) => {
-    console.log(pagedNotices);
-    const notice = findNotice(idAviso);
-
-    if (notice.read) {
-      return;
-    }
-
     const response = await UpdateNotice(idAviso);
+    if (response.data.updated) {
+      setNoticeAmount((previous) => previous - 1);
+    }
   };
 
   return (

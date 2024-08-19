@@ -28,7 +28,7 @@ import "moment/dist/locale/es-mx";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import CustomFab from "../components/CustomFab.jsx";
 
-import ReportGenerator from "./ReportView.jsx";
+import ReportView from "./ReportView.jsx";
 
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
 
@@ -233,13 +233,15 @@ export default function Eventos(
 
   const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);
 
+  const reportRef = useRef(null);
   return (
     <Stack>
       {generatingPDF && (
-        <ReportGenerator
+        <ReportView
           reportRef={reportRef}
           events={reportEvents}
           onFinishReport={() => setGeneratingPDF(false)}
+          date={date}
           dateString={
             date ? date.format("MMMM YYYY") : moment().format("MMMM YYYY")
           }

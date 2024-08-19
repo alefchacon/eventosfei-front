@@ -21,6 +21,7 @@ import CardEvent from "../components/CardEvent";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { useIsLoading } from "../providers/LoadingProvider";
+import moment from "moment";
 
 //import { events } from "./events";
 
@@ -73,13 +74,15 @@ export default function ReportView({
   events,
   onFinishReport,
   dateString = "dateString",
+  date = moment(),
 }) {
   useEffect(() => {
     convertToPdf();
   }, []);
 
   function EventReport({ event }) {
-    const rows = getRows(event);
+    const [rows, setRows] = useState(getRows(event));
+
     return (
       <>
         <CardEvent props={event}></CardEvent>
@@ -94,10 +97,7 @@ export default function ReportView({
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
-                  <TableCell align="left">{row.calories}</TableCell>
-                  <TableCell align="left">{row.fat}</TableCell>
-                  <TableCell align="left">{row.carbs}</TableCell>
-                  <TableCell align="left">{row.protein}</TableCell>
+                  <TableCell align="left">{row.value}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -122,9 +122,9 @@ export default function ReportView({
   }
 
   const options = {
-    filename: "my-document.pdf",
+    filename: `SAEFEI_reporte_${moment().format()}`,
     margin: 1,
-    image: { type: "jpeg", quality: 0.98 },
+    image: { type: "jpeg", quality: 0.99 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
   };

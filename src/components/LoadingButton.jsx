@@ -9,7 +9,7 @@ export default function LoadingButton({
   isLoading = false,
   isReady = true,
   endIcon = <AddIcon></AddIcon>,
-  onClick = () => console.log("Lisan Al Gaib!!!"),
+  onClick,
 }) {
   return (
     <>

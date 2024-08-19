@@ -108,7 +108,7 @@ function NewNotification({ idUsuario, setTitle }) {
   const [modalidades, setModalidades] = useState([]);
   const [tipos, setTipos] = useState([]);
   const { width } = useWindowSize();
-  const isMobile = width < 600;
+  const isMobile = width < 900;
   const [cronograma, setCronograma] = useState(null);
   const [currentStep, setCurrentStep] = useState(numSteps - 1);
   const [showReservations, setShowReservations] = useState(false);
@@ -193,7 +193,6 @@ function NewNotification({ idUsuario, setTitle }) {
 
   const handleSubmitEvent = async () => {
     try {
-      console.log("fuck!!!");
       await StoreEvent(values);
       setShowSuccessModal(true);
     } catch (error) {
@@ -205,8 +204,10 @@ function NewNotification({ idUsuario, setTitle }) {
     const response = await GetAvailableReservations();
     const fetchedReservations = response.data.data;
     setReservations(fetchedReservations);
-    setShowReservationModal(fetchedReservations.length < 1);
-    setShowPlatforms(fetchedReservations.length < 1);
+    setShowReservationModal(fetchedReservations.length === 0);
+    if (fetchedReservations.length === 0) {
+      setFieldValue("idModalidad", modalidad.VIRTUAL);
+    }
   }
 
   const handleChangeSteps = (newStep) => {
@@ -308,14 +309,13 @@ function NewNotification({ idUsuario, setTitle }) {
       setReservationsFetched(true);
     }
 
-    if (reservations.length === 0) {
-      setFieldValue("idModalidad", modalidad.VIRTUAL);
+    if (values.idModalidad === modalidad.VIRTUAL) {
+      values.reservaciones = [];
     }
 
     const _showReservations =
-      (values.idModalidad === modalidad.PRESENCIAL ||
-        values.idModalidad === modalidad.HIBRIDA) &&
-      reservations.length > 0;
+      values.idModalidad === modalidad.PRESENCIAL ||
+      values.idModalidad === modalidad.HIBRIDA;
 
     const _showPlatforms =
       values.idModalidad === modalidad.VIRTUAL ||
@@ -529,7 +529,7 @@ function NewNotification({ idUsuario, setTitle }) {
                 </Stack>
 
                 <Spinner
-                  valueName="numParticipantes"
+                  name="numParticipantes"
                   onClick={setFieldValue}
                   label="Número estimado de participantes"
                   min={10}
