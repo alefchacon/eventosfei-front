@@ -48,7 +48,6 @@ export default function Notices(
     //debugger;;
     const pagedNotices = await getNotices(page);
 
-    console.log(pagedNotices);
     setCurrentPage(pagedNotices?.meta.current_page);
     setTotalPages(pagedNotices.meta.total_pages ?? pagedNotices.meta.last_page);
     setNotices(pagedNotices.data);

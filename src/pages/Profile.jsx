@@ -36,16 +36,11 @@ export default function Profile({ user, setTitle }) {
         <Typography>{user.job}</Typography>
         <Typography variant="button">{user.email}</Typography>
       </Stack>
-      <CustomTabs>
-        <Stack label="Eventos">
-          <Eventos
-            notifications={false}
-            handleGet={GetUserEvents}
-            idUsuario={user.id}
-          ></Eventos>
-        </Stack>
-        <Stack label="Reservaciones">asdf</Stack>
-      </CustomTabs>
+      <Eventos
+        notifications={false}
+        handleGet={GetUserEvents}
+        idUsuario={user.id}
+      ></Eventos>
     </Stack>
   );
 }

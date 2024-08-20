@@ -22,7 +22,6 @@ export default function Spinner({
       return;
     }
     const newValue = value + valueToAdd;
-    console.log(name);
     setValue(newValue);
     onClick(name, newValue);
   };

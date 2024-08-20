@@ -75,7 +75,7 @@ export default function CardEvent(
         {!isProfile && (
           <Typography color="text.primary">
             Organizador:
-            <Link to="/calendario">
+            <Link to="/">
               {" "}
               {user.names} {user.paternalName}
             </Link>

@@ -24,40 +24,25 @@ export function NoticeProvider({ children }) {
 
   const location = useLocation();
 
-  const [currentIdRol, setIdRol] = useState(idRol.ORGANIZADOR);
-  const [idUsuario, setIdUsuario] = useState(1);
   const [isStaff, setIsStaff] = useState();
-
-  const { showSnackbar } = useSnackbar();
+  const [title, setTitle] = useState("Calendario");
 
   const { user, token } = useAuth();
 
   const getNoticeAmount = async (page = 1) => {
-    console.log(token);
-
-    //debugger;
-
     if (!user || !token) {
       return;
     }
 
-    try {
-      setIsStaff(user.rol.id > idRol.COORDINADOR);
-      const response = await GetNoticeAmount();
-      const newNoticeAmount = response.data.noticeAmount;
-      setNoticeAmount(newNoticeAmount);
-    } catch (error) {
-      //showSnackbar(error.message);
-    }
-
-    //return noticeData;
+    setIsStaff(user.rol.id > idRol.ORGANIZADOR);
+    const response = await GetNoticeAmount();
+    const newNoticeAmount = response.data.noticeAmount;
+    setNoticeAmount(newNoticeAmount);
   };
 
   const getNotices = async (page = 1) => {
     try {
       const response = await GetNotices(page);
-
-      console.log(response.data);
 
       setPagedNotices(response.data);
 
@@ -79,18 +64,7 @@ export function NoticeProvider({ children }) {
     });
   };
 
-  const removeNotices = async (notices = []) => {
-    //console.log(isStaff);
-    /*
-    const response = await MarkAsUserRead(notices, isStaff);
-    if (noticeAmount >= response.noticesUpdated) {
-      setNoticeAmount((prev) => prev - response.noticesUpdated);
-    }*/
-    //console.log(response);
-  };
-
   const findNotice = (idAviso) => {
-    console.log(pagedNotices);
     return pagedNotices.data.filter((n) => n.id == idAviso)[0];
   };
 
@@ -118,9 +92,10 @@ export function NoticeProvider({ children }) {
         noticeAmount,
         removeNotice,
         decreaseNotices,
-        removeNotices,
         markAsRead,
         isStaff,
+        title,
+        setTitle,
       }}
     >
       {children}

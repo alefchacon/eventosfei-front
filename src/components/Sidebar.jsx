@@ -56,7 +56,7 @@ export default function Sidebar({
 
   const nonAuthOptions = (
     <>
-      <Link to="/calendario" id="Calendario" className="sidebar-link">
+      <Link to="/" id="Calendario" className="sidebar-link">
         <ClosingListItem>
           <ListItemButton>
             <ListItemIcon>

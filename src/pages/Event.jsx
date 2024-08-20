@@ -57,7 +57,6 @@ export default function Event({ setTitle, notice }) {
           throw new Error("Network response was not ok");
         }
 
-        console.log(response.data.data);
         setEvent(response.data.data);
         setTitle("Evento");
       } catch (error) {

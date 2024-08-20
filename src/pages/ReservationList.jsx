@@ -17,7 +17,6 @@ export default function ReservationList(
   const { showDialog } = useDialog();
 
   const handle = (FEIEvent) => {
-    console.log(FEIEvent);
     setSelectedFEIEvent(FEIEvent);
   };
 
@@ -42,10 +41,8 @@ export default function ReservationList(
 
         const data = response.data;
         const events = data.data;
-        console.log(data);
         setItems(events);
         setLoading(false);
-        //setItems(response)
       } catch (error) {
         console.error("Error fetching data:", error);
       }

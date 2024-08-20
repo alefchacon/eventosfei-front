@@ -22,6 +22,10 @@ const useAxiosInterceptors = () => {
 
 
   client.interceptors.request.use(function (config) {
+    const token = localStorage.getItem('site');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     setIsLoading(true);
     return config;
   }, function (error) {

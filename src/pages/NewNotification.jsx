@@ -119,8 +119,6 @@ function NewNotification({ idUsuario, setTitle }) {
     useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  setTitle("Notificar");
-
   const noReservationMessage =
     "Para notificar un evento presencial o híbrido, primero debe contar con reservaciones de espacios aprobadas por administración, de lo contrario sólo podrá notificar eventos virtuales.";
 
@@ -189,15 +187,12 @@ function NewNotification({ idUsuario, setTitle }) {
     };
 
     getData();
+    setTitle("Notificar");
   }, []);
 
   const handleSubmitEvent = async () => {
-    try {
-      await StoreEvent(values);
-      setShowSuccessModal(true);
-    } catch (error) {
-      console.log(error);
-    }
+    await StoreEvent(values);
+    setShowSuccessModal(true);
   };
 
   async function getReservations() {
@@ -211,7 +206,6 @@ function NewNotification({ idUsuario, setTitle }) {
   }
 
   const handleChangeSteps = (newStep) => {
-    console.log(values);
     if (newStep > -1 && newStep < numSteps) {
       setCurrentStep(newStep);
     }
@@ -349,7 +343,7 @@ function NewNotification({ idUsuario, setTitle }) {
         onPrimaryClick={() => navigate("/reservar")}
         onClose={() => {
           setShowSuccessModal(false);
-          navigate("/calendario");
+          navigate("/");
         }}
         open={showSuccessModal}
         oneTimeOnly

@@ -152,11 +152,9 @@ export default function ReservationList(
         removeUserNotices(readReservations);
       }
     };
-    console.log("update");
     updateNotifications();
   }, [isLoading]);
 
-  console.log("ASDF");
   const handlePageChange = async (event, newPage) => {
     setCurrentPage(newPage);
   };

@@ -41,7 +41,6 @@ export function DialogProvider({ children }) {
   const DialogTypeForms = {};
 
   const showDialog = (title, type, handleSubmit, content) => {
-    console.log(type);
     setTitle(title);
     setType(type);
     setOnSubmit(handleSubmit);

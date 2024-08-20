@@ -72,12 +72,7 @@ export default function CardUser({ user, onUpdate }) {
         >
           Editar
         </Button>
-        <Button
-          size="medium"
-          color="error"
-          onClick={() => console.log(user)}
-          disabled={isEvaluated}
-        >
+        <Button size="medium" color="error" disabled={isEvaluated}>
           Eliminar
         </Button>
       </CardActions>

@@ -74,7 +74,6 @@ export default function NoticeList(
   };
 
   const handle = (FEIEvent) => {
-    console.log(FEIEvent);
     setSelectedFEIEvent(FEIEvent);
   };
 
@@ -120,14 +119,12 @@ export default function NoticeList(
         let response = [];
 
         let initialFilters = [`page=${currentPage}`, `${currentFilter}=true`];
-        console.log(initialFilters);
 
         if (idUsuario > 0) {
           initialFilters.push(`idUsuario[eq]=${idUsuario}`);
         }
 
         response = await GetNewEvents(initialFilters);
-        console.log(response);
 
         if (!response.status === 200) {
           throw new Error("Network response was not ok");

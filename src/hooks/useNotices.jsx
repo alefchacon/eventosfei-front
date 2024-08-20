@@ -20,7 +20,6 @@ export default function useNotices(idRol = 2) {
           notice.notifyAdministrator === 1 ? count + 1 : count,
         0
       );
-      console.log(_noticeAmount);
       setNoticeAmount(
         notices.reduce(
           (count, notice) =>
@@ -38,7 +37,6 @@ export default function useNotices(idRol = 2) {
   }, []);
 
   const decreaseNotices = async (a) => {
-    console.log(noticeAmount);
     setNoticeAmount(100);
   };
 
