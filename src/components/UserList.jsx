@@ -12,7 +12,6 @@ export default function UserList({ notifications }, { setSelectedFEIEvent }) {
   const [loading, setLoading] = useState(true);
 
   const handle = (FEIEvent) => {
-    console.log(FEIEvent);
     setSelectedFEIEvent(FEIEvent);
   };
 

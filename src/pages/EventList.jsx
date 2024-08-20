@@ -73,8 +73,6 @@ export default function Eventos(
       filters.push(`nombre=${searchQuery}`);
     }
 
-    console.log(filters);
-
     const response = await GetEvents(filters);
 
     return response;
@@ -122,7 +120,6 @@ export default function Eventos(
     if (!ready) {
       return;
     }
-    console.log("now");
     getEventsOnFilterChange();
   }, [currentPage, currentFilter, date, searchQuery]);
 

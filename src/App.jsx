@@ -52,9 +52,7 @@ function App(props) {
   const [currentSection, setCurrentSection] = React.useState("Calendario");
   const [selectedFEIEvent, setSelectedFEIEvent] = React.useState();
 
-  const { noticeAmount, decreaseNotices } = useNotices();
-
-  const [title, setTitle] = useState("Calendario");
+  const { noticeAmount, title, setTitle } = useNotices();
 
   const { user, token, logIn, logOut } = useAuth();
   const [isStaff, setIsStaff] = useState(
@@ -64,6 +62,7 @@ function App(props) {
   const [isAuthenticated, setIsAuthenticated] = React.useState(Boolean(user));
 
   useEffect(() => {
+    console.log(user);
     setIsAuthenticated(Boolean(user));
   }, []);
 
@@ -101,7 +100,6 @@ function App(props) {
           onLogOutClick={logOut}
           isAuthenticated={isAuthenticated}
           user={user}
-          title={title}
         ></Topbar>
 
         <Stack className="content" padding={{ xs: 0, md: 3 }}>
@@ -127,27 +125,24 @@ function App(props) {
             <Route
               path="/usuarios"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <Users />
                 </RouteGuard>
               }
             >
               {" "}
             </Route>
-            <Route
-              path="/calendario"
-              element={<EventCalendar setTitle={setTitle} />}
-            >
+            <Route path="/" element={<EventCalendar setTitle={setTitle} />}>
               {" "}
             </Route>
 
-            <Route path="/" element={<LogInPage></LogInPage>}>
+            <Route path="/entrar" element={<LogInPage></LogInPage>}>
               {" "}
             </Route>
             <Route
               path="/Notificaciones"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <NewNotification
                     idUsuario={user ? user.id : 0}
                     setTitle={setTitle}
@@ -168,7 +163,7 @@ function App(props) {
             <Route
               path="/reservar"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <ReservationForm
                     idUsuario={user ? user.id : null}
                     setTitle={setTitle}
@@ -181,7 +176,7 @@ function App(props) {
             <Route
               path="/reservaciones"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <ReservationList></ReservationList>
                 </RouteGuard>
               }
@@ -191,7 +186,7 @@ function App(props) {
             <Route
               path="/usuario"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <ProfilePage user={user} setTitle={setTitle}></ProfilePage>
                 </RouteGuard>
               }
@@ -201,7 +196,7 @@ function App(props) {
             <Route
               path="/test"
               element={
-                <RouteGuard isAuthenticated={isAuthenticated}>
+                <RouteGuard>
                   <ReportView />
                 </RouteGuard>
               }

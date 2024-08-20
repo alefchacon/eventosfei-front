@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import messages from './messages';
-import {alphanumericRegex} from './regexes';
+import {alphanumericRegex, emailRegex, uvEmailRegex} from './regexes';
 
 export const alphanumericSchema = yup
     .string()
@@ -12,7 +12,8 @@ export const numericSchema = yup
 
 export const emailSchema = yup
     .string()
-    .email(messages.email)
+    .matches(emailRegex, messages.email)
+    //.matches(emailRegex, messages.email)
 
 export const arraySchema = yup
     .array()

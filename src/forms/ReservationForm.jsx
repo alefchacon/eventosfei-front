@@ -210,7 +210,6 @@ export default function ReservationForm({
 
   useEffect(() => {
     setTitle("Reservar");
-    console.log(space);
   }, []);
 
   const submitReservation = async (values, actions) => {

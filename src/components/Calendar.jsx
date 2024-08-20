@@ -7,8 +7,6 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 import { Stack, Button, Typography, Fab, IconButton } from "@mui/material";
-import html2pdf from "html2pdf.js";
-import { Link, useNavigate } from "react-router-dom";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -20,8 +18,6 @@ import {
   DateLocalizer,
   momentLocalizer,
 } from "react-big-calendar";
-
-import AddIcon from "@mui/icons-material/Add";
 
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -41,6 +37,8 @@ import { modalidad } from "../validation/enums/modalidad.js";
 import ResponsiveDialog from "./ResponsiveDialog.jsx";
 
 import CustomFab from "./CustomFab.jsx";
+
+import useWindowSize from "../hooks/useWindowSize.jsx";
 
 moment.locale("es");
 const mLocalizer = momentLocalizer(moment);
@@ -127,6 +125,8 @@ export default function EventCalendar({
   const [showEventModal, setShowEventModal] = useState(false);
   const [view, setView] = useState(Views.MONTH);
 
+  const { width } = useWindowSize();
+
   useEffect(() => {
     setTitle("Calendario");
   }, []);
@@ -155,7 +155,7 @@ export default function EventCalendar({
   const filterEventsInDateRange = (slotInfo) => {
     let { start, end } = slotInfo;
 
-    if (slotInfo.userIsMobile) {
+    if (slotInfo.userIsMobile || slotInfo.singleEventClick) {
       start = moment(start);
       end = moment(start).add(1, "days");
     }
@@ -198,7 +198,10 @@ export default function EventCalendar({
     setSelectedDate(start);
     setSelectedEvents(eventsInDateRange);
 
-    setShowEventModal(slotInfo.userIsMobile);
+    const userIsMobile = slotInfo.userIsMobile || width < 900;
+    console.log(width < 900);
+
+    setShowEventModal(userIsMobile);
   };
 
   const getEvents = async () => {
@@ -303,7 +306,7 @@ export default function EventCalendar({
             view={view}
             onNavigate={handleNavigation}
             onSelectEvent={(FEIEvent) => {
-              FEIEvent.userIsMobile = true;
+              FEIEvent.singleEventClick = true;
               filterEventsInDateRange(FEIEvent);
             }}
             defaultDate={moment()}

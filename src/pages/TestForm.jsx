@@ -12,7 +12,6 @@ export default function TestForm() {
   const [files, setFiles] = useState([]);
 
   const submit = async () => {
-    console.log(files);
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
       formData.append(`archivos[${i}]`, files[i]);
@@ -22,7 +21,7 @@ export default function TestForm() {
     /*
 
     /*
-    THIS FUCKING WORKS !!!!!!
+    THIS WORKS !!!!!!
     const response = await fetch("http://localhost:8000/api/evidencias", {
       method: "POST",
       body: formData,
@@ -34,8 +33,6 @@ export default function TestForm() {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    console.log(response);
   };
 
   return (

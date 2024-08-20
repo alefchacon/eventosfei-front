@@ -31,9 +31,6 @@ export default function Users() {
   };
 
   const handleUpdateUser = (updatedUser) => {
-    console.log(updatedUser);
-    console.log(users);
-
     const newUsers = users.map((user) =>
       user.id === updatedUser.id ? updatedUser : user
     );

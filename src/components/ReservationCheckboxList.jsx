@@ -75,7 +75,6 @@ export default function CheckboxList({
       newChecked.splice(currentIndex, 1);
     }
 
-    console.log(newChecked);
     setChecked(newChecked);
     onClick(valueName, newChecked);
   };

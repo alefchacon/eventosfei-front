@@ -80,7 +80,6 @@ export default function UploadArea({ files, setFiles }) {
 
     try {
       const parsedFiles = await parsePickedFile(items);
-      console.log(parsedFiles);
 
       setFiles((oldFiles) => [...oldFiles, ...parsedFiles]);
     } catch (e) {
@@ -90,7 +89,6 @@ export default function UploadArea({ files, setFiles }) {
 
   function dragOverHandler(event) {
     event.preventDefault();
-    console.log("sasdf");
   }
 
   const handleDelete = async (fileToDelete) => {
@@ -108,10 +106,7 @@ export default function UploadArea({ files, setFiles }) {
         onDrop={handleDrop}
         onDragOver={dragOverHandler}
       >
-        <Stack
-          className="upload-button"
-          onDragLeave={() => console.log("rewq")}
-        >
+        <Stack className="upload-button">
           <Typography
             variant="caption"
             display={"flex"}

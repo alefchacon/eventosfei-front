@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
       setToken(token);
       client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      navigate("/calendario");
+      navigate("/");
     } catch (error) {
       console.error(error);
     }

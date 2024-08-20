@@ -16,7 +16,7 @@ export default function MultiUserForm({ onCancel, onSubmit }) {
         Seleccione un archivo .CSV para registrar múltiples usuarios.
       </Typography>
       <UserTable users={users}></UserTable>
-      <Button onClick={() => console.log(users)}>Reiniciar</Button>
+      <Button>Reiniciar</Button>
       <UploadButton onUpload={setUsers}></UploadButton>
       <Stack
         direction={"row"}

@@ -17,16 +17,18 @@ import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 
 import { useAuth } from "../providers/AuthProvider";
+import { useNotices } from "../providers/NoticeProvider";
 
 export default function Topbar({
   noticeAmount = 0,
-  title = "Calendario",
   onLogOutClick,
   onMenuIconClick,
 }) {
   const { user } = useAuth();
   const { isLoading } = useIsLoading();
   const navigate = useNavigate();
+
+  const { title } = useNotices();
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -149,7 +151,7 @@ export default function Topbar({
               <Button
                 variant="contained"
                 disableElevation
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/entrar")}
               >
                 Entrar
               </Button>

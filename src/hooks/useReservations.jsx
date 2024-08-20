@@ -19,6 +19,5 @@ export default function useReservations(start, end) {
     fetchData(start, end);
   }, [start, end]);
 
-  console.log(reservations);
   return reservations;
 }

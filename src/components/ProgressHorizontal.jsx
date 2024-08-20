@@ -45,7 +45,6 @@ export default function Progress({
         value: i,
       });
     }
-    console.log(marks);
     setSteps(marks);
   }, []);
 

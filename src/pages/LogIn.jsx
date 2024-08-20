@@ -41,12 +41,7 @@ export default function LogInPage({ onLoginIn }) {
   const { logIn } = useAuth();
 
   const onSubmit = async (values, actions) => {
-    try {
-      console.log("asdf");
-      const response = await logIn(values);
-    } catch (error) {
-      console.log(error);
-    }
+    const response = await logIn(values);
   };
 
   const {
