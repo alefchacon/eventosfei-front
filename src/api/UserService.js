@@ -23,13 +23,13 @@ export const LogIn = async (credentials) => {
     password: credentials.password,
   };
 
-  const response = await client.post(`http://${backendUrl}/api/login`,requestData);
+  const response = await client.post(`${backendUrl}/api/login`,requestData);
 
   return response;
 };
   
 export const LogOut = async () => {
-  const response = await client.post(`http://${backendUrl}/api/logout`)
+  const response = await client.post(`${backendUrl}/api/logout`)
   return response;
 }
 
