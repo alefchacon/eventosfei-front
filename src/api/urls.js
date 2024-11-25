@@ -1,6 +1,6 @@
 
-export const backendUrl = 'http://localhost:8000';
-//export const backendUrl = 'https://seabackaucd.space';
+//export const backendUrl = 'http://localhost:8000';
+export const backendUrl = 'https://seabackaucd.space';
 export const urlLogin = "/api/fuck/";
 export const urlVerifyToken = "/api/token/verify/";
 
