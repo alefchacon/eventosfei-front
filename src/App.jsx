@@ -93,7 +93,7 @@ function App(props) {
         setMobileOpen={setMobileOpen}
       />
 
-      <Stack direction={"column"} width={"100%"}>
+      <Stack direction={"column"} width={"100%"} about="testing deployment">
         <Topbar
           noticeAmount={noticeAmount}
           onMenuIconClick={handleDrawerToggle}
