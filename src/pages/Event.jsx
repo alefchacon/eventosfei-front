@@ -33,9 +33,8 @@ import { estado } from "../validation/enums/estado.js";
 import { stringConstants } from "../validation/enums/stringConstants.js";
 
 import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
-
+import UploadArea from "../components/UploadArea.jsx";
 import InfoItem from "../components/InfoItem.jsx";
-
 export default function Event({ setTitle, notice }) {
   const [FEIEvent, setEvent] = useState(null);
   const [cronogram, setCronogram] = useState(null);
@@ -281,6 +280,20 @@ export default function Event({ setTitle, notice }) {
     );
   }
 
+  const [files, setFiles] = useState([]);
+  const uploadPublicityButton = (
+    <>
+
+    <UploadArea files={files} setFiles={setFiles}></UploadArea>
+    <br></br>
+    <Button variant="contained" onClick={() => {
+      setPublicity(files)
+      
+      
+    }}>Subir publicidad</Button>
+    </>
+  )
+
   return (
     <>
       {false && (
@@ -289,11 +302,11 @@ export default function Event({ setTitle, notice }) {
         </Stack>
       )}
 
+          
       {FEIEvent && (
         <CustomTabs>
           {showEvaluation(FEIEvent)}
           {showResponse(FEIEvent)}
-
           <div label="Organizador">
             <Typography variant="h5">Información del organizador</Typography>
             <InfoItem
@@ -439,7 +452,7 @@ export default function Event({ setTitle, notice }) {
               <Stack alignItems={"center"} gap={2}>
                 <Typography color={"text.secondary"}>
                   {fetchedPublicity
-                    ? "Sin publicidad"
+                    ? uploadPublicityButton
                     : "Obteniendo publicidad..."}
                 </Typography>
               </Stack>
