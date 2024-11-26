@@ -52,7 +52,7 @@ export default function Topbar({
         color="inherit"
         onClick={() => navigate("/avisos")}
       >
-        <Badge badgeContent={noticeAmount} color="error">
+        <Badge badgeContent={3} color="error">
           <NotificationsIcon />
         </Badge>
       </IconButton>
