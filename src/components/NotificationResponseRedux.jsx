@@ -32,7 +32,7 @@ import "../App.css";
 import { estado } from "../validation/enums/estado.js";
 import { stringConstants } from "../validation/enums/stringConstants.js";
 import { idRol } from "../validation/enums/idRol.js";
-
+import { useDialog } from "../providers/DialogProvider.jsx";
 export default function NotificationResponse({
   children,
   idAviso,
@@ -44,6 +44,7 @@ export default function NotificationResponse({
   const { showSnackbar } = useSnackbar();
   const { decreaseNotices, markAsRead } = useNotices();
   const { user } = useAuth();
+  const {closeDialog} = useDialog();
 
   const submitResponse = async (values) => {
     try {
@@ -57,6 +58,7 @@ export default function NotificationResponse({
   };
 
   async function chooseSubmitType() {
+    
     if (type === "event") {
       return await UpdateEvent(values, idAviso);
     }

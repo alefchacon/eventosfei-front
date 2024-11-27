@@ -31,10 +31,11 @@ import CustomFab from "../components/CustomFab.jsx";
 import ReportView from "./ReportView.jsx";
 
 import { showIfBig, showIfSmall } from "../validation/enums/breakpoints.js";
-
+import { getEventReport } from "../api/EventService.js";
 import ResponsiveDialog from "../components/ResponsiveDialog.jsx";
 import { idRol } from "../validation/enums/idRol.js";
-
+import axios from "axios";
+import { backendUrl } from "../api/urls.js";
 export default function Eventos(
   { notifications, handleGet, idUsuario = 0, setTitle, user },
   { setSelectedFEIEvent }
@@ -190,6 +191,7 @@ export default function Eventos(
           sx={{ flexGrow1: 1 }}
           label={"Buscar por mes"}
           views={["month", "year"]}
+          onMonthChange={(date) => setDate(date)}
           onYearChange={(date) => setDate(date)}
           value={date}
         />
@@ -222,10 +224,22 @@ export default function Eventos(
   const [reportEvents, setReportEvents] = useState({});
 
   const generateReport = async () => {
+    //const start = date.format("YYYY-MM-DD");
+    //const end = date.clone().add(1, "month").subtract(1, "day").format("YYYY-MM-DD");
+
+    console.log(await getEventReport(date));
+
+    /*
+    const dateCopy = date.clone();
+    console.log(dateCopy.format("YYYY-MM-DD"));
+    console.log(dateCopy.add(1, "month").subtract(1, "day").format("YYYY-MM-DD"))
+    */
+    /*
     showSnackbar("Obteniendo evidencias y generando el reporte...", "asdf");
     const response = await getFilteredEvents(true);
     setReportEvents(response.data.data);
     toggleReportGeneration();
+    */
   };
 
   const toggleReportGeneration = () => setGeneratingPDF(!generatingPDF);

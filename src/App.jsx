@@ -56,7 +56,7 @@ function App(props) {
 
   const { user, token, logIn, logOut } = useAuth();
   const [isStaff, setIsStaff] = useState(
-    user ? user.rol.id > idRol.ORGANIZADOR : false
+    user ? user?.rol?.id > idRol.ORGANIZADOR : false
   );
 
   const [isAuthenticated, setIsAuthenticated] = React.useState(Boolean(user));
