@@ -10,7 +10,7 @@ import {
 import { client } from "./Client";
 
 import moment from "moment";
-import packageInfo from '../package.json';
+
 
 const filters = {
   porFechaEnvio: "&porFechaEnvio=true",
