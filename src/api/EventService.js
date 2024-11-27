@@ -8,11 +8,54 @@ import {
   urlResponses
 } from "./urls.js";
 import { client } from "./Client";
+
 import moment from "moment";
+import packageInfo from '../package.json';
 
 const filters = {
   porFechaEnvio: "&porFechaEnvio=true",
   porAlfabetico: "&porAlfabetico=true",
+}
+
+export const getEventReport = async (month = moment()) => {
+  //downloadReport()
+  mockDownloadReport();
+  
+} 
+
+const downloadReport = (response) => {
+  const start = month.format("YYYY-MM-DD");
+  const end = month.clone().add(1, "month").subtract(1, "day").format("YYYY-MM-DD");
+  client.get(`/eventos/reporte?fechaInicio=${start}&fechaFin=${end}`, {responseType: "blob"})
+        .then(response => downloadFile(
+          URL.createObjectURL(response.data), 
+          getReportFilename(response)
+        ))
+  client.get(`/evidencias/reporte?fechaInicio=${start}&fechaFin=${end}`, {responseType: "blob"})
+      .then(response => downloadFile(
+        URL.createObjectURL(response.data), 
+        getReportFilename(response)
+      ))
+}
+
+const mockDownloadReport = () => {
+  downloadFile("https://alefchacon.github.io/eventosfei-front/reportesEventos.pdf", "reportesEventos.pdf");
+  downloadFile("https://alefchacon.github.io/eventosfei-front/reportesEvidencias.pdf", "reportesEvidencias.pdf");
+}
+
+function downloadFile(filePath, fileName) {
+  const link = document.createElement('a');
+  link.href = filePath; // File URL
+  link.download = fileName; // Desired file name
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); // Cleanup
+}
+
+const getReportFilename = (response) => {
+  const contentDisposition = response.headers['content-disposition'];
+  const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+  return filenameMatch ? filenameMatch[1] : 'default-filename.pdf';
 }
 
 export const GetEventsByMonth = async (date) => {

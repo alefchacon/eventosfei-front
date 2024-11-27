@@ -133,7 +133,7 @@ export default function Sidebar({
             {nonAuthOptions}
             {user && authOptions}
             <Divider />
-            {user?.rol.id === idRol.COORDINADOR && coordinatorOptions}
+            {user?.rol?.id === idRol.COORDINADOR && coordinatorOptions}
           </List>
           <Divider />
         </Stack>

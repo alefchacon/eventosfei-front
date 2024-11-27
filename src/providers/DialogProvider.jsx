@@ -56,13 +56,17 @@ export function DialogProvider({ children }) {
     if (reason === "clickaway") {
       return;
     }
+    closeDialog();
+  };
+
+  const closeDialog = () => {
     setTitle("");
     setContent(null);
     setOpen(false);
-  };
+  }
 
   return (
-    <DialogContext.Provider value={{ showDialog }}>
+    <DialogContext.Provider value={{ showDialog, closeDialog }}>
       {children}
       <Box
         sx={{
